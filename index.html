@@ -1,0 +1,1647 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Warka Furniture — solid hardwood, made to order in Addis Ababa</title>
+<meta name="description" content="Warka Furniture builds solid hardwood furniture to order in Kebena, Addis Ababa. Four weeks, delivered and levelled.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..700;1,62..125,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0A0A0A;
+  --void-2:#141414;
+  --ghost:rgba(255,255,255,.07);
+  --bone:#F2F0EA;
+  --mute:#8A8781;
+  --ember:#E2542C;
+  --line:rgba(242,240,234,.12);
+  --pale:#E7E5DF;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:auto}
+body{
+  margin:0;background:var(--void);color:var(--bone);
+  font-family:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-size:15px;line-height:1.55;font-weight:400;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ember);outline-offset:3px}
+
+/* ---------- type ---------- */
+.dsp{
+  font-family:'Archivo',sans-serif;font-weight:700;font-stretch:125%;
+  text-transform:uppercase;letter-spacing:-.02em;line-height:.86;margin:0;
+}
+.mic{
+  font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--mute);display:inline-block;
+}
+.mic.em{color:var(--ember)}
+h2.sec-t{font-size:clamp(34px,6.4vw,86px)}
+p{margin:0 0 14px}
+.lede{color:var(--mute);font-size:15px;max-width:46ch}
+
+/* ---------- loader ---------- */
+#load{position:fixed;top:0;left:0;right:0;height:2px;z-index:120;transition:opacity .4s ease;pointer-events:none}
+#load i{display:block;height:100%;width:0%;background:var(--ember);transition:width .28s ease}
+#load.done{opacity:0}
+
+/* ---------- nav ---------- */
+.nav{
+  position:fixed;top:0;left:0;right:0;height:60px;z-index:60;
+  display:flex;align-items:center;gap:24px;padding:0 22px;
+  border-bottom:1px solid transparent;background:transparent;
+  transition:background .28s ease,border-color .28s ease;
+}
+.nav.solid{background:var(--void-2);border-bottom-color:var(--line)}
+.brand{
+  font-family:'Archivo',sans-serif;font-weight:700;font-stretch:118%;
+  text-transform:uppercase;letter-spacing:.02em;font-size:15px;text-decoration:none;
+}
+.nav-links{display:flex;gap:22px;margin-left:8px}
+.nav-links a{font-size:13px;color:var(--mute);text-decoration:none;transition:color .18s}
+.nav-links a:hover{color:var(--bone)}
+.btn{
+  display:inline-block;border:1px solid var(--line);background:transparent;color:var(--bone);
+  font:inherit;font-size:13px;font-weight:500;padding:9px 18px;border-radius:1px;
+  text-decoration:none;cursor:pointer;transition:border-color .18s,color .18s;
+}
+.btn:hover{border-color:var(--bone)}
+.btn-ember{background:var(--ember);border-color:var(--ember);color:#fff}
+.btn-ember:hover{border-color:var(--ember);filter:brightness(1.08)}
+.nav .btn{margin-left:auto}
+
+/* ---------- hero ---------- */
+#probe{position:absolute;top:0;left:0;width:1px;height:100vh;height:100svh;pointer-events:none;visibility:hidden}
+.hero{position:relative}
+.hero-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.ghost{position:absolute;inset:0;display:grid;place-items:center;z-index:0;pointer-events:none;padding:0 12px}
+.ghost span{
+  position:absolute;color:var(--ghost);font-size:clamp(56px,13vw,190px);
+  white-space:nowrap;opacity:0;transition:opacity .17s linear;will-change:transform,opacity;
+}
+#stage{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:pan-y}
+#stage:focus-visible{outline:2px solid var(--ember);outline-offset:-4px}
+.hero-meta{position:absolute;left:0;right:0;bottom:0;z-index:4;padding:0 26px 30px;pointer-events:none}
+.meta-layer{
+  position:absolute;left:26px;right:26px;bottom:30px;max-width:min(520px,78vw);
+  opacity:0;transition:opacity .17s linear;pointer-events:none;
+}
+.meta-layer.on{opacity:1;pointer-events:auto}
+.meta-head{display:flex;align-items:baseline;gap:14px;margin-bottom:7px}
+.meta-head .rule{flex:1;height:1px;background:var(--line);transform:translateY(-4px)}
+.meta-head .lab{font-size:13px;font-weight:500;letter-spacing:.02em}
+.meta-cap{font-size:14px;color:var(--mute);margin:0;max-width:44ch}
+.meta-layer .btn{margin-top:16px}
+.scroll-hint{
+  position:absolute;right:26px;bottom:34px;z-index:4;
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);
+  transition:opacity .3s ease;
+}
+
+/* ---------- marquee ---------- */
+.marquee{overflow:hidden;background:#000;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0}
+.mq-track{display:flex;width:max-content;animation:mq 44s linear infinite}
+.mq-track span{
+  font-family:'Archivo',sans-serif;font-weight:700;font-stretch:112%;text-transform:uppercase;
+  font-size:clamp(20px,3.1vw,40px);letter-spacing:-.01em;white-space:nowrap;padding-right:26px;
+}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- generic sections ---------- */
+.sec{padding:clamp(70px,10vw,130px) 24px}
+.wrap{max-width:1280px;margin:0 auto}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;margin-bottom:46px}
+.band-void2{background:var(--void-2)}
+
+/* four columns */
+.cols4{display:grid;grid-template-columns:repeat(4,1fr)}
+.cols4 > div{padding:0 26px;border-left:1px solid var(--line)}
+.cols4 > div:first-child{padding-left:0;border-left:0}
+.cols4 h3{font-size:19px;font-weight:500;margin:0 0 10px;letter-spacing:-.01em}
+.cols4 p{font-size:14px;color:var(--mute);margin:0}
+
+/* ---------- horizontal explode band ---------- */
+.band{position:relative;background:var(--pale);color:#141414;padding:clamp(70px,9vw,110px) 24px clamp(40px,6vw,64px);overflow:hidden}
+.band .mic{color:#6E6A62}
+.band-side{max-width:210px;font-size:12.5px;line-height:1.5;color:#3A3833;margin-bottom:18px}
+.band-side p{margin:8px 0 0}
+.band-stage{position:relative;height:220px;margin:0 -8px}
+#stage2{position:absolute;inset:0;width:100%;height:100%;display:block}
+.band-labels{display:grid;margin:14px -8px 0}
+.band-labels div{text-align:center;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6E6A62}
+.band-labels b{display:block;color:#141414;font-weight:500;letter-spacing:.02em;text-transform:none;font-size:13px;margin-top:3px}
+
+/* ---------- pull quote ---------- */
+.quote{padding:clamp(80px,12vw,150px) 24px;text-align:center}
+.quote blockquote{
+  margin:0 auto;max-width:16ch;font-family:'Instrument Serif',Georgia,serif;font-style:italic;
+  font-size:clamp(32px,6.6vw,76px);line-height:1.06;letter-spacing:-.01em;font-weight:400;
+}
+.quote .mic{margin-top:26px}
+
+/* ---------- woods ---------- */
+.woods{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
+.wood{background:var(--void);padding:0 0 30px;border:0;text-align:left;font:inherit;color:inherit;cursor:pointer;position:relative}
+.wood .bar{height:60px;display:block;width:100%}
+.wood .body{display:block;padding:20px 24px 0}
+.wood .wnm{display:block;margin:0 0 6px;font-size:22px;font-weight:500;letter-spacing:-.01em}
+.wood .wp{display:block;font-size:14px;color:var(--mute);max-width:34ch}
+.wood .state{position:absolute;top:76px;right:24px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:transparent}
+.wood[aria-pressed="true"] .state{color:var(--ember)}
+
+/* ---------- range ---------- */
+.range{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.piece{
+  background:var(--void);border:0;font:inherit;color:inherit;text-align:left;cursor:pointer;
+  padding:26px 24px 28px;display:flex;flex-direction:column;gap:6px;min-height:150px;
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  transition:background .2s ease;
+}
+.piece:hover{background:var(--void-2)}
+.piece .nm{font-size:19px;font-weight:500;letter-spacing:-.01em}
+.piece .pr{font-size:14px;color:var(--mute)}
+.piece .act{margin-top:auto;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.piece[aria-current="true"] .act{color:var(--ember)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:56px}
+.dl{display:grid;grid-template-columns:130px 1fr;gap:12px 20px;font-size:14px;border-top:1px solid var(--line);padding-top:22px}
+.dl dt{color:var(--mute);margin:0}
+.dl dd{margin:0}
+.dl a{text-decoration:none;border-bottom:1px solid var(--line)}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:36px 24px 44px;color:var(--mute);font-size:13px}
+.foot-grid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-end}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .cols4{grid-template-columns:repeat(2,1fr);row-gap:38px}
+  .cols4 > div:nth-child(3){padding-left:0;border-left:0}
+  .woods,.range{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr;gap:34px}
+  .band-side{position:static;max-width:none}
+}
+@media (max-width:620px){
+  .nav-links{display:none}
+  .cols4{grid-template-columns:1fr}
+  .cols4 > div{padding-left:0;border-left:0}
+  .hero-meta{padding:0}
+  .meta-layer{
+    left:0;right:0;bottom:0;max-width:none;padding:64px 20px 26px;
+    background:linear-gradient(to top,rgba(10,10,10,.94) 42%,rgba(10,10,10,0));
+  }
+  .scroll-hint{display:none}
+  .band-labels div{font-size:10px;letter-spacing:.06em}
+  .band-labels b{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){
+  .mq-track{animation:none}
+}
+</style>
+</head>
+<body>
+<div id="load" aria-hidden="true"><i></i></div>
+<div id="probe" aria-hidden="true"></div>
+
+<nav class="nav" id="nav">
+  <a class="brand" href="#top">Warka</a>
+  <div class="nav-links">
+    <a href="#range">Pieces</a>
+    <a href="#woods">Woods</a>
+    <a href="#workshop">Workshop</a>
+    <a href="#visit">Visit</a>
+  </div>
+  <a class="btn btn-ember" href="#visit">Order</a>
+</nav>
+
+<main id="top">
+
+  <section class="hero" id="hero">
+    <div class="hero-sticky">
+      <div class="ghost" aria-hidden="true">
+        <span class="dsp" id="gA"></span>
+        <span class="dsp" id="gB"></span>
+      </div>
+      <canvas id="stage" tabindex="0" role="img"
+        aria-label="Three-dimensional view of the Meda lounge chair. Scrolling separates it into cushion, seat, back, rails and legs. Drag or use the arrow keys to turn it."></canvas>
+      <div class="hero-meta">
+        <div class="meta-layer" id="mA"></div>
+        <div class="meta-layer" id="mB"></div>
+      </div>
+      <div class="scroll-hint" id="hint">Scroll</div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="mq-track" id="mq"></div>
+  </div>
+
+  <section class="sec band-void2" id="workshop">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="dsp sec-t">How it is made</h2>
+        <span class="mic">Kebena, Addis Ababa</span>
+      </div>
+      <div class="cols4">
+        <div>
+          <h3>Dried a year</h3>
+          <p>Air-dried before anything is cut, so joints stay tight through the dry season.</p>
+        </div>
+        <div>
+          <h3>Cut to one joint</h3>
+          <p>Every mortise is marked to its own tenon. Parts are not interchangeable, on purpose.</p>
+        </div>
+        <div>
+          <h3>Oiled, not lacquered</h3>
+          <p>Four coats of hardwax oil. Scratches spot-repair instead of needing a full refinish.</p>
+        </div>
+        <div>
+          <h3>Four weeks</h3>
+          <p>From order to your floor, delivered and levelled anywhere in Addis.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="band">
+    <div class="wrap">
+      <div class="band-side">
+        <span class="mic" id="bandCount">Five parts</span>
+        <p id="bandBlurb">Laid out left to right in the order they are cut. Same scale, no screws between them.</p>
+      </div>
+      <div class="band-stage" id="bandStage">
+        <canvas id="stage2" role="img" aria-label="The same chair with its parts laid out in a row, left to right, at the same scale."></canvas>
+      </div>
+      <div class="band-labels" id="bandLabels"></div>
+    </div>
+  </section>
+
+  <section class="quote">
+    <blockquote>A chair is twelve joints agreeing to hold still.</blockquote>
+    <span class="mic">Tesfaye, bench two</span>
+  </section>
+
+  <section class="sec" id="woods">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="dsp sec-t">The woods</h2>
+        <span class="mic">Pick one to see it on the chair</span>
+      </div>
+      <div class="woods" id="woodList"></div>
+    </div>
+  </section>
+
+  <section class="sec band-void2" id="range">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="dsp sec-t">The range</h2>
+        <span class="mic">Pick one to load it into the view above</span>
+      </div>
+      <div class="range" id="rangeList"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="visit">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="dsp sec-t">Visit the workshop</h2>
+      </div>
+      <div class="visit-grid">
+        <div>
+          <p class="lede">Come and sit in one before you order. The benches run Tuesday to Saturday, and there is usually a chair part-built on the far bench you can pick up and look at.</p>
+          <p class="lede">Orders are taken in person, by mail or by phone. Half up front, half on delivery.</p>
+          <a class="btn" href="mailto:hello@warka.et?subject=Order%20-%20Meda%20lounge%20chair">Mail an order</a>
+        </div>
+        <dl class="dl">
+          <dt>Workshop</dt><dd>Kebena, Addis Ababa</dd>
+          <dt>Open</dt><dd>Tuesday to Saturday, 9 to 6</dd>
+          <dt>Mail</dt><dd><a href="mailto:hello@warka.et">hello@warka.et</a></dd>
+          <dt>Phone</dt><dd><a href="tel:+251110000000">+251 11 000 0000</a></dd>
+          <dt>Lead time</dt><dd>Four weeks, delivered and levelled</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap foot-grid">
+      <div>
+        <p style="margin:0 0 4px;color:var(--bone)">Warka Furniture</p>
+        <p style="margin:0">Warka is the sycamore fig, the tree a village meets under.</p>
+      </div>
+      <div style="text-align:right">
+        <p style="margin:0">Solid hardwood, made to order.</p>
+        <p style="margin:0">Prices in Ethiopian Birr.</p>
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var T = window.THREE;
+
+/* =====================================================================
+   1. DATA
+   ===================================================================== */
+
+var WOODS = {
+  wanza: {
+    key:'wanza', name:'Wanza', swatch:'#A9733F',
+    base:'#96602C', dark:'#57330F', light:'#C08A4C', knot:'#452508',
+    copy:'Cuts warm honey and darkens a shade every year it stands in a room. Soft enough to carve, hard enough to sit on.'
+  },
+  zigba: {
+    key:'zigba', name:'Zigba', swatch:'#C9AC80',
+    base:'#B99A6B', dark:'#8A6B3D', light:'#DCC49C', knot:'#7A5C30',
+    copy:'Pale, with grain so even it nearly disappears. Takes oil without blotching, so it stays light.'
+  },
+  weyra: {
+    key:'weyra', name:'Weyra', swatch:'#5E4229',
+    base:'#52371F', dark:'#22140A', light:'#8E6739', knot:'#1C1006',
+    copy:'Dense olive wood, dark streaks running through a paler ground. Slow to work, and about a third more.'
+  }
+};
+
+var PIECES = [
+  { id:'meda', name:'Meda lounge chair', price:'Br 14,500', build:'meda',
+    open:'CUT BY HAND', close:'TWELVE JOINTS',
+    intro:'Meda lounge chair. Br 14,500. Scroll to take it apart.',
+    outro:'No screws in the frame. Four weeks, delivered and levelled.',
+    parts:[
+      {key:'cushion', word:'CUSHION', lab:'The cushion', cap:'Handspun cotton over coir. Lifts off for washing, no zips.', az:28,  el:52, pad:1.75},
+      {key:'seat',    word:'SEAT',    lab:'The seat',    cap:'Three boards edge-glued so the grain runs the same way, then hollowed by hand.', az:38, el:34, pad:1.5},
+      {key:'back',    word:'BACK',    lab:'The back',    cap:'Posts steam-bent over a form, left a week to set. Sixteen degrees of lean.', az:152, el:18, pad:1.42},
+      {key:'rails',   word:'RAILS',   lab:'The rails',   cap:'Each mortise is cut to one leg and marked. Parts are not interchangeable.', az:88, el:7, pad:1.05},
+      {key:'legs',    word:'LEGS',    lab:'The legs',    cap:'One billet each, 42 mm at the joint down to 26 mm at the floor. Wedged tenons.', az:30, el:5, pad:1.15}
+    ]},
+  { id:'sheger', name:'Sheger dining table', price:'Br 42,000', build:'table',
+    open:'ONE SLAB', close:'SIX SEATS',
+    intro:'Sheger dining table. Br 42,000. Scroll to take it apart.',
+    outro:'Seats six without anyone straddling a leg. Four weeks, delivered and levelled.',
+    parts:[
+      {key:'top',       word:'TOP',        lab:'The top',        cap:'Five boards, 40 mm, edge-glued and flattened with a plane rather than a sander.', az:26, el:50, pad:1.55},
+      {key:'aprons',    word:'APRONS',     lab:'The aprons',     cap:'Deep enough to stop the top cupping, shallow enough to get your knees under.', az:34, el:20, pad:1.5},
+      {key:'stretchers',word:'STRETCHERS', lab:'The stretchers', cap:'Two low rails down the length. They take the shove when six people stand up at once.', az:92, el:8, pad:1.15},
+      {key:'legs',      word:'LEGS',       lab:'The legs',       cap:'One billet each, tapered from 56 mm at the apron down to 34 mm at the floor.', az:30, el:5, pad:1.2}
+    ]},
+  { id:'awash', name:'Awash bench', price:'Br 38,000', build:'bench',
+    open:'SIT THREE', close:'ONE PLANK',
+    intro:'Awash bench. Br 38,000. Scroll to take it apart.',
+    outro:'One plank across, no join down the middle. Four weeks, delivered and levelled.',
+    parts:[
+      {key:'seat',  word:'SEAT',  lab:'The seat',  cap:'A single 1.8 metre board, 45 mm thick, dished slightly where people sit.', az:28, el:46, pad:1.55},
+      {key:'back',  word:'BACK',  lab:'The back',  cap:'Three slats on through-tenons you can see from behind. Nothing is hidden.', az:150, el:20, pad:1.45},
+      {key:'rails', word:'RAILS', lab:'The rails', cap:'Long rails run the full span and are drawbored, so the joint pulls tighter with age.', az:90, el:8, pad:1.15},
+      {key:'legs',  word:'LEGS',  lab:'The legs',  cap:'Splayed six degrees each way. A bench that gets sat on sideways needs the spread.', az:32, el:5, pad:1.2}
+    ]},
+  { id:'adama', name:'Adama armchair', price:'Br 19,400', build:'armchair',
+    open:'TWO ARMS', close:'FIFTEEN JOINTS',
+    intro:'Adama armchair. Br 19,400. Scroll to take it apart.',
+    outro:'Fifteen joints, no screws in the frame. Four weeks, delivered and levelled.',
+    parts:[
+      {key:'cushion', word:'CUSHION', lab:'The cushion', cap:'Coir under cotton, firmer than the Meda because you sit more upright in it.', az:28, el:52, pad:1.75},
+      {key:'seat',    word:'SEAT',    lab:'The seat',    cap:'Narrower than the lounge chair by 40 mm so it pulls in to a table.', az:38, el:34, pad:1.5},
+      {key:'arms',    word:'ARMS',    lab:'The arms',    cap:'Cut from one piece so the grain turns the corner instead of meeting end-on.', az:64, el:26, pad:1.5},
+      {key:'back',    word:'BACK',    lab:'The back',    cap:'Twelve degrees of lean. Upright enough to eat in, slack enough to stay for coffee.', az:152, el:18, pad:1.45},
+      {key:'legs',    word:'LEGS',    lab:'The legs',    cap:'Front legs run up into the arm. The joint at the top is the whole chair.', az:30, el:5, pad:1.55}
+    ]},
+  { id:'omo', name:'Omo dining chair', price:'Br 8,900', build:'diningchair',
+    open:'STACK SIX', close:'EIGHT JOINTS',
+    intro:'Omo dining chair. Br 8,900. Scroll to take it apart.',
+    outro:'Eight joints and 4.1 kilos. Four weeks, delivered and levelled.',
+    parts:[
+      {key:'seat',  word:'SEAT',  lab:'The seat',  cap:'Saddled with a scorp until your hand stops finding a ridge. About forty minutes each.', az:30, el:48, pad:1.6},
+      {key:'back',  word:'BACK',  lab:'The back',  cap:'One bent lath across two posts. It takes the whole weight of a lean.', az:150, el:20, pad:1.5},
+      {key:'rails', word:'RAILS', lab:'The rails', cap:'Round tenons, hammered in dry into damp legs so they lock as they meet.', az:90, el:9, pad:1.15},
+      {key:'legs',  word:'LEGS',  lab:'The legs',  cap:'Turned from one billet. 34 mm at the seat, 22 mm at the floor.', az:30, el:5, pad:1.2}
+    ]},
+  { id:'kesem', name:'Kesem floor lamp', price:'Br 9,800', build:'lamp',
+    open:'ONE POLE', close:'READS WARM',
+    intro:'Kesem floor lamp. Br 9,800. Scroll to take it apart.',
+    outro:'Wired for E27, cloth flex, switch on the cord. Four weeks, delivered and levelled.',
+    parts:[
+      {key:'shade',  word:'SHADE',  lab:'The shade',  cap:'Cotton over a steel ring. Open top, so it throws light at the ceiling as well.', az:26, el:36, pad:1.7},
+      {key:'collar', word:'COLLAR', lab:'The collar', cap:'Turned from one offcut. It holds the shade and hides the lampholder.', az:40, el:22, pad:1.9},
+      {key:'stem',   word:'STEM',   lab:'The stem',   cap:'1.5 metres of one billet, drilled end to end for the flex before it is turned.', az:34, el:10, pad:1.35},
+      {key:'base',   word:'BASE',   lab:'The base',   cap:'Six kilos of wood. Heavy enough that a dog walking past does not take it down.', az:30, el:8, pad:1.7}
+    ]},
+  { id:'bale', name:'Bale sideboard', price:'Br 52,000', build:'sideboard',
+    open:'PUT IT AWAY', close:'FOUR WEEKS',
+    intro:'Bale sideboard. Br 52,000. Scroll to take it apart.',
+    outro:'Runs on wooden slides, no metal runners to fail. Four weeks, delivered and levelled.',
+    parts:[
+      {key:'top',     word:'TOP',     lab:'The top',     cap:'Overhangs 20 mm on three sides so a wet glass never sits over the door gap.', az:26, el:48, pad:1.5},
+      {key:'doors',   word:'DOORS',   lab:'The doors',   cap:'Two frames with floating panels, so the panel can move and the door stays square.', az:18, el:14, pad:1.5},
+      {key:'carcass', word:'CARCASS', lab:'The carcass', cap:'Dovetailed at all four corners. You can see the tails from the end of the room.', az:44, el:16, pad:1.4},
+      {key:'legs',    word:'LEGS',    lab:'The legs',    cap:'Short and set in from the corner, so the box reads as floating rather than standing.', az:30, el:6, pad:1.25}
+    ]}
+];
+
+/* =====================================================================
+   2. TEXTURE GENERATION
+   ===================================================================== */
+
+function hexToRgb(h){
+  h = h.replace('#','');
+  return [parseInt(h.substr(0,2),16), parseInt(h.substr(2,2),16), parseInt(h.substr(4,2),16)];
+}
+function mixHex(a,b,t){
+  var A = hexToRgb(a), B = hexToRgb(b);
+  return 'rgb(' + Math.round(A[0]+(B[0]-A[0])*t) + ',' +
+                  Math.round(A[1]+(B[1]-A[1])*t) + ',' +
+                  Math.round(A[2]+(B[2]-A[2])*t) + ')';
+}
+function rnd(a,b){ return a + Math.random()*(b-a); }
+
+// Broad cathedral figure, then fine grain, then a few knots.
+function woodCanvas(w){
+  var S = 1024;
+  var c = document.createElement('canvas'); c.width = c.height = S;
+  var g = c.getContext('2d', { willReadFrequently: true });
+  g.fillStyle = w.base; g.fillRect(0,0,S,S);
+
+  // 70 wide wavy strokes — the cathedral figure
+  for(var i=0;i<70;i++){
+    var y0 = (i/70)*S + rnd(-7,7);
+    var t = Math.random();
+    g.strokeStyle = t < 0.5 ? mixHex(w.base, w.dark, rnd(0.25,0.85)) : mixHex(w.base, w.light, rnd(0.2,0.75));
+    g.globalAlpha = rnd(0.13,0.40);
+    g.lineWidth = rnd(4,20);
+    g.lineCap = 'round';
+    var amp = rnd(4,17), ph = Math.random()*6.283, fq = 1 + Math.floor(Math.random()*2);
+    g.beginPath(); g.moveTo(-24, y0);
+    for(var x=-24;x<=S+24;x+=14){
+      g.lineTo(x, y0 + Math.sin(x/S*fq*6.283 + ph)*amp + Math.sin(x/S*3*6.283 + ph*2)*2.2);
+    }
+    g.stroke();
+  }
+
+  // 420 fine grain lines
+  for(var j=0;j<420;j++){
+    var yy = Math.random()*S;
+    g.strokeStyle = Math.random() < 0.62 ? mixHex(w.base, w.dark, rnd(0.4,1)) : mixHex(w.base, w.light, rnd(0.3,0.9));
+    g.globalAlpha = rnd(0.06,0.26);
+    g.lineWidth = rnd(0.5,1.8);
+    var a2 = rnd(1.5,7), p2 = Math.random()*6.283, f2 = 1 + Math.floor(Math.random()*3);
+    g.beginPath(); g.moveTo(-24, yy);
+    for(var x2=-24;x2<=S+24;x2+=18){
+      g.lineTo(x2, yy + Math.sin(x2/S*f2*6.283 + p2)*a2);
+    }
+    g.stroke();
+  }
+
+  // a handful of elliptical knots
+  g.globalAlpha = 1;
+  var knots = 2 + Math.floor(Math.random()*3);
+  for(var k=0;k<knots;k++){
+    var kx = rnd(90,S-90), ky = rnd(90,S-90), kr = rnd(8,18), sq = rnd(0.16,0.26);
+    for(var r=kr*4.0;r>0;r-=rnd(2,5)){
+      var f = Math.max(0, 1 - r/(kr*4.2));
+      g.beginPath();
+      g.ellipse(kx, ky, r, r*sq, rnd(-0.18,0.18), 0, 6.283);
+      g.strokeStyle = mixHex(w.base, w.knot, f*0.9);
+      g.globalAlpha = 0.06 + 0.34*f;
+      g.lineWidth = rnd(1.2,3);
+      g.stroke();
+    }
+    g.globalAlpha = 0.42;
+    g.beginPath();
+    g.ellipse(kx, ky, kr*0.34, kr*0.34*sq*2.6, 0, 0, 6.283);
+    g.fillStyle = w.knot; g.fill();
+  }
+  g.globalAlpha = 1;
+  return c;
+}
+
+// Sobel over luminance -> tangent-space normal map.
+function normalFrom(srcCanvas, strength){
+  var S = srcCanvas.width;
+  var src = srcCanvas.getContext('2d', { willReadFrequently: true }).getImageData(0,0,S,S).data;
+  var lum = new Float32Array(S*S);
+  for(var i=0,n=S*S;i<n;i++){
+    lum[i] = (src[i*4]*0.2126 + src[i*4+1]*0.7152 + src[i*4+2]*0.0722)/255;
+  }
+  var out = document.createElement('canvas'); out.width = out.height = S;
+  var octx = out.getContext('2d');
+  var img = octx.createImageData(S,S);
+  var d = img.data;
+  var idx = function(x,y){ return ((y+S)%S)*S + ((x+S)%S); };
+  for(var y=0;y<S;y++){
+    for(var x=0;x<S;x++){
+      var tl=lum[idx(x-1,y-1)], tc=lum[idx(x,y-1)], tr=lum[idx(x+1,y-1)];
+      var ml=lum[idx(x-1,y)],                       mr=lum[idx(x+1,y)];
+      var bl=lum[idx(x-1,y+1)], bc=lum[idx(x,y+1)], br=lum[idx(x+1,y+1)];
+      var gx = (tr + 2*mr + br) - (tl + 2*ml + bl);
+      var gy = (bl + 2*bc + br) - (tl + 2*tc + tr);
+      var nx = -gx*strength, ny = -gy*strength, nz = 1;
+      var len = Math.sqrt(nx*nx + ny*ny + nz*nz);
+      var p = (y*S + x)*4;
+      d[p]   = Math.round((nx/len*0.5 + 0.5)*255);
+      d[p+1] = Math.round((ny/len*0.5 + 0.5)*255);
+      d[p+2] = Math.round((nz/len*0.5 + 0.5)*255);
+      d[p+3] = 255;
+    }
+  }
+  octx.putImageData(img,0,0);
+  return out;
+}
+
+// Luminance -> roughness. Dark late-wood reads slightly rougher.
+function roughFrom(srcCanvas, lo, hi){
+  var S = srcCanvas.width;
+  var src = srcCanvas.getContext('2d', { willReadFrequently: true }).getImageData(0,0,S,S);
+  var d = src.data;
+  for(var i=0,n=S*S;i<n;i++){
+    var l = (d[i*4]*0.2126 + d[i*4+1]*0.7152 + d[i*4+2]*0.0722)/255;
+    var r = Math.round((lo + (hi-lo)*(1-l))*255);
+    d[i*4] = d[i*4+1] = d[i*4+2] = r; d[i*4+3] = 255;
+  }
+  var out = document.createElement('canvas'); out.width = out.height = S;
+  out.getContext('2d').putImageData(src,0,0);
+  return out;
+}
+
+// Plain woven cloth, for the cushion and the lamp shade.
+function weaveCanvas(){
+  var S = 256, c = document.createElement('canvas'); c.width = c.height = S;
+  var g = c.getContext('2d', { willReadFrequently: true });
+  g.fillStyle = '#808080'; g.fillRect(0,0,S,S);
+  var step = 8;
+  for(var y=0;y<S;y+=step){
+    for(var x=0;x<S;x+=step){
+      var over = ((x/step) + (y/step)) % 2 === 0;
+      var v = over ? 172 : 96;
+      g.fillStyle = 'rgb('+v+','+v+','+v+')';
+      g.fillRect(x, y, step-1, step-1);
+      g.fillStyle = 'rgba(128,128,128,0.5)';
+      g.fillRect(x + rnd(0,3), y + rnd(0,3), 2, 2);
+    }
+  }
+  return c;
+}
+
+// Equirectangular studio: white gradient, one bright window upper-left, a dim bounce opposite.
+function envCanvas(){
+  var W = 1024, H = 512;
+  var c = document.createElement('canvas'); c.width = W; c.height = H;
+  var g = c.getContext('2d');
+  var sky = g.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,   '#E4E2DE');
+  sky.addColorStop(0.42,'#C2C0BC');
+  sky.addColorStop(0.52,'#7E7C78');
+  sky.addColorStop(1,   '#262625');
+  g.fillStyle = sky; g.fillRect(0,0,W,H);
+
+  function soft(cx, cy, rx, ry, col, alpha){
+    g.save();
+    g.translate(cx, cy); g.scale(rx/ry, 1);
+    var rg = g.createRadialGradient(0,0,0, 0,0, ry);
+    rg.addColorStop(0, col); rg.addColorStop(1, 'rgba(255,255,255,0)');
+    g.globalAlpha = alpha; g.fillStyle = rg;
+    g.beginPath(); g.arc(0,0,ry,0,6.283); g.fill();
+    g.restore();
+  }
+  soft(W*0.24, H*0.24, W*0.20, H*0.30, 'rgba(255,255,255,1)', 1.0);   // key window
+  soft(W*0.24, H*0.24, W*0.09, H*0.13, 'rgba(255,255,255,1)', 1.0);   // hot centre
+  soft(W*0.74, H*0.36, W*0.22, H*0.26, 'rgba(255,252,246,1)', 0.42);  // bounce
+  soft(W*0.50, H*0.06, W*0.40, H*0.12, 'rgba(255,255,255,1)', 0.28);  // ceiling wash
+  g.globalAlpha = 1;
+  return c;
+}
+
+/* =====================================================================
+   3. GEOMETRY HELPERS
+   ===================================================================== */
+
+var UVD = 1.8; // texture tiles per metre
+
+function rrShape(w,d,r){
+  var x = -w/2, y = -d/2;
+  r = Math.max(0.0005, Math.min(r, Math.min(w,d)/2 - 0.0008));
+  var s = new T.Shape();
+  s.moveTo(x+r, y);
+  s.lineTo(x+w-r, y);   s.quadraticCurveTo(x+w, y,     x+w,   y+r);
+  s.lineTo(x+w, y+d-r); s.quadraticCurveTo(x+w, y+d,   x+w-r, y+d);
+  s.lineTo(x+r, y+d);   s.quadraticCurveTo(x,   y+d,   x,     y+d-r);
+  s.lineTo(x, y+r);     s.quadraticCurveTo(x,   y,     x+r,   y);
+  return s;
+}
+
+function scaleUV(geo, sx, sy){
+  var a = geo.attributes.uv;
+  if(!a) return geo;
+  for(var i=0;i<a.count;i++) a.setXY(i, a.getX(i)*sx, a.getY(i)*sy);
+  a.needsUpdate = true;
+  return geo;
+}
+function swapUV(geo){
+  var a = geo.attributes.uv;
+  if(!a) return geo;
+  for(var i=0;i<a.count;i++){ var u = a.getX(i), v = a.getY(i); a.setXY(i, v, u); }
+  a.needsUpdate = true;
+  return geo;
+}
+
+// A chamfered slab: w along x, h along y (thickness), d along z.
+function slab(w,h,d,r,bev){
+  r   = (r === undefined) ? 0.014 : r;
+  bev = (bev === undefined) ? 0.010 : bev;
+  bev = Math.max(0.0015, Math.min(bev, h/2 - 0.0015, Math.min(w,d)/2 - 0.002));
+  var g = new T.ExtrudeGeometry(
+    rrShape(w - bev*2, d - bev*2, Math.max(0.0008, r - bev)),
+    { depth: Math.max(0.001, h - bev*2), bevelEnabled:true,
+      bevelThickness:bev, bevelSize:bev, bevelSegments:3, curveSegments:10 }
+  );
+  g.rotateX(-Math.PI/2);
+  g.center();
+  g.computeVertexNormals();
+  scaleUV(g, UVD, UVD);
+  return g;
+}
+
+// A tapered, chamfered post standing on y = 0.
+function post(h, rBot, rTop, chamfer, seg){
+  chamfer = chamfer || 0.005;
+  seg = seg || 18;
+  var pts = [];
+  pts.push(new T.Vector2(0, 0));
+  pts.push(new T.Vector2(rBot - chamfer, 0));
+  pts.push(new T.Vector2(rBot, chamfer));
+  for(var i=1;i<seg;i++){
+    var t = i/seg;
+    pts.push(new T.Vector2(rBot + (rTop-rBot)*t, chamfer + (h - chamfer*2)*t));
+  }
+  pts.push(new T.Vector2(rTop, h - chamfer));
+  pts.push(new T.Vector2(rTop - chamfer, h));
+  pts.push(new T.Vector2(0, h));
+  var g = new T.LatheGeometry(pts, 22);
+  g.computeVertexNormals();
+  swapUV(g);
+  // after the swap: u runs up the post (grain direction), v runs around it
+  scaleUV(g, h*UVD, 2*Math.PI*((rBot+rTop)/2)*UVD);
+  return g;
+}
+
+// Steam-bent: the top of a post is pushed back along z over its height.
+function bendZ(geo, h, k){
+  var pos = geo.attributes.position;
+  for(var i=0;i<pos.count;i++){
+    var t = Math.max(0, pos.getY(i) / h);
+    pos.setZ(i, pos.getZ(i) + k * t * t);
+  }
+  pos.needsUpdate = true;
+  geo.computeVertexNormals();
+  return geo;
+}
+function backPost(h, rBot, rTop, bend){ return bendZ(post(h, rBot, rTop), h, bend); }
+
+// A hollow open-ended cone, for the lamp shade.
+function cone(h, rBot, rTop){
+  var g = new T.CylinderGeometry(rTop, rBot, h, 40, 1, true);
+  scaleUV(g, 5, 5);
+  return g;
+}
+
+function mesh(geo, mat){
+  var m = new T.Mesh(geo, mat);
+  m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
+
+// Records where a node sits, and how far it travels when the piece comes apart.
+function anchor(o, ex, rx){
+  o.userData.base    = o.position.clone();
+  o.userData.baseRot = o.rotation.clone();
+  o.userData.ex      = ex || new T.Vector3();
+  o.userData.rx      = rx || new T.Vector3();
+  return o;
+}
+function applyExplode(o, e){
+  if(o.userData && o.userData.base){
+    o.position.copy(o.userData.base).addScaledVector(o.userData.ex, e);
+    var b = o.userData.baseRot, r = o.userData.rx;
+    o.rotation.set(b.x + r.x*e, b.y + r.y*e, b.z + r.z*e);
+  }
+  for(var i=0;i<o.children.length;i++) applyExplode(o.children[i], e);
+}
+
+/* =====================================================================
+   4. THE PIECES, BUILT FROM PRIMITIVES
+   Every builder returns { root, groups } where groups is keyed by the
+   part names used in the scroll choreography above.
+   ===================================================================== */
+
+function partGroup(root, key, mat, ex, rx, pos){
+  var g = new T.Group();
+  g.name = key;
+  g.userData.mat = mat;
+  if(pos) g.position.set(pos[0], pos[1], pos[2]);
+  if(rx && rx.length > 3) g.rotation.set(rx[3], rx[4] || 0, rx[5] || 0);
+  anchor(g, ex ? new T.Vector3(ex[0],ex[1],ex[2]) : null,
+            rx  ? new T.Vector3(rx[0],rx[1],rx[2])  : null);
+  root.add(g);
+  return g;
+}
+function put(group, geo, x, y, z, ex, ry){
+  var m = mesh(geo, group.userData.mat);
+  m.position.set(x,y,z);
+  if(ry) m.rotation.y = ry;
+  anchor(m, ex ? new T.Vector3(ex[0],ex[1],ex[2]) : null);
+  group.add(m);
+  return m;
+}
+var S4 = [[-1,-1],[1,-1],[-1,1],[1,1]]; // the four corners
+
+var BUILDERS = {};
+
+BUILDERS.meda = function(M){
+  var root = new T.Group(), groups = {};
+  var seatY = 0.405, seatTop = seatY + 0.025;
+
+  var cu = groups.cushion = partGroup(root,'cushion',M.cloth(),[0,0.60,0]);
+  put(cu, slab(0.52,0.095,0.48,0.055,0.026), 0, seatTop + 0.0475, -0.005);
+
+  var se = groups.seat = partGroup(root,'seat',M.wood(),[0,0.34,0]);
+  put(se, slab(0.56,0.05,0.52,0.030,0.013), 0, seatY, 0);
+
+  var ba = groups.back = partGroup(root,'back',M.wood(),[0,0.10,-0.26],[-0.42,0,0,-0.2793,0,0],[0,0.42,-0.23]);
+  put(ba, backPost(0.52,0.022,0.016,-0.090), -0.25, 0, 0);
+  put(ba, backPost(0.52,0.022,0.016,-0.090),  0.25, 0, 0);
+  put(ba, slab(0.47,0.105,0.020,0.030,0.008), 0, 0.200, -0.009);
+  put(ba, slab(0.47,0.120,0.020,0.030,0.008), 0, 0.400, -0.049);
+
+  var ra = groups.rails = partGroup(root,'rails',M.wood());
+  put(ra, slab(0.455,0.035,0.035,0.009,0.006), 0, 0.155,  0.22, [0,0,0.15]);
+  put(ra, slab(0.455,0.035,0.035,0.009,0.006), 0, 0.155, -0.22, [0,0,-0.15]);
+  put(ra, slab(0.035,0.035,0.40,0.009,0.006),  0.24, 0.155, 0, [0.15,0,0]);
+  put(ra, slab(0.035,0.035,0.40,0.009,0.006), -0.24, 0.155, 0, [-0.15,0,0]);
+
+  var le = groups.legs = partGroup(root,'legs',M.wood(),[0,-0.18,0]);
+  for(var i=0;i<4;i++){
+    var s = S4[i];
+    put(le, post(0.38,0.013,0.021), s[0]*0.24, 0, s[1]*0.22, [s[0]*0.10, 0, s[1]*0.09]);
+  }
+  return { root:root, groups:groups };
+};
+
+BUILDERS.table = function(M){
+  var root = new T.Group(), groups = {};
+
+  var tp = groups.top = partGroup(root,'top',M.wood(),[0,0.50,0]);
+  put(tp, slab(1.80,0.040,0.92,0.018,0.010), 0, 0.735, 0);
+
+  var ap = groups.aprons = partGroup(root,'aprons',M.wood());
+  put(ap, slab(1.52,0.130,0.030,0.008,0.006), 0, 0.650,  0.38, [0,0,0.36]);
+  put(ap, slab(1.52,0.130,0.030,0.008,0.006), 0, 0.650, -0.38, [0,0,-0.36]);
+  put(ap, slab(0.030,0.130,0.70,0.008,0.006),  0.78, 0.650, 0, [0.36,0,0]);
+  put(ap, slab(0.030,0.130,0.70,0.008,0.006), -0.78, 0.650, 0, [-0.36,0,0]);
+
+  var st = groups.stretchers = partGroup(root,'stretchers',M.wood());
+  put(st, slab(1.50,0.055,0.040,0.010,0.007), 0, 0.180,  0.38, [0,0,0.30]);
+  put(st, slab(1.50,0.055,0.040,0.010,0.007), 0, 0.180, -0.38, [0,0,-0.30]);
+
+  var le = groups.legs = partGroup(root,'legs',M.wood(),[0,-0.30,0]);
+  for(var i=0;i<4;i++){
+    var s = S4[i];
+    put(le, post(0.715,0.017,0.028), s[0]*0.78, 0, s[1]*0.38, [s[0]*0.12, 0, s[1]*0.10]);
+  }
+  return { root:root, groups:groups };
+};
+
+BUILDERS.bench = function(M){
+  var root = new T.Group(), groups = {};
+
+  var se = groups.seat = partGroup(root,'seat',M.wood(),[0,0.46,0]);
+  put(se, slab(1.80,0.045,0.42,0.022,0.012), 0, 0.440, 0);
+
+  var ba = groups.back = partGroup(root,'back',M.wood(),[0,0.08,-0.26],[-0.36,0,0,-0.2094,0,0],[0,0.450,-0.170]);
+  put(ba, backPost(0.44,0.024,0.018,-0.050), -0.78, 0, 0);
+  put(ba, backPost(0.44,0.024,0.018,-0.050),  0.78, 0, 0);
+  put(ba, slab(1.62,0.085,0.018,0.026,0.007), 0, 0.120,  0.000);
+  put(ba, slab(1.62,0.085,0.018,0.026,0.007), 0, 0.250, -0.012);
+  put(ba, slab(1.62,0.085,0.018,0.026,0.007), 0, 0.380, -0.033);
+
+  var ra = groups.rails = partGroup(root,'rails',M.wood());
+  put(ra, slab(1.54,0.050,0.035,0.010,0.007), 0, 0.180,  0.17, [0,0,0.32]);
+  put(ra, slab(1.54,0.050,0.035,0.010,0.007), 0, 0.180, -0.17, [0,0,-0.32]);
+  put(ra, slab(0.035,0.050,0.30,0.010,0.007),  0.78, 0.180, 0, [0.32,0,0]);
+  put(ra, slab(0.035,0.050,0.30,0.010,0.007), -0.78, 0.180, 0, [-0.32,0,0]);
+
+  var le = groups.legs = partGroup(root,'legs',M.wood(),[0,-0.26,0]);
+  for(var i=0;i<4;i++){
+    var s = S4[i];
+    put(le, post(0.42,0.016,0.024), s[0]*0.78, 0, s[1]*0.17, [s[0]*0.12, 0, s[1]*0.10]);
+  }
+  return { root:root, groups:groups };
+};
+
+BUILDERS.armchair = function(M){
+  var root = new T.Group(), groups = {};
+  var seatY = 0.408, seatTop = seatY + 0.024;
+
+  var cu = groups.cushion = partGroup(root,'cushion',M.cloth(),[0,0.58,0]);
+  put(cu, slab(0.46,0.085,0.44,0.050,0.024), 0, seatTop + 0.043, -0.005);
+
+  var se = groups.seat = partGroup(root,'seat',M.wood(),[0,0.34,0]);
+  put(se, slab(0.50,0.048,0.48,0.026,0.012), 0, seatY, 0);
+
+  var ar = groups.arms = partGroup(root,'arms',M.wood(),[0,0.14,0]);
+  put(ar, slab(0.055,0.040,0.40,0.018,0.012),  0.255, 0.620, -0.020, [ 0.34,0,0]);
+  put(ar, slab(0.055,0.040,0.40,0.018,0.012), -0.255, 0.620, -0.020, [-0.34,0,0]);
+  put(ar, slab(0.045,0.190,0.045,0.012,0.008),  0.255, 0.505, -0.195, [ 0.34,0,0]);
+  put(ar, slab(0.045,0.190,0.045,0.012,0.008), -0.255, 0.505, -0.195, [-0.34,0,0]);
+
+  var ba = groups.back = partGroup(root,'back',M.wood(),[0,0.10,-0.26],[-0.40,0,0,-0.2094,0,0],[0,0.420,-0.210]);
+  put(ba, backPost(0.56,0.022,0.016,-0.075), -0.225, 0, 0);
+  put(ba, backPost(0.56,0.022,0.016,-0.075),  0.225, 0, 0);
+  put(ba, slab(0.41,0.100,0.020,0.028,0.008), 0, 0.220, -0.008);
+  put(ba, slab(0.41,0.100,0.020,0.028,0.008), 0, 0.390, -0.033);
+
+  var le = groups.legs = partGroup(root,'legs',M.wood(),[0,-0.26,0]);
+  put(le, post(0.620,0.014,0.021),  0.255, 0, 0.210, [ 0.17,0, 0.15]);
+  put(le, post(0.620,0.014,0.021), -0.255, 0, 0.210, [-0.17,0, 0.15]);
+  put(le, post(0.395,0.014,0.021),  0.225, 0,-0.205, [ 0.17,0,-0.15]);
+  put(le, post(0.395,0.014,0.021), -0.225, 0,-0.205, [-0.17,0,-0.15]);
+  put(le, slab(0.44,0.030,0.030,0.008,0.006), 0, 0.150,  0.210, [0,0,0.18]);
+  put(le, slab(0.40,0.030,0.030,0.008,0.006), 0, 0.150, -0.205, [0,0,-0.18]);
+  return { root:root, groups:groups };
+};
+
+BUILDERS.diningchair = function(M){
+  var root = new T.Group(), groups = {};
+
+  var se = groups.seat = partGroup(root,'seat',M.wood(),[0,0.38,0]);
+  put(se, slab(0.44,0.042,0.42,0.024,0.011), 0, 0.450, 0);
+
+  var ba = groups.back = partGroup(root,'back',M.wood(),[0,0.10,-0.24],[-0.40,0,0,-0.1920,0,0],[0,0.460,-0.180]);
+  put(ba, backPost(0.50,0.020,0.015,-0.055), -0.190, 0, 0);
+  put(ba, backPost(0.50,0.020,0.015,-0.055),  0.190, 0, 0);
+  put(ba, slab(0.37,0.115,0.018,0.045,0.008), 0, 0.400, -0.031);
+  put(ba, slab(0.37,0.048,0.016,0.020,0.007), 0, 0.180, -0.003);
+
+  var ra = groups.rails = partGroup(root,'rails',M.wood());
+  put(ra, slab(0.345,0.032,0.032,0.009,0.006), 0, 0.190,  0.18, [0,0,0.28]);
+  put(ra, slab(0.345,0.032,0.032,0.009,0.006), 0, 0.190, -0.18, [0,0,-0.28]);
+  put(ra, slab(0.032,0.032,0.325,0.009,0.006),  0.19, 0.190, 0, [0.28,0,0]);
+  put(ra, slab(0.032,0.032,0.325,0.009,0.006), -0.19, 0.190, 0, [-0.28,0,0]);
+
+  var le = groups.legs = partGroup(root,'legs',M.wood(),[0,-0.24,0]);
+  for(var i=0;i<4;i++){
+    var s = S4[i];
+    put(le, post(0.44,0.011,0.017), s[0]*0.19, 0, s[1]*0.18, [s[0]*0.09, 0, s[1]*0.08]);
+  }
+  return { root:root, groups:groups };
+};
+
+BUILDERS.lamp = function(M){
+  var root = new T.Group(), groups = {};
+
+  var sh = groups.shade = partGroup(root,'shade',M.cloth(),[0,0.62,0]);
+  var shadeMesh = put(sh, cone(0.30,0.235,0.155), 0, 1.500, 0);
+  shadeMesh.material.side = T.DoubleSide;
+
+  var co = groups.collar = partGroup(root,'collar',M.wood(),[0,0.34,0]);
+  put(co, post(0.075,0.026,0.034), 0, 1.320, 0);
+
+  var stm = groups.stem = partGroup(root,'stem',M.wood(),[0,0.12,0]);
+  put(stm, post(1.270,0.024,0.017), 0, 0.055, 0);
+
+  var bs = groups.base = partGroup(root,'base',M.wood(),[0,-0.18,0]);
+  put(bs, slab(0.300,0.058,0.300,0.150,0.012), 0, 0.029, 0);
+  return { root:root, groups:groups };
+};
+
+BUILDERS.sideboard = function(M){
+  var root = new T.Group(), groups = {};
+
+  var tp = groups.top = partGroup(root,'top',M.wood(),[0,0.46,0]);
+  put(tp, slab(1.55,0.035,0.46,0.016,0.009), 0, 0.845, 0);
+
+  var dr = groups.doors = partGroup(root,'doors',M.wood(),[0,0,0.34]);
+  put(dr, slab(0.715,0.500,0.026,0.012,0.008),  0.378, 0.565, 0.212, [ 0.16,0,0]);
+  put(dr, slab(0.715,0.500,0.026,0.012,0.008), -0.378, 0.565, 0.212, [-0.16,0,0]);
+
+  var ca = groups.carcass = partGroup(root,'carcass',M.wood(),[0,0.06,-0.14]);
+  put(ca, slab(0.030,0.520,0.44,0.010,0.007),  0.757, 0.565, 0);
+  put(ca, slab(0.030,0.520,0.44,0.010,0.007), -0.757, 0.565, 0);
+  put(ca, slab(1.514,0.026,0.44,0.010,0.007), 0, 0.318, 0);
+  put(ca, slab(1.514,0.026,0.44,0.010,0.007), 0, 0.812, 0);
+  put(ca, slab(1.514,0.500,0.020,0.008,0.006), 0, 0.565, -0.212);
+  put(ca, slab(0.026,0.490,0.42,0.008,0.006), 0, 0.570, 0);
+
+  var le = groups.legs = partGroup(root,'legs',M.wood(),[0,-0.26,0]);
+  for(var i=0;i<4;i++){
+    var s = S4[i];
+    put(le, post(0.305,0.016,0.024), s[0]*0.64, 0, s[1]*0.16, [s[0]*0.13, 0, s[1]*0.10]);
+  }
+  return { root:root, groups:groups };
+};
+
+/* =====================================================================
+   5. STAGE
+   ===================================================================== */
+
+var $  = function(s){ return document.querySelector(s); };
+var stageEl = $('#stage'), stage2El = $('#stage2');
+var loadEl  = $('#load'), loadBar = loadEl.firstElementChild;
+var navEl   = $('#nav'),  hintEl  = $('#hint'), heroEl = $('#hero'), probeEl = $('#probe');
+var gA = $('#gA'), gB = $('#gB'), mA = $('#mA'), mB = $('#mB');
+
+var DEG = Math.PI/180;
+var MOBILE = Math.min(screen.width, screen.height) < 700 || window.innerWidth < 760;
+
+var renderer, scene, camera, key, fill, floor, contact, pmremEnv;
+var r2, scene2, cam2, bandRoot, band2Env;
+var TEX = {};          // per-wood {map, normal, rough}
+var clothMaps = null;
+var woodMats = [];     // every wood material currently alive, both scenes
+var currentWood = 'wanza';
+var piece = null, bandPiece = null;
+var pieceDef = PIECES[0];
+var unit = window.innerHeight;
+var bandVisible = false;
+
+function texFromCanvas(c, srgb){
+  var t = new T.CanvasTexture(c);
+  t.wrapS = t.wrapT = T.RepeatWrapping;
+  t.anisotropy = 8;
+  if(srgb) t.encoding = T.sRGBEncoding;
+  return t;
+}
+
+function woodTextures(k){
+  if(TEX[k]) return TEX[k];
+  var c = woodCanvas(WOODS[k]);
+  TEX[k] = {
+    map:    texFromCanvas(c, true),
+    normal: texFromCanvas(normalFrom(c, 1.5), false),
+    rough:  texFromCanvas(roughFrom(c, 0.46, 0.84), false)
+  };
+  return TEX[k];
+}
+
+function makeWood(){
+  var m = new T.MeshPhysicalMaterial({
+    color: 0xffffff, roughness: 1.0, metalness: 0.0,
+    clearcoat: 0.28, clearcoatRoughness: 0.42,
+    envMapIntensity: 0.85
+  });
+  m.normalScale = new T.Vector2(0.42, 0.42);
+  var t = woodTextures(currentWood);
+  m.map = t.map; m.normalMap = t.normal; m.roughnessMap = t.rough;
+  woodMats.push(m);
+  return m;
+}
+function makeCloth(){
+  var m = new T.MeshPhysicalMaterial({
+    roughness: 1.0, metalness: 0.0, clearcoat: 0.0, envMapIntensity: 0.5
+  });
+  // r128 takes material colours as linear values, so convert from the sRGB one we mean
+  m.color = new T.Color('#9C9280').convertSRGBToLinear();
+  if(clothMaps){
+    m.normalMap = clothMaps.normal;
+    m.normalMap.repeat.set(5,5);
+    m.normalScale = new T.Vector2(0.35, 0.35);
+  }
+  return m;
+}
+var MATS = { wood: makeWood, cloth: makeCloth };
+
+function setWood(k){
+  currentWood = k;
+  var t = woodTextures(k);
+  for(var i=0;i<woodMats.length;i++){
+    var m = woodMats[i];
+    m.map = t.map; m.normalMap = t.normal; m.roughnessMap = t.rough;
+    m.needsUpdate = true;
+  }
+  var btns = document.querySelectorAll('.wood');
+  for(var j=0;j<btns.length;j++) btns[j].setAttribute('aria-pressed', btns[j].dataset.k === k ? 'true' : 'false');
+  dirty = true;
+  drawBand();
+}
+
+function contactTexture(){
+  var S = 256, c = document.createElement('canvas'); c.width = c.height = S;
+  var g = c.getContext('2d');
+  var rg = g.createRadialGradient(S/2,S/2,0, S/2,S/2,S/2);
+  rg.addColorStop(0,   'rgba(0,0,0,0.85)');
+  rg.addColorStop(0.45,'rgba(0,0,0,0.40)');
+  rg.addColorStop(1,   'rgba(0,0,0,0)');
+  g.fillStyle = rg; g.fillRect(0,0,S,S);
+  return texFromCanvas(c, false);
+}
+
+function buildStage(){
+  renderer = new T.WebGLRenderer({ canvas: stageEl, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+  renderer.outputEncoding = T.sRGBEncoding;
+  renderer.toneMapping = T.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = T.PCFSoftShadowMap;
+
+  scene = new T.Scene();
+  camera = new T.PerspectiveCamera(34, 1, 0.05, 60);
+
+  var pm = new T.PMREMGenerator(renderer);
+  pm.compileEquirectangularShader();
+  var eq = texFromCanvas(envCanvas(), true);
+  eq.mapping = T.EquirectangularReflectionMapping;
+  pmremEnv = pm.fromEquirectangular(eq).texture;
+  scene.environment = pmremEnv;
+  pm.dispose(); eq.dispose();
+
+  key = new T.DirectionalLight(0xffffff, 1.45);
+  key.position.set(2.4, 4.6, 3.0);
+  key.castShadow = true;
+  key.shadow.mapSize.set(MOBILE ? 2048 : 4096, MOBILE ? 2048 : 4096);
+  key.shadow.radius = 3;
+  key.shadow.bias = -0.00035;
+  key.shadow.normalBias = 0.018;
+  var sc = key.shadow.camera;
+  sc.near = 0.5; sc.far = 14; sc.left = -1.8; sc.right = 1.8; sc.top = 2.4; sc.bottom = -1.4;
+  sc.updateProjectionMatrix();
+  scene.add(key);
+  scene.add(key.target);
+
+  fill = new T.DirectionalLight(0xffffff, 0.5);
+  fill.position.set(-2.6, 1.8, -2.4);
+  scene.add(fill);
+
+  floor = new T.Mesh(new T.PlaneGeometry(24,24), new T.ShadowMaterial({ opacity: 0.17 }));
+  floor.rotation.x = -Math.PI/2;
+  floor.receiveShadow = true;
+  floor.material.depthWrite = false;
+  scene.add(floor);
+
+  contact = new T.Mesh(
+    new T.PlaneGeometry(1,1),
+    new T.MeshBasicMaterial({ map: contactTexture(), transparent: true, depthWrite: false, opacity: 0.5 })
+  );
+  contact.rotation.x = -Math.PI/2;
+  contact.position.y = 0.004;
+  scene.add(contact);
+}
+
+function buildBandStage(){
+  r2 = new T.WebGLRenderer({ canvas: stage2El, antialias: true, alpha: true });
+  r2.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  r2.setClearColor(0x000000, 0);
+  r2.outputEncoding = T.sRGBEncoding;
+  r2.toneMapping = T.ACESFilmicToneMapping;
+  r2.toneMappingExposure = 0.98;
+
+  scene2 = new T.Scene();
+  cam2 = new T.OrthographicCamera(-1,1,0.5,-0.5, 0.01, 40);
+  cam2.position.set(0,0,10);
+  cam2.lookAt(0,0,0);
+
+  var pm = new T.PMREMGenerator(r2);
+  pm.compileEquirectangularShader();
+  var eq = texFromCanvas(envCanvas(), true);
+  eq.mapping = T.EquirectangularReflectionMapping;
+  band2Env = pm.fromEquirectangular(eq).texture;
+  scene2.environment = band2Env;
+  pm.dispose(); eq.dispose();
+
+  var k2 = new T.DirectionalLight(0xffffff, 1.15); k2.position.set(2.0, 3.2, 4.0); scene2.add(k2);
+  var f2 = new T.DirectionalLight(0xffffff, 0.45); f2.position.set(-2.4, 1.0, -2.0); scene2.add(f2);
+
+  bandRoot = new T.Group();
+  scene2.add(bandRoot);
+}
+
+/* ---------------------------------------------------------------------
+   Loading a piece
+   --------------------------------------------------------------------- */
+
+function disposeTree(obj, keepMats){
+  obj.traverse(function(o){
+    if(o.geometry) o.geometry.dispose();
+    if(o.material && !keepMats){
+      var i = woodMats.indexOf(o.material);
+      if(i >= 0) woodMats.splice(i,1);
+      o.material.dispose();
+    }
+  });
+}
+
+function loadPiece(def){
+  pieceDef = def;
+
+  if(piece){ scene.remove(piece.root); disposeTree(piece.root); }
+  var built = BUILDERS[def.build](MATS);
+  scene.add(built.root);
+
+  // Measure once: every part step sits at explode = 1, the bookends at 0.
+  applyExplode(built.root, 1);
+  built.root.updateMatrixWorld(true);
+  var boxes = {};
+  for(var i=0;i<def.parts.length;i++){
+    var k = def.parts[i].key;
+    var b = new T.Box3().setFromObject(built.groups[k]);
+    var sph = b.getBoundingSphere(new T.Sphere());
+    boxes[k] = { c: sph.center.clone(), r: sph.radius };
+  }
+  applyExplode(built.root, 0);
+  built.root.updateMatrixWorld(true);
+  var fb = new T.Box3().setFromObject(built.root);
+  var fs = fb.getBoundingSphere(new T.Sphere());
+  var fsize = fb.getSize(new T.Vector3());
+
+  piece = { def: def, root: built.root, groups: built.groups, boxes: boxes,
+            full: { c: fs.center.clone(), r: fs.radius }, size: fsize };
+
+  contact.scale.set(fsize.x*1.9, fsize.z*1.9, 1);
+  key.target.position.set(0, fs.center.y*0.6, 0);
+  key.target.updateMatrixWorld();
+  var sc = key.shadow.camera;
+  var span = Math.max(fsize.x, fsize.z) * 0.85 + 0.5;
+  sc.left = -span; sc.right = span; sc.top = fs.center.y + span; sc.bottom = -0.4;
+  sc.updateProjectionMatrix();
+
+  steps = def.parts.length + 2;
+  layoutHero();
+
+  curStep = -1;   // force the crossfade to redraw the opening frame
+
+  var cards = document.querySelectorAll('.piece');
+  for(var j=0;j<cards.length;j++) cards[j].setAttribute('aria-current', cards[j].dataset.id === def.id ? 'true' : 'false');
+
+  stageEl.setAttribute('aria-label',
+    def.name + ' shown in three dimensions. Scrolling separates it into ' +
+    def.parts.map(function(p){ return p.lab.replace(/^The /,''); }).join(', ') +
+    '. Drag or use the arrow keys to turn it.');
+
+  dirty = true;
+  buildBandPiece(def);
+}
+
+/* ---------------------------------------------------------------------
+   The horizontal explode band
+   --------------------------------------------------------------------- */
+
+function buildBandPiece(def){
+  if(bandPiece){
+    bandRoot.remove.apply(bandRoot, bandRoot.children.slice());
+    disposeTree(bandPiece.root);
+    bandPiece.wrappers.forEach(function(w){ disposeTree(w); });
+  }
+  var built = BUILDERS[def.build](MATS);
+  applyExplode(built.root, 0);
+  built.root.updateMatrixWorld(true);
+
+  var wrappers = [], maxW = 0, maxH = 0;
+  for(var i=0;i<def.parts.length;i++){
+    var g = built.groups[def.parts[i].key];
+    var b = new T.Box3().setFromObject(g);
+    var c = b.getCenter(new T.Vector3()), s = b.getSize(new T.Vector3());
+    var w = new T.Group();
+    w.add(g);
+    g.position.sub(c);
+    g.userData.base = g.position.clone();   // keep it anchored where we put it
+    g.userData.ex   = new T.Vector3();
+    wrappers.push(w);
+    bandRoot.add(w);
+    maxW = Math.max(maxW, Math.max(s.x, s.z) * 0.86 + Math.min(s.x, s.z) * 0.5);
+    maxH = Math.max(maxH, s.y);
+  }
+  bandPiece = { root: built.root, wrappers: wrappers, maxW: maxW, maxH: maxH, n: def.parts.length };
+
+  var labels = $('#bandLabels');
+  labels.style.gridTemplateColumns = 'repeat(' + def.parts.length + ',1fr)';
+  labels.innerHTML = def.parts.map(function(p,i){
+    return '<div>' + ('0' + (i+1)).slice(-2) + '<b>' + p.lab.replace(/^The /,'') + '</b></div>';
+  }).join('');
+
+  var words = ['One part','Two parts','Three parts','Four parts','Five parts','Six parts'];
+  $('#bandCount').textContent = words[def.parts.length - 1] || (def.parts.length + ' parts');
+  $('#bandBlurb').textContent = 'The ' + def.name.toLowerCase() +
+    ', laid out left to right in the order the parts are cut. Same scale, nothing between them but joints.';
+
+  layoutBand();
+}
+
+function layoutBand(){
+  if(!bandPiece) return;
+  var host = $('#bandStage');
+  var w = host.clientWidth;
+  if(!w) return;
+  // Equal scale across n columns fixes the aspect the row wants; give the
+  // canvas exactly that height so no part of the band is dead space.
+  var want = 0.94 * bandPiece.n * bandPiece.maxW / bandPiece.maxH;
+  host.style.height = Math.round(Math.max(120, Math.min(430, w / want))) + 'px';
+  var h = host.clientHeight;
+  if(!h) return;
+  r2.setSize(w, h, false);
+  var H = 1.0, W = H * (w/h);
+  cam2.left = -W/2; cam2.right = W/2; cam2.top = H/2; cam2.bottom = -H/2;
+  cam2.updateProjectionMatrix();
+
+  var n = bandPiece.n, col = W / n;
+  var s = Math.min(col * 0.90 / bandPiece.maxW, H * 0.84 / bandPiece.maxH);
+  for(var i=0;i<n;i++){
+    var wr = bandPiece.wrappers[i];
+    wr.position.set(-W/2 + col*(i + 0.5), 0, 0);
+    wr.scale.setScalar(s);
+  }
+  drawBand();
+}
+
+function drawBand(){
+  if(!r2 || !bandPiece) return;
+  var rect = $('#band').getBoundingClientRect();
+  var t = 1 - (rect.top + rect.height/2) / (window.innerHeight + rect.height/2);
+  t = Math.max(0, Math.min(1, t));
+  var ry = -0.86 + t * 0.52;
+  for(var i=0;i<bandPiece.wrappers.length;i++){
+    bandPiece.wrappers[i].rotation.set(0.17, ry, 0);
+  }
+  r2.render(scene2, cam2);
+}
+
+/* =====================================================================
+   6. SCROLL CHOREOGRAPHY
+   ===================================================================== */
+
+var steps = 7, curStep = -1, front = 0;
+var gL = [gA, gB], mL = [mA, mB];
+var camS = { az: 34*DEG, el: 14*DEG, d: 2.4, x: 0, y: 0.4, z: 0 };
+var camT = { az: 34*DEG, el: 14*DEG, d: 2.4, x: 0, y: 0.4, z: 0 };
+var exCur = 0, exTar = 0, idle = 0, dragAz = 0, dragEl = 0, scrolled = false;
+
+function smoothstep(t){ t = Math.max(0, Math.min(1, t)); return t*t*(3 - 2*t); }
+function pad2(n){ return ('0' + n).slice(-2); }
+
+function layoutHero(){
+  unit = probeEl.getBoundingClientRect().height || window.innerHeight;
+  heroEl.style.height = (steps * unit) + 'px';
+}
+
+function explodeAt(s){
+  var last = steps - 1;
+  if(s <= 0.2) return 0;
+  if(s < 1.0) return smoothstep((s - 0.2) / 0.8);
+  var d0 = last - 0.7, d1 = last - 0.05;
+  if(s <= d0) return 1;
+  if(s >= d1) return 0;
+  return 1 - smoothstep((s - d0) / (d1 - d0));
+}
+
+// Camera framing for one step: where to stand, and what has to fill the frame.
+function stepView(i){
+  if(i <= 0 || i >= steps - 1){
+    return { az: 34, el: 14, pad: 1.32, c: piece.full.c, r: piece.full.r };
+  }
+  var p = pieceDef.parts[i-1], b = piece.boxes[p.key];
+  return { az: p.az, el: p.el, pad: p.pad, c: b.c, r: b.r };
+}
+
+function fitDist(r, pad){
+  var v = camera.fov * DEG;
+  var h = 2 * Math.atan(Math.tan(v/2) * camera.aspect);
+  return (r / Math.sin(Math.min(v, h) / 2)) * pad;
+}
+
+function wordFor(i){
+  if(i === 0) return pieceDef.open;
+  if(i === steps - 1) return pieceDef.close;
+  return pieceDef.parts[i-1].word;
+}
+function metaFor(i){
+  var d = pieceDef, n = d.parts.length;
+  function head(mic, lab){
+    return '<div class="meta-head"><span class="mic em">' + mic + '</span>' +
+           (lab ? '<span class="lab">' + lab + '</span>' : '') +
+           '<span class="rule"></span></div>';
+  }
+  function cap(t){ return '<p class="meta-cap">' + t + '</p>'; }
+  if(i === 0) return head('In one piece','') + cap(d.intro);
+  if(i === steps - 1){
+    var noun = d.name.split(' ').pop();
+    return head('Back together','') + cap(d.outro) +
+      '<a class="btn btn-ember" href="mailto:hello@warka.et?subject=' +
+      encodeURIComponent('Order - ' + d.name) + '">Order this ' + noun + '</a>';
+  }
+  var p = d.parts[i-1];
+  return head(pad2(i) + ' / ' + pad2(n), p.lab) + cap(p.cap);
+}
+
+// The ghost word is set at 13vw and then pulled in to fit the viewport,
+// so a long word like TWELVE JOINTS still sits inside the frame.
+function fitGhost(el){
+  el.style.transform = 'none';
+  var w = el.getBoundingClientRect().width;
+  el.dataset.fit = (w > 0) ? String(Math.min(1, (window.innerWidth * 0.94) / w)) : '1';
+}
+function refitGhosts(){ fitGhost(gL[0]); fitGhost(gL[1]); }
+
+function setStep(i){
+  front = 1 - front;
+  gL[front].textContent = wordFor(i);
+  fitGhost(gL[front]);
+  mL[front].innerHTML   = metaFor(i);
+  dirty = true;
+  gL[front].style.opacity = '1';
+  gL[1-front].style.opacity = '0';
+  mL[front].classList.add('on');
+  mL[1-front].classList.remove('on');
+  curStep = i;
+}
+
+function setGroupOpacity(g, o){
+  var m = g.userData.mat;
+  m.opacity = o;
+  var trans = o < 0.985;
+  if(m.transparent !== trans){ m.transparent = trans; m.needsUpdate = true; }
+  m.depthWrite = !trans;
+  var cast = o > 0.5;
+  if(g.userData.cast !== cast){
+    g.userData.cast = cast;
+    g.traverse(function(c){ if(c.isMesh) c.castShadow = cast; });
+  }
+}
+
+var lastT = (window.performance || Date).now();
+var lastScrollY = -1;
+var dirty = true;   // set whenever something outside the scroll changes the frame
+
+function tick(now){
+  requestAnimationFrame(tick);
+  var dt = Math.min((now - lastT) / 1000, 0.1);
+  lastT = now;
+  if(!piece) return;
+
+  var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+  var s = Math.max(0, Math.min(steps - 1, (y - heroEl.offsetTop) / unit));
+
+  if(y > 8) scrolled = true;
+  navEl.classList.toggle('solid', y > unit * 0.94);
+  var hint = y > 40 ? '0' : '1';
+  if(hintEl.dataset.o !== hint){ hintEl.dataset.o = hint; hintEl.style.opacity = hint; }
+
+  // --- ghost word + small text, swapped at the halfway point between steps
+  var idx = Math.round(s);
+  if(idx !== curStep) setStep(idx);
+  var drift = REDUCE ? 0 : -(s - idx) * 108;
+  gL[0].style.transform = 'translateY(' + drift.toFixed(2) + 'px) scale(' + (gL[0].dataset.fit || 1) + ')';
+  gL[1].style.transform = 'translateY(' + drift.toFixed(2) + 'px) scale(' + (gL[1].dataset.fit || 1) + ')';
+
+  // --- explode amount
+  exTar = explodeAt(s);
+  exCur += (exTar - exCur) * (1 - Math.pow(1 - 0.11, dt * 60));
+  applyExplode(piece.root, exCur);
+  contact.material.opacity = 0.5 * (1 - exCur * 0.72);
+
+  // --- one part lit, the rest ghosted
+  var hi = (idx >= 1 && idx <= steps - 2) ? pieceDef.parts[idx-1].key : null;
+  var ok = 1 - Math.pow(1 - 0.11, dt * 60), opMoved = 0;
+  for(var i=0;i<pieceDef.parts.length;i++){
+    var k2 = pieceDef.parts[i].key, g = piece.groups[k2];
+    var want = (!hi || k2 === hi) ? 1 : 0.13;
+    var cur = g.userData.mat.opacity;
+    opMoved = Math.max(opMoved, Math.abs(want - cur));
+    setGroupOpacity(g, cur + (want - cur) * ok);
+  }
+
+  // --- camera, blended between the two neighbouring steps then damped
+  var i0 = Math.floor(s), i1 = Math.min(i0 + 1, steps - 1), f = smoothstep(((s - i0) - 0.3) / 0.5);
+  var v0 = stepView(i0), v1 = stepView(i1);
+  var az = (v0.az + (v1.az - v0.az) * f) * DEG;
+  var el = (v0.el + (v1.el - v0.el) * f) * DEG;
+  var rr = v0.r  + (v1.r  - v0.r)  * f;
+  var pd = v0.pad+ (v1.pad- v0.pad)* f;
+  camT.az = az; camT.el = el;
+  camT.d  = fitDist(rr, pd);
+  camT.x  = v0.c.x + (v1.c.x - v0.c.x) * f;
+  camT.y  = v0.c.y + (v1.c.y - v0.c.y) * f;
+  camT.z  = v0.c.z + (v1.c.z - v0.c.z) * f;
+
+  var k = 1 - Math.pow(1 - 0.075, dt * 60);
+  camS.az += (camT.az - camS.az) * k;
+  camS.el += (camT.el - camS.el) * k;
+  camS.d  += (camT.d  - camS.d)  * k;
+  camS.x  += (camT.x  - camS.x)  * k;
+  camS.y  += (camT.y  - camS.y)  * k;
+  camS.z  += (camT.z  - camS.z)  * k;
+
+  var idleOn = !scrolled && !REDUCE;
+  if(idleOn) idle += dt * 0.15;
+
+  // Once every damped value has settled and nothing is moving, stop drawing.
+  var moved = Math.abs(camT.az - camS.az) + Math.abs(camT.el - camS.el) +
+              Math.abs(camT.d - camS.d) + Math.abs(camT.x - camS.x) +
+              Math.abs(camT.y - camS.y) + Math.abs(camT.z - camS.z) +
+              Math.abs(exTar - exCur);
+
+  var aA = camS.az + dragAz + idle;
+  var eA = Math.max(-0.12, Math.min(1.25, camS.el + dragEl));
+  var cd = Math.cos(eA) * camS.d;
+  camera.position.set(camS.x + cd * Math.sin(aA), camS.y + Math.sin(eA) * camS.d, camS.z + cd * Math.cos(aA));
+  camera.lookAt(camS.x, camS.y, camS.z);
+
+  var live = dirty || idleOn || y !== lastScrollY || moved > 2e-4 || opMoved > 2e-3;
+  if(live && y < heroEl.offsetTop + steps * unit){
+    renderer.render(scene, camera);
+    dirty = false;
+  }
+  if(bandVisible && y !== lastScrollY) drawBand();
+  lastScrollY = y;
+}
+
+/* =====================================================================
+   7. PAGE FURNITURE AND INPUT
+   ===================================================================== */
+
+function buildUI(){
+  var names = PIECES.map(function(p){ return p.name.replace(' dining','').replace(' lounge',''); });
+  var run = names.map(function(n){ return '<span>' + n.toUpperCase() + ' &middot;</span>'; }).join('');
+  $('#mq').innerHTML = run + run;
+
+  $('#woodList').innerHTML = Object.keys(WOODS).map(function(k){
+    var w = WOODS[k];
+    return '<button class="wood" type="button" data-k="' + k + '" aria-pressed="' + (k === currentWood) + '">' +
+             '<span class="bar" style="background:' + w.swatch + '"></span>' +
+             '<span class="state">On the piece</span>' +
+             '<span class="body"><span class="wnm">' + w.name + '</span>' +
+             '<span class="wp">' + w.copy + '</span></span>' +
+           '</button>';
+  }).join('');
+  $('#woodList').addEventListener('click', function(e){
+    var b = e.target.closest('.wood');
+    if(b) setWood(b.dataset.k);
+  });
+
+  $('#rangeList').innerHTML = PIECES.map(function(p){
+    return '<button class="piece" type="button" data-id="' + p.id + '" aria-current="' + (p.id === pieceDef.id) + '">' +
+             '<span class="nm">' + p.name + '</span>' +
+             '<span class="pr">' + p.price + '</span>' +
+             '<span class="act">Load it above</span>' +
+           '</button>';
+  }).join('');
+  $('#rangeList').addEventListener('click', function(e){
+    var b = e.target.closest('.piece');
+    if(!b) return;
+    var def = PIECES.filter(function(p){ return p.id === b.dataset.id; })[0];
+    if(!def || def.id === pieceDef.id){ window.scrollTo({ top: 0, behavior: REDUCE ? 'auto' : 'smooth' }); return; }
+    loadPiece(def);
+    window.scrollTo({ top: 0, behavior: REDUCE ? 'auto' : 'smooth' });
+  });
+}
+
+function bindInput(){
+  var down = false, px = 0, py = 0;
+  stageEl.addEventListener('pointerdown', function(e){
+    down = true; px = e.clientX; py = e.clientY;
+    stageEl.setPointerCapture(e.pointerId);
+    stageEl.style.cursor = 'grabbing';
+  });
+  stageEl.addEventListener('pointermove', function(e){
+    if(!down) return;
+    dirty = true;
+    dragAz -= (e.clientX - px) * 0.006;
+    dragEl  = Math.max(-0.5, Math.min(0.9, dragEl + (e.clientY - py) * 0.004));
+    px = e.clientX; py = e.clientY;
+  });
+  function up(e){
+    down = false; stageEl.style.cursor = 'grab';
+    if(e.pointerId !== undefined && stageEl.hasPointerCapture && stageEl.hasPointerCapture(e.pointerId))
+      stageEl.releasePointerCapture(e.pointerId);
+  }
+  stageEl.addEventListener('pointerup', up);
+  stageEl.addEventListener('pointercancel', up);
+  stageEl.style.cursor = 'grab';
+
+  stageEl.addEventListener('keydown', function(e){
+    var step = 0.14;
+    if(e.key === 'ArrowLeft')       dragAz += step;
+    else if(e.key === 'ArrowRight') dragAz -= step;
+    else if(e.key === 'ArrowUp')    dragEl = Math.min(0.9, dragEl + step*0.6);
+    else if(e.key === 'ArrowDown')  dragEl = Math.max(-0.5, dragEl - step*0.6);
+    else return;
+    dirty = true;
+    e.preventDefault();   // arrows only, while the canvas has focus. The wheel is never touched.
+  });
+
+  var rw = window.innerWidth, rt;
+  window.addEventListener('resize', function(){
+    clearTimeout(rt);
+    rt = setTimeout(function(){
+      if(window.innerWidth === rw && !MOBILE) { resizeAll(); return; }
+      rw = window.innerWidth;
+      resizeAll();
+    }, 90);
+  });
+  window.addEventListener('orientationchange', function(){ setTimeout(resizeAll, 260); });
+
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){
+      bandVisible = es[0].isIntersecting;
+      if(bandVisible) drawBand();
+    }, { rootMargin: '120px' }).observe($('#band'));
+  } else {
+    bandVisible = true;
+  }
+}
+
+function resizeAll(){
+  dirty = true;
+  layoutHero();
+  refitGhosts();
+  var w = stageEl.clientWidth, h = stageEl.clientHeight;
+  if(w && h){
+    renderer.setSize(w, h, false);
+    camera.aspect = w/h;
+    camera.updateProjectionMatrix();
+  }
+  layoutBand();
+}
+
+/* =====================================================================
+   8. BOOT
+   ===================================================================== */
+
+function step(pct){
+  loadBar.style.width = pct + '%';
+  return new Promise(function(res){
+    requestAnimationFrame(function(){ setTimeout(res, 0); });
+  });
+}
+
+function fallback(msg){
+  stageEl.style.display = 'none';
+  stage2El.style.display = 'none';
+  loadEl.classList.add('done');
+  mA.innerHTML = '<div class="meta-head"><span class="mic em">Meda lounge chair</span><span class="rule"></span></div>' +
+                 '<p class="meta-cap">Br 14,500. Solid hardwood, twelve joints, no screws in the frame. ' +
+                 (msg || '') + '</p>';
+  mA.classList.add('on');
+  gA.textContent = 'CUT BY HAND';
+  gA.style.opacity = '1';
+}
+
+function boot(){
+  if(!T){ fallback('The three-dimensional view could not load.'); return; }
+  buildUI();
+
+  step(8)
+  .then(function(){
+    buildStage();
+    buildBandStage();
+    return step(22);
+  })
+  .then(function(){
+    var wc = weaveCanvas();
+    clothMaps = { normal: texFromCanvas(normalFrom(wc, 1.4), false) };
+    clothMaps.normal.wrapS = clothMaps.normal.wrapT = T.RepeatWrapping;
+    return step(38);
+  })
+  .then(function(){
+    woodTextures('wanza');        // colour map
+    return step(72);
+  })
+  .then(function(){
+    loadPiece(PIECES[0]);
+    return step(92);
+  })
+  .then(function(){
+    resizeAll();
+    setStep(0);
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(refitGhosts);
+    applyExplode(piece.root, 0);
+    renderer.render(scene, camera);
+    drawBand();
+    return step(100);
+  })
+  .then(function(){
+    loadEl.classList.add('done');
+    bindInput();
+    requestAnimationFrame(tick);
+  })
+  .catch(function(err){
+    if(window.console) console.error(err);
+    fallback('Come and see it in Kebena instead.');
+  });
+}
+
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();
+
+})();
+</script>
+</body>
+</html>
