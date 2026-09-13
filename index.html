@@ -224,8 +224,23 @@ footer{border-top:1px solid var(--line-2);padding:34px 0 44px;color:var(--ink-2)
 .foot-brand b{display:block;color:var(--ink);font-weight:600;margin-bottom:3px}
 .note{font-size:12.5px;color:var(--ink-2);max-width:66ch;margin:26px 0 0}
 
+/* ---------------- one piece ---------------- */
+.piece-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(24px,4vw,56px);align-items:start;margin-top:22px}
+.piece-shot{background:var(--stage);border:1px solid var(--line-2);border-radius:var(--radius);aspect-ratio:4/3;overflow:hidden}
+.piece-shot img{width:100%;height:100%;object-fit:cover}
+.piece-head{font-size:clamp(28px,4.6vw,54px);margin:12px 0}
+.piece-price{font-size:27px;font-weight:600;letter-spacing:-.02em;margin:18px 0 2px}
+.piece-price.ask{font-size:17px;font-weight:400;color:var(--ink-2)}
+.piece-buy{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:20px 0 4px}
+.card{cursor:pointer}
+.card-body h3 a{color:inherit}
+.card:hover .card-body h3 a{text-decoration:underline}
+.skip{position:absolute;left:-9999px;top:0;z-index:400;background:var(--ink);color:var(--bg);padding:10px 16px}
+.skip:focus{left:8px;top:8px}
+
 /* ---------------- responsive ---------------- */
 @media (max-width:1000px){
+  .piece-grid{grid-template-columns:1fr}
   .hero{grid-template-columns:1fr;gap:30px}
   .hero-stage{aspect-ratio:16/10;order:-1}
   .order-grid{grid-template-columns:1fr}
@@ -253,6 +268,7 @@ footer{border-top:1px solid var(--line-2);padding:34px 0 44px;color:var(--ink-2)
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to the content</a>
 <div id="load" aria-hidden="true"><i></i></div>
 
 <header class="nav" id="nav">
@@ -271,7 +287,7 @@ footer{border-top:1px solid var(--line-2);padding:34px 0 44px;color:var(--ink-2)
   </div>
 </header>
 
-<main>
+<main id="main">
 
 <!-- ============================ HOME ============================ -->
 <section class="view" id="view-home">
@@ -415,6 +431,32 @@ footer{border-top:1px solid var(--line-2);padding:34px 0 44px;color:var(--ink-2)
         <p class="ok" id="okMsg" role="status"></p>
         <p class="hintline">Your list stays in this browser until you send it.</p>
       </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ ONE PIECE ============================ -->
+<section class="view" id="view-piece" hidden>
+  <div class="wrap sec">
+    <a class="btn btn-sm" href="#/shop">&larr; All pieces</a>
+    <div class="piece-grid">
+      <div class="piece-shot"><img id="pcImg" alt=""></div>
+      <div>
+        <span class="mic em" id="pcCat"></span>
+        <h1 class="dsp piece-head" id="pcName"></h1>
+        <p class="card-spec" id="pcSpec"></p>
+        <div id="pcPrice"></div>
+        <div class="piece-buy">
+          <button class="btn btn-ember" id="pcAdd" type="button">Add to the order</button>
+          <a class="btn" id="pcCall" href="#">Ask about it</a>
+        </div>
+        <p class="lede" id="pcNote" style="margin-top:18px"></p>
+        <dl class="dl" id="pcDl"></dl>
+      </div>
+    </div>
+    <div id="pcSibWrap" hidden>
+      <div class="sec-head" style="margin:56px 0 22px"><h2 class="dsp" style="font-size:clamp(22px,3vw,34px)">The same piece, other ways</h2></div>
+      <div class="grid" id="pcSiblings"></div>
     </div>
   </div>
 </section>
@@ -1445,7 +1487,7 @@ function buildCatalogue(){
       var d = line.derive(vals);
       var spec = c.map(function(pr){ return pr[1]; }).join(' · ');
       CATALOGUE.push({
-        id:id, name:line.name, cat:line.cat, spec:spec, rank:line.rank,
+        id:id, line:line.key, name:line.name, cat:line.cat, spec:spec, rank:line.rank,
         price: Object.prototype.hasOwnProperty.call(PRICES, id) ? PRICES[id] : null,
         photo: PHOTOS[id] || null,
         finish: d.board || d.uph,
@@ -1472,8 +1514,15 @@ function initHero(heightImg){
   hR.toneMappingExposure = 1.05;
 
   hScene = new T.Scene();
-  hScene.environment = tEnv;
   hCam = new T.PerspectiveCamera(30, 4/3, 0.05, 40);
+
+  // Its own PMREM: a render target built by one renderer cannot be read by another.
+  var hpm = new T.PMREMGenerator(hR);
+  hpm.compileEquirectangularShader();
+  var heq = texFromCanvas(envCanvas(), true);
+  heq.mapping = T.EquirectangularReflectionMapping;
+  hScene.environment = hpm.fromEquirectangular(heq).texture;
+  hpm.dispose(); heq.dispose();
 
   var k = new T.DirectionalLight(0xffffff, 1.5);  k.position.set(2.0, 3.0, 3.4); hScene.add(k);
   var f = new T.DirectionalLight(0xffffff, 0.45); f.position.set(-2.6, 1.2, -2.0); hScene.add(f);
@@ -1563,17 +1612,30 @@ function heroTick(now){
    ===================================================================== */
 
 var MOBILE = Math.min(screen.width, screen.height) < 700 || window.innerWidth < 760;
-var VIEWS = { '#/':'view-home', '#/shop':'view-shop', '#/order':'view-order' };
+var VIEWS = { '#/':'view-home', '#/shop':'view-shop', '#/order':'view-order', '#/piece':'view-piece' };
 
-function route(){
-  var h = location.hash.split('?')[0];
-  if(!VIEWS[h]) h = '#/';
+function show(h){
   Object.keys(VIEWS).forEach(function(k){ $('#' + VIEWS[k]).hidden = (k !== h); });
   $$('#navLinks a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('href') === h); });
-  if(h === '#/shop') ensureShop();
-  if(h === '#/order') renderOrder();
   hDirty = true;
-  if(!location.hash.split('?')[1]) window.scrollTo(0, 0);
+}
+function route(){
+  var raw = location.hash || '#/', h = raw, id = null;
+  if(raw.indexOf('#/piece/') === 0){ h = '#/piece'; id = decodeURIComponent(raw.slice(8)); }
+
+  // a plain #anchor is a jump inside the home page, not a view of its own
+  if(!VIEWS[h]){
+    var el = document.getElementById(raw.slice(1));
+    show('#/');
+    if(el){ el.scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth', block:'start' }); return; }
+    window.scrollTo(0, 0);
+    return;
+  }
+  show(h);
+  if(h === '#/shop')  ensureShop();
+  if(h === '#/order') renderOrder();
+  if(h === '#/piece' && !renderPiece(id)){ location.replace('#/shop'); return; }
+  window.scrollTo(0, 0);
 }
 
 /* =====================================================================
@@ -1602,7 +1664,7 @@ function cardHTML(p){
   return '<article class="card" data-id="' + p.id + '">' +
       '<div class="card-img' + (p.photo ? ' photo' : '') + '">' + pic + '</div>' +
       '<div class="card-body">' +
-        '<h3>' + p.name + '</h3>' +
+        '<h3><a href="#/piece/' + p.id + '">' + p.name + '</a></h3>' +
         '<p class="card-spec">' + p.spec + '</p>' +
         '<div class="card-foot">' + priceHTML(p.price) +
           '<button class="btn btn-sm add" type="button" data-add="' + p.id + '">Add</button>' +
@@ -1696,6 +1758,57 @@ function onChip(e){
     c.setAttribute('aria-pressed', String(c.dataset.v === b.dataset.v));
   });
   renderGrid();
+}
+
+/* =====================================================================
+   9b. ONE PIECE
+   ===================================================================== */
+
+var CAT_NAME = {};
+function catName(k){
+  if(!CAT_NAME[k]) CATEGORIES.forEach(function(c){ CAT_NAME[c.key] = c.name; });
+  return CAT_NAME[k] || k;
+}
+
+function renderPiece(id){
+  var p = findProduct(id);
+  if(!p) return false;
+
+  $('#pcCat').textContent  = catName(p.cat);
+  $('#pcName').textContent = p.name;
+  $('#pcSpec').textContent = p.spec;
+  $('#pcPrice').className  = '';
+  $('#pcPrice').innerHTML  = typeof p.price === 'number' || typeof p.price === 'string'
+    ? '<div class="piece-price">' + money(p.price) + '</div>'
+    : '<div class="piece-price ask">Priced when you ask. It moves with the size and the board.</div>';
+  $('#pcAdd').dataset.add  = p.id;
+  $('#pcCall').href = 'tel:' + CONTACT.phoneHref;
+  $('#pcNote').textContent = p.photo
+    ? 'This is the piece photographed in the shop. Anything about it can still be changed before it is built.'
+    : 'Made to order. The drawing shows this size and finish; the shop builds it to the measurement you bring in.';
+
+  var img = $('#pcImg');
+  img.removeAttribute('src');
+  img.alt = p.name + ', ' + p.spec;
+  if(p.photo) img.src = p.photo;
+  else requestThumb(p.thumb, function(u){ img.src = u; });
+
+  var f = FINISHES[p.finish];
+  $('#pcDl').innerHTML =
+    '<dt>Category</dt><dd>' + catName(p.cat) + '</dd>' +
+    (f ? '<dt>Finish</dt><dd>' + f.name + '</dd>' : '') +
+    '<dt>Lead time</dt><dd>Ask in the shop when you order</dd>' +
+    '<dt>Delivery</dt><dd>Anywhere in Addis, set up on arrival</dd>' +
+    '<dt>Reference</dt><dd>' + p.id + '</dd>';
+
+  var sibs = CATALOGUE.filter(function(q){ return q.line === p.line && q.id !== p.id; }).slice(0, 8);
+  $('#pcSibWrap').hidden = sibs.length === 0;
+  if(sibs.length){
+    var grid = $('#pcSiblings');
+    grid.innerHTML = sibs.map(cardHTML).join('');
+    watchThumbs(grid, sibs);
+  }
+  return true;
 }
 
 /* =====================================================================
@@ -1805,7 +1918,7 @@ function orderText(){
   if(f('#fName'))  L.push('Name:     ' + f('#fName'));
   if(f('#fPhone')) L.push('Phone:    ' + f('#fPhone'));
   if(f('#fAddr'))  L.push('Address:  ' + f('#fAddr'));
-  if(f('#fWhen'))  L.push('Wanted by:' + f('#fWhen'));
+  if(f('#fWhen'))  L.push('Wanted by: ' + f('#fWhen'));
   if(f('#fNotes')) L.push('Notes:    ' + f('#fNotes'));
   var known = 0, ask = 0;
   cart.forEach(function(l){
@@ -1823,6 +1936,8 @@ function bindOrder(){
   document.addEventListener('click', function(e){
     var add = e.target.closest('[data-add]');
     if(add){ addToOrder(add.dataset.add); return; }
+    var card = e.target.closest('.card');
+    if(card && !e.target.closest('a')){ location.hash = '#/piece/' + card.dataset.id; return; }
     var row = e.target.closest('.o-item');
     if(row){
       var q = e.target.closest('[data-q]');
