@@ -70,8 +70,8 @@ button{font:inherit;color:inherit}
 .mic{font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-2)}
 .mic.em{color:var(--ember)}
 .lede{color:var(--ink-2);max-width:52ch;margin:0}
-.wrap{max-width:1360px;margin:0 auto;padding:0 24px}
-.sec{padding:clamp(64px,8vw,112px) 0}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:24px}
+.sec{padding-block:clamp(64px,8vw,112px)}
 .sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:40px}
 .sec-t{font-size:clamp(30px,5.2vw,68px)}
 
@@ -212,7 +212,7 @@ select{width:auto;cursor:pointer;padding-right:30px}
 .cols4>div{background:var(--bg-2);padding:26px 22px}
 .cols4 h3{margin:0 0 8px;font-size:16px;font-weight:600}
 .cols4 p{margin:0;font-size:13.5px;color:var(--ink-2)}
-.quote{padding:clamp(56px,8vw,110px) 0;text-align:center}
+.quote{padding-block:clamp(56px,8vw,110px);padding-inline:24px;text-align:center}
 .quote blockquote{margin:0 auto;max-width:17ch;font-family:'Instrument Serif',Georgia,serif;
   font-style:italic;font-size:clamp(28px,5.4vw,62px);line-height:1.08}
 .visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(22px,3vw,48px);align-items:center}
@@ -221,7 +221,7 @@ select{width:auto;cursor:pointer;padding-right:30px}
   border-top:1px solid var(--line);padding-top:20px;margin:22px 0 0}
 .dl dt{color:var(--ink-2);margin:0}
 .dl dd{margin:0}
-footer{border-top:1px solid var(--line-2);padding:34px 0 44px;color:var(--ink-2);font-size:13px;margin-top:40px}
+footer{border-top:1px solid var(--line-2);padding-block:34px 44px;color:var(--ink-2);font-size:13px;margin-top:40px}
 .foot-grid{display:flex;justify-content:space-between;gap:26px;flex-wrap:wrap;align-items:flex-end}
 .foot-brand{display:flex;gap:15px;align-items:flex-start}
 .foot-brand img{width:128px;border-radius:2px;border:1px solid var(--line-2)}
@@ -1134,109 +1134,36 @@ function shapeOf(sh){
   return shape;
 }
 // ---------------------------------------------------------------------
-// A warka: the broad, flat-crowned fig a village meets under. Grown from
-// a skeleton of limbs and a canopy of blobs, in eight pieces, so it can
-// put itself together trunk first and canopy last.
+// The warka, as it is actually cut: a pierced fretwork crown, the leaves
+// taken out of the wood as voids along veins that fan from the stem. Four
+// pieces — the stem and three fans — so the crown opens out a fan at a
+// time. Outlines and leaf holes are generated, not traced.
 // ---------------------------------------------------------------------
-function hash3(x, y, z){
-  var v = Math.sin(x*12.9898 + y*78.233 + z*37.719) * 43758.5453;
-  return v - Math.floor(v);
-}
-function limb(a, b, r0, r1, seg){
-  var dir = new T.Vector3(b[0]-a[0], b[1]-a[1], b[2]-a[2]);
-  var len = dir.length();
-  var g = new T.CylinderGeometry(r1, r0, len, seg || 9, 1, false);
-  g.translate(0, len/2, 0);
-  var q = new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0), dir.normalize());
-  g.applyMatrix4(new T.Matrix4().makeRotationFromQuaternion(q));
-  g.translate(a[0], a[1], a[2]);
-  scaleUV(g, 2.2, 2.2);
-  return g;
-}
-function blob(c, r, flat){
-  var g = new T.SphereGeometry(r, 14, 10);
-  var p = g.attributes.position;
-  for(var i=0;i<p.count;i++){
-    var x = p.getX(i), y = p.getY(i), z = p.getZ(i);
-    // keyed off the position, so the duplicated vertices of a face agree
-    var k = 0.84 + 0.34 * hash3(x*97, y*97, z*97);
-    p.setXYZ(i, x*k, y*k*flat, z*k);
-  }
-  p.needsUpdate = true;
-  g.computeVertexNormals();
-  g.translate(c[0], c[1], c[2]);
-  scaleUV(g, 1.7, 1.7);
-  return g;
-}
+var TREE_PARTS = {"aspect":1.7636,"p":[{"id":"stem","s":[{"o":[[0.411,0.1257],[0.4079,0.12],[0.4159,0.0466],[0.4004,0.0011],[0.476,0.0],[0.4773,0.0041],[0.4616,0.0466],[0.4689,0.1232],[0.4632,0.1265]],"h":[]}]},{"id":"fan0","s":[{"o":[[0.1222,0.5336],[0.0669,0.4773],[0.0363,0.4332],[0.0165,0.3957],[0.0,0.3321],[0.0004,0.2831],[0.019,0.2211],[0.0277,0.2064],[0.0455,0.1887],[0.0977,0.1515],[0.1679,0.1174],[0.2282,0.1038],[0.2413,0.1104],[0.2705,0.1412],[0.2971,0.1869],[0.3113,0.2407],[0.3113,0.275],[0.2852,0.3123],[0.2609,0.3257],[0.2386,0.35],[0.2228,0.399],[0.1314,0.5262]],"h":[[[0.1313,0.1706],[0.1483,0.183],[0.1891,0.1867],[0.2103,0.1814],[0.2315,0.17],[0.246,0.1575],[0.2501,0.1461],[0.2413,0.1369],[0.2282,0.132],[0.1891,0.1316],[0.1499,0.1466],[0.1342,0.1608]],[[0.0513,0.2407],[0.0602,0.2482],[0.0732,0.252],[0.1026,0.2521],[0.1238,0.2483],[0.163,0.2287],[0.1759,0.2178],[0.1833,0.2032],[0.1711,0.194],[0.1499,0.1903],[0.1108,0.1956],[0.0945,0.2012],[0.0667,0.2184],[0.0543,0.2309]],[[0.1735,0.2781],[0.1842,0.2829],[0.2005,0.2793],[0.2413,0.2569],[0.2717,0.2211],[0.2815,0.1999],[0.2813,0.1887],[0.2739,0.1854],[0.2609,0.1858],[0.2331,0.1971],[0.1974,0.2244],[0.1815,0.2456],[0.1713,0.2685]],[[0.0479,0.3547],[0.0586,0.3582],[0.0765,0.356],[0.114,0.3368],[0.1477,0.3043],[0.1608,0.2831],[0.1638,0.2638],[0.1565,0.2605],[0.1434,0.2609],[0.0977,0.2817],[0.0624,0.3158],[0.0477,0.3435]],[[0.155,0.3803],[0.1662,0.3825],[0.1793,0.3781],[0.2054,0.3625],[0.2199,0.3484],[0.2391,0.3158],[0.2444,0.2962],[0.2411,0.2855],[0.2331,0.2832],[0.2038,0.2935],[0.1827,0.3093],[0.1554,0.35],[0.1516,0.3647]],[[0.0963,0.4896],[0.1059,0.4902],[0.1206,0.4849],[0.1418,0.4691],[0.1559,0.4528],[0.171,0.4202],[0.1726,0.4022],[0.1677,0.3916],[0.1565,0.3914],[0.1385,0.3995],[0.1081,0.4267],[0.0914,0.4659],[0.0914,0.4789]]]}]},{"id":"fan1","s":[{"o":[[0.1536,0.5556],[0.1799,0.5124],[0.1846,0.5344],[0.194,0.5404],[0.2152,0.5293],[0.244,0.4952],[0.2538,0.4724],[0.2591,0.4398],[0.2525,0.4226],[0.2382,0.4249],[0.237,0.4218],[0.2419,0.4144],[0.2674,0.3973],[0.2831,0.3794],[0.2962,0.3484],[0.299,0.3239],[0.312,0.3029],[0.3162,0.3019],[0.3392,0.321],[0.3571,0.3237],[0.3718,0.3184],[0.393,0.297],[0.4175,0.2917],[0.4332,0.2782],[0.4369,0.2554],[0.4226,0.2277],[0.4173,0.1738],[0.4094,0.151],[0.4387,0.1041],[0.4449,0.1132],[0.4334,0.1249],[0.4291,0.1493],[0.4311,0.1689],[0.4425,0.2016],[0.4599,0.226],[0.4795,0.2387],[0.4893,0.2293],[0.4953,0.1958],[0.5197,0.2358],[0.5185,0.2389],[0.5058,0.2393],[0.4975,0.2603],[0.5013,0.2946],[0.516,0.3239],[0.535,0.345],[0.5529,0.3529],[0.5611,0.3419],[0.5643,0.3305],[0.563,0.3127],[0.5665,0.3127],[0.6176,0.3973],[0.6097,0.4088],[0.6068,0.4235],[0.6106,0.4496],[0.622,0.4773],[0.6411,0.5034],[0.6606,0.5168],[0.6719,0.5189],[0.6813,0.5026],[0.7077,0.5458],[0.7061,0.5489],[0.6818,0.5497],[0.6557,0.5636],[0.6329,0.5622],[0.5856,0.5669],[0.5219,0.5509],[0.5007,0.5491],[0.4746,0.5259],[0.4518,0.5214],[0.4273,0.5312],[0.4061,0.5636],[0.3784,0.5573],[0.3539,0.5587],[0.3196,0.5426],[0.3033,0.5459],[0.2821,0.5583],[0.2576,0.5591],[0.2348,0.5654],[0.1728,0.5669],[0.1597,0.5625]],"h":[[[0.4518,0.4073],[0.4632,0.399],[0.4701,0.3876],[0.4828,0.3402],[0.479,0.2978],[0.4724,0.2815],[0.4599,0.2682],[0.4502,0.2734],[0.44,0.288],[0.429,0.3272],[0.4311,0.3729],[0.4409,0.399]],[[0.393,0.4287],[0.4045,0.4218],[0.4146,0.4071],[0.424,0.3745],[0.4202,0.3402],[0.412,0.3223],[0.4012,0.3149],[0.393,0.318],[0.3845,0.3272],[0.3767,0.3435],[0.3702,0.3696],[0.374,0.4039],[0.3834,0.4218]],[[0.3001,0.4455],[0.3131,0.4434],[0.3326,0.4282],[0.351,0.399],[0.3571,0.3598],[0.3473,0.3378],[0.3359,0.3399],[0.3229,0.3486],[0.2997,0.381],[0.2921,0.4039],[0.2919,0.4283]],[[0.5138,0.4602],[0.523,0.4544],[0.5328,0.43],[0.5332,0.3941],[0.5272,0.3761],[0.5165,0.3582],[0.5089,0.3506],[0.5007,0.3477],[0.4911,0.3549],[0.4866,0.3631],[0.4797,0.3892],[0.4797,0.4055],[0.4932,0.443],[0.504,0.4559]],[[0.5823,0.4943],[0.5899,0.4871],[0.5964,0.4724],[0.5968,0.4349],[0.5892,0.412],[0.5801,0.3973],[0.5676,0.3845],[0.5578,0.3813],[0.5477,0.3908],[0.5417,0.4104],[0.5433,0.4463],[0.5542,0.4708],[0.5709,0.4898]]]}]},{"id":"fan2","s":[{"o":[[0.9868,0.5556],[0.969,0.5637],[0.9543,0.5636],[0.9298,0.5529],[0.9184,0.5524],[0.8891,0.5652],[0.8499,0.5621],[0.8238,0.567],[0.7846,0.5668],[0.7732,0.5641],[0.7522,0.5505],[0.7247,0.5101],[0.7569,0.5224],[0.7634,0.5165],[0.765,0.505],[0.7612,0.4887],[0.7449,0.4512],[0.7063,0.4106],[0.6818,0.3992],[0.6775,0.4008],[0.6739,0.4104],[0.6784,0.4381],[0.6748,0.4396],[0.6255,0.368],[0.6255,0.3639],[0.6349,0.3614],[0.6394,0.3451],[0.6356,0.319],[0.6274,0.3011],[0.6084,0.2783],[0.5839,0.2609],[0.5727,0.2611],[0.5629,0.2775],[0.5314,0.2326],[0.5334,0.2285],[0.5546,0.2419],[0.5741,0.2483],[0.5854,0.245],[0.5883,0.2277],[0.572,0.195],[0.5399,0.1662],[0.5105,0.1548],[0.4982,0.1593],[0.4927,0.1763],[0.4741,0.1428],[0.4507,0.1167],[0.4428,0.1012],[0.473,0.1006],[0.5529,0.1173],[0.597,0.1312],[0.6378,0.1336],[0.6884,0.1628],[0.7487,0.1896],[0.7781,0.1979],[0.8058,0.2222],[0.8727,0.2686],[0.9135,0.306],[0.9342,0.3305],[0.9601,0.3696],[0.988,0.4267],[0.9982,0.474],[1.0,0.5018]],"h":[[[0.7887,0.2619],[0.7812,0.2393],[0.7585,0.218],[0.7455,0.211],[0.7112,0.2034],[0.6949,0.207],[0.6859,0.213],[0.6873,0.2244],[0.6938,0.2358],[0.721,0.259],[0.7585,0.2701],[0.7797,0.2679]],[[0.6974,0.2911],[0.6992,0.2831],[0.6887,0.2587],[0.6655,0.2331],[0.6378,0.2175],[0.6247,0.2135],[0.6084,0.2132],[0.5994,0.2164],[0.5988,0.2277],[0.6031,0.2407],[0.6329,0.2764],[0.6606,0.2917],[0.6753,0.296],[0.6884,0.296]],[[0.8295,0.3922],[0.8301,0.3827],[0.8225,0.3615],[0.7911,0.3241],[0.7471,0.2995],[0.734,0.2978],[0.7234,0.3013],[0.7212,0.3125],[0.7271,0.3272],[0.7569,0.3662],[0.7781,0.3814],[0.8058,0.3935],[0.8205,0.3957]],[[0.7545,0.402],[0.7563,0.3925],[0.7442,0.3647],[0.7194,0.3355],[0.6933,0.3147],[0.672,0.3049],[0.6557,0.3011],[0.6451,0.3046],[0.6449,0.319],[0.6579,0.3451],[0.69,0.3809],[0.7259,0.4006],[0.7455,0.4055]],[[0.9225,0.4151],[0.9247,0.4055],[0.9204,0.3908],[0.8988,0.36],[0.8809,0.3464],[0.8597,0.3375],[0.8434,0.3337],[0.8294,0.3372],[0.8276,0.35],[0.8381,0.3729],[0.8613,0.3988],[0.8809,0.4108],[0.9135,0.4185]],[[0.8627,0.5125],[0.866,0.5018],[0.8591,0.4822],[0.835,0.4463],[0.7993,0.419],[0.7748,0.4106],[0.7636,0.4112],[0.7602,0.4235],[0.764,0.4381],[0.7913,0.4789],[0.8254,0.5054],[0.8532,0.5146]],[[0.9519,0.5358],[0.9541,0.5262],[0.9488,0.5067],[0.9298,0.479],[0.9103,0.4632],[0.8939,0.455],[0.8793,0.4512],[0.8653,0.4547],[0.8629,0.4642],[0.8651,0.4773],[0.8766,0.4985],[0.8907,0.5148],[0.907,0.5273],[0.9298,0.5377],[0.9429,0.5393]]]}]}]};
 
-var TRUNK = [
-  [[0,0,0],      [0.00,0.10,0.00], 0.230, 0.160],
-  [[0,0.09,0],   [0.03,0.34,0.02], 0.160, 0.108]
-];
-var BOUGHS = [
-  [ [[0.03,0.33,0.02],  [-0.60,0.54,0.10], 0.100, 0.055],
-    [[-0.60,0.54,0.10], [-1.00,0.62,0.00], 0.052, 0.026],
-    [[-0.56,0.52,0.09], [-0.66,0.72,0.30], 0.048, 0.024] ],
-  [ [[0.03,0.33,0.02],  [0.10,0.62,-0.18], 0.098, 0.054],
-    [[0.10,0.62,-0.18], [-0.14,0.76,-0.36], 0.050, 0.025],
-    [[0.09,0.58,-0.16], [0.36,0.78,-0.06], 0.048, 0.024] ],
-  [ [[0.03,0.33,0.02],  [0.68,0.50,0.16], 0.096, 0.052],
-    [[0.68,0.50,0.16],  [1.06,0.58,0.28], 0.048, 0.024],
-    [[0.64,0.48,0.14],  [0.82,0.70,-0.08], 0.046, 0.023] ]
-];
-// the crown: wider than it is tall, and flat on top
-var CANOPY = [
-  [[-0.92,0.62,0.04],0.30],[[-0.58,0.70,0.20],0.31],[[-0.64,0.66,-0.18],0.27],
-  [[-0.26,0.76,0.02],0.33],[[-0.22,0.70,-0.28],0.27],[[0.00,0.80,0.20],0.30],
-  [[0.14,0.80,-0.12],0.31],[[0.42,0.74,0.06],0.30],[[0.34,0.70,-0.26],0.26],
-  [[0.70,0.68,0.22],0.28],[[0.78,0.64,-0.08],0.28],[[1.02,0.58,0.08],0.25],
-  [[-0.40,0.54,0.30],0.24],[[0.52,0.54,0.30],0.23],[[0.20,0.56,-0.36],0.23],
-  [[-0.78,0.52,-0.10],0.23],[[-0.06,0.60,0.34],0.22],[[0.62,0.58,-0.30],0.21],
-  [[-0.44,0.60,-0.32],0.22],[[0.90,0.52,0.26],0.21]
-];
-
-function buildTree(barkMat, leafMat, box){
-  var pieces = [], all = [], i, j;
-  function add(id, geos, mat){
-    var node = new T.Group();
-    for(var k=0;k<geos.length;k++){
-      var m = new T.Mesh(geos[k], mat);
-      m.castShadow = true; m.receiveShadow = true;
-      node.add(m);
-      all.push(geos[k]);
-    }
-    pieces.push({ id:id, node:node, mats:[mat] });
+function buildTree(mat, box, depth){
+  var pieces = [], s = box.w;          // the outlines run 0..1 across, so width is the scale
+  for(var i=0;i<TREE_PARTS.p.length;i++){
+    var tp = TREE_PARTS.p[i];
+    var geo = new T.ExtrudeGeometry(tp.s.map(shapeOf), {
+      depth: depth, bevelEnabled: true, bevelThickness: depth*0.17,
+      bevelSize: depth*0.13, bevelSegments: 2, curveSegments: 1
+    });
+    geo.computeVertexNormals();
+    geo.scale(s, s, 1);
+    geo.translate(box.x, box.y, box.z);
+    scaleUV(geo, 3.2, 3.2);
+    geo.computeBoundingBox();
+    var c = geo.boundingBox.getCenter(new T.Vector3());
+    geo.translate(-c.x, -c.y, -c.z);
+    var m = new T.Mesh(geo, mat.clone());
+    m.position.copy(c);
+    m.castShadow = true; m.receiveShadow = true;
+    m.material.transparent = true;
+    pieces.push({ id:tp.id, node:m, mats:[m.material], home:c.clone() });
   }
-  add('trunk', TRUNK.map(function(l){ return limb(l[0], l[1], l[2], l[3]); }), barkMat);
-  for(i=0;i<BOUGHS.length;i++){
-    add('bough'+i, BOUGHS[i].map(function(l){ return limb(l[0], l[1], l[2], l[3]); }), barkMat);
-  }
-  for(i=0;i<4;i++){
-    var g = [];
-    for(j=i;j<CANOPY.length;j+=4) g.push(blob(CANOPY[j][0], CANOPY[j][1], 0.74));
-    add('canopy'+i, g, leafMat);
-  }
-
-  // fit the whole tree into the slot the lettering leaves for it
-  var bb = new T.Box3();
-  for(i=0;i<all.length;i++){ all[i].computeBoundingBox(); bb.union(all[i].boundingBox); }
-  var sz = bb.getSize(new T.Vector3());
-  var sx = box.w / sz.x, sy = box.h / sz.y;
-  for(i=0;i<all.length;i++){
-    all[i].translate(-bb.min.x, -bb.min.y, -(bb.min.z + sz.z/2));
-    all[i].scale(sx, sy, sx);
-    all[i].translate(box.x, box.y, box.z);
-  }
-
   var root = new T.Group();
-  for(i=0;i<pieces.length;i++){
-    var pc = pieces[i];
-    var c = new T.Box3().setFromObject(pc.node).getCenter(new T.Vector3());
-    for(j=0;j<pc.node.children.length;j++) pc.node.children[j].geometry.translate(-c.x, -c.y, -c.z);
-    pc.node.position.copy(c);
-    pc.home = c.clone();
-    root.add(pc.node);
-  }
+  for(var j=0;j<pieces.length;j++) root.add(pieces[j].node);
   return { root:root, pieces:pieces };
 }
 
@@ -1599,7 +1526,7 @@ var LOGO_PARTS = [{"id":"w0","s":[{"o":[[0.1412,0.1253],[0.1342,0.1261],[0.1332,
 var hR, hScene, hCam, logoNode, hDirty = true, hIdle = 0;
 var dragAz = 0, dragEl = 0, hHeld = false, hParts = [];
 var asmT = 0, asmRun = false;
-var STAGGER = 0.085, DUR = 0.46, TREE_DUR = 0.52, TREE_STAGGER = 0.15;
+var STAGGER = 0.085, DUR = 0.46, TREE_DUR = 0.56, TREE_STAGGER = 0.19;
 
 function initHero(){
   var canvas = $('#stage');
@@ -1633,10 +1560,7 @@ function initHero(){
   logoNode = buildLogo(wood, 0.055);
   hScene.add(logoNode);
 
-  var bark = wood.clone(); bark.transparent = true;
-  var leaf = wood.clone(); leaf.transparent = true;
-  leaf.color = new T.Color(0.66, 0.60, 0.50);        // the canopy a shade back from the boughs
-  var tree = buildTree(bark, leaf, { x:-0.368, y:-0.004, z:0.028, w:0.316, h:0.150 });
+  var tree = buildTree(wood, { x:-0.368, y:-0.024, z:0.008, w:0.316 }, 0.042);
   logoNode.add(tree.root);
 
   // the letters first, left to right, then the frame, then the tree grows
@@ -1650,8 +1574,9 @@ function initHero(){
   at += 0.22;
   tree.pieces.forEach(function(pc, i){
     pc.at = at; pc.dur = TREE_DUR;
-    pc.rise = i === 0 ? -0.055 : 0.05;                // the trunk rises out of the ground
-    pc.push = 0.05; pc.tilt = i === 0 ? 0 : 0.35;
+    pc.rise = i === 0 ? -0.05 : 0.045;                // the stem rises, then the fans open out
+    pc.push = i === 0 ? 0.04 : 0.09;
+    pc.tilt = i === 0 ? 0 : 0.4;
     at += TREE_STAGGER;
     hParts.push(pc);
   });
