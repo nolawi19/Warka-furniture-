@@ -1,0 +1,7 @@
+.panel {
+  max-width: 420px;
+  margin-inline: auto;
+  padding-block: clamp(40px, 7vw, 88px);
+}
+.title { font-size: clamp(30px, 4.4vw, 46px); margin-bottom: var(--space-3); }
+.blurb { color: var(--ink-2); font-size: var(--text-sm); margin-bottom: var(--space-6); text-wrap: pretty; }

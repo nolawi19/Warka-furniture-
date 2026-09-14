@@ -97,7 +97,8 @@ export function SearchTrigger() {
         type="button"
         className={styles.trigger}
         onClick={() => setOpen(true)}
-        aria-label="Search the catalogue"
+        aria-label="Search"
+        aria-haspopup="dialog"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">
           <circle cx="11" cy="11" r="6.4" />
@@ -129,7 +130,7 @@ export function SearchTrigger() {
                 placeholder="Search beds, tables, drawers…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                aria-label="Search the catalogue"
+                aria-label="Search everything Warka makes"
                 autoComplete="off"
                 enterKeyHint="search"
               />
