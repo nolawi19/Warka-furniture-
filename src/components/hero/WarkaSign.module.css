@@ -1,0 +1,91 @@
+.stage {
+  position: relative;
+  aspect-ratio: 7 / 5;
+  background: var(--stage);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: background var(--dur-slow) var(--ease-out);
+}
+
+/* The wordmark set enormous behind the sign — the shop's name at the size it
+   is painted on the shutter. Decorative only; the heading carries the text. */
+.ghost {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 0;
+  pointer-events: none;
+}
+.ghost span {
+  font-size: clamp(64px, 13vw, 190px);
+  color: var(--ghost);
+  white-space: nowrap;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  /* Vertical drags scroll the page; only horizontal movement turns the sign. */
+  touch-action: pan-y;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+.canvas[data-ready='true'] { opacity: 1; }
+.canvas:active { cursor: grabbing; }
+
+.fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+.fallbackImage {
+  width: min(68%, 340px);
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.hint {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  z-index: 2;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  pointer-events: none;
+}
+
+.replay {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  z-index: 3;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 6px 13px;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.replay:hover { background: var(--bg-3); color: var(--ink); }
+
+@media (pointer: coarse) {
+  .replay { padding: 11px 15px; }
+}
+
+@media (max-width: 1000px) {
+  .stage { aspect-ratio: 16 / 10; }
+}

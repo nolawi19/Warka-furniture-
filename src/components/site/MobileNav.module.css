@@ -1,0 +1,103 @@
+.trigger {
+  display: none;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink);
+  cursor: pointer;
+}
+.trigger:hover { background: var(--bg-3); }
+.trigger svg { width: 20px; height: 20px; }
+
+@media (max-width: 1000px) {
+  .trigger { display: grid; }
+}
+@media (pointer: coarse) {
+  .trigger { width: 44px; height: 44px; }
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(12, 11, 9, 0.42);
+  backdrop-filter: blur(2px);
+  animation: fade var(--dur-base) var(--ease-out);
+}
+
+.panel {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  width: min(380px, 88vw);
+  background: var(--bg);
+  border-left: 1px solid var(--line-2);
+  box-shadow: var(--shadow-3);
+  display: flex;
+  flex-direction: column;
+  /* Respects the notch and the home indicator on a phone. */
+  padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-5)
+           max(var(--space-5), env(safe-area-inset-bottom));
+  animation: slide var(--dur-base) var(--ease-out);
+  overflow-y: auto;
+}
+
+@keyframes fade { from { opacity: 0; } }
+@keyframes slide { from { transform: translateX(14px); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim, .panel { animation: none; }
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--space-5);
+}
+
+.close {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius);
+  color: var(--ink);
+  cursor: pointer;
+  margin-right: -10px;
+}
+.close:hover { background: var(--bg-3); }
+.close svg { width: 20px; height: 20px; }
+
+.list { border-top: 1px solid var(--line-2); }
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 17px 2px;
+  font-size: var(--text-h4);
+  border-bottom: 1px solid var(--line-2);
+  transition: color var(--dur-fast) var(--ease-out), padding-left var(--dur-fast) var(--ease-out);
+}
+.link:hover { color: var(--ember-text); padding-left: 6px; }
+.link svg { width: 18px; height: 18px; color: var(--ink-3); flex: none; }
+
+.panelFoot {
+  margin-top: auto;
+  padding-top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.footLink {
+  padding: 13px 2px;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--line-2);
+}
+.footLink:hover { color: var(--ink); }

@@ -1,0 +1,167 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  /* A light wash, not a glass panel: the page beneath should read as paper. */
+  backdrop-filter: saturate(1.4) blur(12px);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
+  border-bottom: 1px solid var(--line-2);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .header { background: var(--bg); }
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: var(--header-h);
+}
+
+/* ------------------------------------------------------------- brand */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  padding-block: var(--space-2);
+}
+
+.mark {
+  /* The traced crown is wider than it is tall; height is what must stay
+     constant beside the wordmark. */
+  height: 24px;
+  width: auto;
+  color: var(--ember-text);
+  flex: none;
+}
+
+.wordmark {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1;
+}
+.wordmark strong {
+  font-weight: 700;
+  font-stretch: 112%;
+  letter-spacing: 0.04em;
+  font-size: 16px;
+}
+.wordmark em {
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------------------- nav */
+
+.nav { flex: 1; }
+
+.navList {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.navLink {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.navLink:hover { color: var(--ink); background: var(--bg-3); }
+
+/* ------------------------------------------------------------- actions */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: none;
+}
+
+.iconLink {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.iconLink:hover { background: var(--bg-3); }
+.iconLink svg { width: 18px; height: 18px; }
+
+.staffLink {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+.staffLink:hover { color: var(--ink); border-color: var(--ink-3); }
+
+.cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ember);
+  color: var(--ember-ink);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: filter var(--dur-fast) var(--ease-out), transform var(--dur-instant) var(--ease-out);
+}
+.cart:hover { filter: brightness(1.08); }
+.cart:active { transform: translateY(1px); }
+.cart svg { width: 17px; height: 17px; }
+
+.cartLabel { display: inline; }
+
+.count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding-inline: 6px;
+  background: rgba(255, 255, 255, 0.24);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-micro);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.count[data-empty='true'] { opacity: 0.6; }
+
+/* ------------------------------------------------------------- responsive */
+
+@media (max-width: 1000px) {
+  .nav { display: none; }
+  .staffLink { display: none; }
+  .cartLabel { display: none; }
+  .cart { padding: 10px 12px; }
+}
+
+@media (max-width: 560px) {
+  .iconLink { display: none; }
+  .wordmark em { display: none; }
+}
+
+@media (pointer: coarse) {
+  .iconLink { width: 44px; height: 44px; }
+  .cart { padding-block: 12px; }
+  .navLink { padding-block: 12px; }
+}

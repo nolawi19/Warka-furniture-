@@ -1,0 +1,148 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding-inline: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink-2);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.trigger:hover { background: var(--bg-3); color: var(--ink); }
+.trigger svg { width: 17px; height: 17px; flex: none; }
+.triggerHint { display: none; }
+
+@media (min-width: 1100px) {
+  .triggerHint { display: inline; }
+}
+@media (max-width: 1000px) {
+  .trigger { width: 40px; padding-inline: 0; justify-content: center; }
+}
+@media (pointer: coarse) {
+  .trigger { height: 44px; min-width: 44px; }
+}
+
+/* ------------------------------------------------------------- overlay */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(12, 11, 9, 0.42);
+  backdrop-filter: blur(3px);
+  padding: max(8vh, 56px) var(--space-4) var(--space-4);
+  animation: fade var(--dur-base) var(--ease-out);
+}
+@keyframes fade { from { opacity: 0; } }
+
+.panel {
+  width: min(640px, 100%);
+  margin-inline: auto;
+  background: var(--bg-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-3);
+  overflow: hidden;
+  animation: rise var(--dur-base) var(--ease-out);
+}
+@keyframes rise { from { transform: translateY(-8px); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim, .panel { animation: none; }
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--line-2);
+}
+.formIcon { width: 19px; height: 19px; color: var(--ink-3); flex: none; }
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  font-size: var(--text-lg);
+  padding-block: 10px;
+}
+.input:focus { outline: none; }
+.input::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+.esc {
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 7px 10px;
+  cursor: pointer;
+  flex: none;
+}
+.esc:hover { background: var(--bg-3); color: var(--ink); }
+
+.body { max-height: min(60vh, 520px); overflow-y: auto; }
+
+.suggest { padding: var(--space-4); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--space-3); }
+.chip {
+  font-size: var(--text-xs);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 8px 14px;
+  cursor: pointer;
+  color: var(--ink-2);
+}
+.chip:hover { background: var(--bg-3); color: var(--ink); }
+
+.hits { padding: var(--space-2); }
+
+.hit, .hitCat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.hit:hover, .hitCat:hover { background: var(--bg-3); }
+
+.thumb {
+  width: 56px;
+  height: 42px;
+  flex: none;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-3);
+}
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.thumbBlank { display: block; width: 100%; height: 100%; }
+
+.hitText { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.35; }
+.hitText strong { font-size: var(--text-sm); font-weight: 600; }
+.hitText span { font-size: var(--text-xs); color: var(--ink-2); }
+
+.hitPrice { font-size: var(--text-xs); color: var(--ink-2); flex: none; font-variant-numeric: tabular-nums; }
+
+.hitCat { font-size: var(--text-sm); color: var(--ink-2); }
+.hitCat strong { color: var(--ink); font-weight: 600; }
+
+.empty { padding: var(--space-6) var(--space-4); text-align: center; color: var(--ink-2); font-size: var(--text-sm); }
+.empty strong { color: var(--ink); }
+.emptyHint { margin-top: var(--space-2); }
+.emptyHint a { color: var(--ember-text); text-decoration: underline; }
+
+/* Skeletons hold the exact shape of a result, so nothing jumps when data lands. */
+.skeleton { display: flex; align-items: center; gap: var(--space-3); padding: 10px 12px; }
+.skelThumb { width: 56px; height: 42px; border-radius: var(--radius-sm); background: var(--bg-3); flex: none; }
+.skelLines { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+.skelLines span { height: 10px; border-radius: 3px; background: var(--bg-3); }
+.skelLines span:first-child { width: 42%; }
+.skelLines span:last-child { width: 26%; }
+.skeleton { animation: pulse 1.4s var(--ease-in-out) infinite; }
+@keyframes pulse { 50% { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }

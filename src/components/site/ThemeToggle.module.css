@@ -1,0 +1,20 @@
+.toggle {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--ink);
+  background: transparent;
+  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  flex: none;
+}
+.toggle:hover { background: var(--bg-3); }
+.toggle:active { transform: translateY(1px); }
+.toggle svg { width: 18px; height: 18px; transition: opacity var(--dur-fast) var(--ease-out); }
+
+@media (pointer: coarse) {
+  .toggle { width: 44px; height: 44px; }
+}

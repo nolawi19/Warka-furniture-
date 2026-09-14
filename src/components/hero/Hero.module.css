@@ -1,0 +1,74 @@
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1.12fr;
+  gap: clamp(24px, 4vw, 64px);
+  align-items: center;
+  padding-block: clamp(28px, 4vw, 56px) clamp(36px, 5vw, 72px);
+}
+
+.copy { display: flex; flex-direction: column; gap: var(--space-5); }
+
+.headline {
+  font-size: var(--text-display);
+  margin-block: var(--space-1) 0;
+}
+
+.cta { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+
+.primary, .secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  padding: 13px 22px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  transition: filter var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out),
+              transform var(--dur-instant) var(--ease-out);
+}
+.primary { background: var(--ember); color: var(--ember-ink); }
+.primary:hover { filter: brightness(1.08); }
+.secondary { border-color: var(--line); color: var(--ink); }
+.secondary:hover { background: var(--bg-3); }
+.primary:active, .secondary:active { transform: translateY(1px); }
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+.facts > div {
+  padding-inline: 20px;
+  border-left: 1px solid var(--line-2);
+}
+.facts > div:first-child { padding-left: 0; border-left: 0; }
+.facts dt {
+  font-weight: 600;
+  font-size: var(--text-lg);
+  letter-spacing: var(--tracking-tight);
+  font-variant-numeric: tabular-nums;
+}
+.facts dd { font-size: var(--text-xs); color: var(--ink-2); }
+
+/* Exactly the shape of the real stage, so the page does not move when the
+   3D module finishes loading. */
+.stageSkeleton {
+  aspect-ratio: 7 / 5;
+  background: var(--stage);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 1000px) {
+  .hero { grid-template-columns: 1fr; gap: var(--space-6); }
+  /* On a phone the sign leads: it is the thing worth seeing first. */
+  .stageColumn { order: -1; }
+  .stageSkeleton { aspect-ratio: 16 / 10; }
+}
+
+@media (max-width: 480px) {
+  .facts > div { padding-inline: 0 14px; border-left: 0; }
+  .primary, .secondary { flex: 1; }
+}
