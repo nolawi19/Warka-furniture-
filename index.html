@@ -36,18 +36,18 @@
 /* ---------------- tokens: light is the default, dark is opt-in ------------- */
 :root{
   --bg:#F4F2ED; --bg-2:#FFFFFF; --bg-3:#EAE7E0; --stage:#FFFFFF;
-  --ink:#191814; --ink-2:#6E6A60; --ink-3:#959084;
+  --ink:#191814; --ink-2:#5E5A51; --ink-3:#8A857A;
   --line:rgba(25,24,20,.14); --line-2:rgba(25,24,20,.07);
-  --ember:#BC431E; --ember-ink:#FFFFFF;
+  --ember:#BC431E; --ember-text:#B5411D; --ember-ink:#FFFFFF;
   --ghost:rgba(25,24,20,.055);
   --shadow:0 1px 2px rgba(25,24,20,.05), 0 8px 24px -12px rgba(25,24,20,.16);
   --radius:3px;
 }
 :root[data-theme="dark"]{
   --bg:#0D0C0A; --bg-2:#161510; --bg-3:#201E18; --stage:#121110;
-  --ink:#F3F1EA; --ink-2:#948F83; --ink-3:#6E6A60;
+  --ink:#F3F1EA; --ink-2:#A39D90; --ink-3:#7C7768;
   --line:rgba(243,241,234,.14); --line-2:rgba(243,241,234,.06);
-  --ember:#E2542C; --ember-ink:#FFFFFF;
+  --ember:#D2451D; --ember-text:#F0714A; --ember-ink:#FFFFFF;
   --ghost:rgba(243,241,234,.055);
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
 }
@@ -62,18 +62,19 @@ body{
 img{max-width:100%;display:block}
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--ember);outline-offset:2px;border-radius:2px}
+:focus-visible{outline:2px solid var(--ember-text);outline-offset:2px;border-radius:2px}
 [hidden]{display:none!important}
 
 .dsp{font-family:'Archivo',sans-serif;font-weight:700;font-stretch:125%;
   text-transform:uppercase;letter-spacing:-.022em;line-height:.88;margin:0}
 .mic{font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-2)}
-.mic.em{color:var(--ember)}
+.mic.em{color:var(--ember-text)}
 .lede{color:var(--ink-2);max-width:52ch;margin:0}
 .wrap{max-width:1360px;margin:0 auto;padding-inline:24px}
-.sec{padding-block:clamp(64px,8vw,112px)}
-.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:40px}
-.sec-t{font-size:clamp(30px,5.2vw,68px)}
+.sec{padding-block:clamp(52px,6.2vw,88px)}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+  margin-bottom:clamp(22px,2.6vw,34px)}
+.sec-t{font-size:clamp(28px,4.4vw,54px)}
 
 /* ---------------- loader ---------------- */
 #load{position:fixed;top:0;left:0;right:0;height:2px;z-index:200;transition:opacity .4s ease;pointer-events:none}
@@ -107,6 +108,7 @@ button{font:inherit;color:inherit}
 .btn-ember{background:var(--ember);border-color:var(--ember);color:var(--ember-ink)}
 .btn-ember:hover{background:var(--ember);border-color:var(--ember);filter:brightness(1.08)}
 .btn-sm{padding:7px 13px;font-size:12.5px}
+.btn:active{transform:translateY(1px)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .count{display:inline-grid;place-items:center;min-width:19px;height:19px;padding:0 5px;
   background:rgba(255,255,255,.22);border-radius:99px;font-size:11px;font-weight:600}
@@ -117,39 +119,42 @@ button{font:inherit;color:inherit}
 .hero h1{font-size:clamp(38px,6.4vw,92px);margin:0 0 20px}
 .hero .lede{font-size:16px;margin-bottom:28px}
 .hero-cta{display:flex;gap:10px;flex-wrap:wrap}
-.hero-note{margin-top:26px;display:flex;gap:22px;flex-wrap:wrap}
-.hero-note div{font-size:12.5px;color:var(--ink-2)}
+.hero-note{margin-top:30px;display:flex;gap:0;flex-wrap:wrap;row-gap:16px}
+.hero-note div{font-size:12.5px;color:var(--ink-2);padding:0 20px;border-left:1px solid var(--line-2)}
+.hero-note div:first-child{padding-left:0;border-left:0}
 .hero-note b{display:block;color:var(--ink);font-weight:600;font-size:15px}
 .hero-stage{position:relative;border-radius:var(--radius);background:var(--stage);
-  border:1px solid var(--line-2);aspect-ratio:4/3;overflow:hidden;transition:background .3s ease}
+  border:1px solid var(--line-2);aspect-ratio:7/5;overflow:hidden;transition:background .3s ease}
 .ghost{position:absolute;inset:0;display:grid;place-items:center;z-index:0;pointer-events:none}
 .ghost span{font-size:clamp(64px,13vw,180px);color:var(--ghost);white-space:nowrap}
 #stage{position:absolute;inset:0;width:100%;height:100%;z-index:1;touch-action:pan-y;cursor:grab}
 .stage-hint{position:absolute;left:14px;bottom:12px;z-index:2;font-size:10.5px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--ink-3);pointer-events:none}
+  text-transform:uppercase;color:var(--ink-2);pointer-events:none}
 .stage-replay{position:absolute;right:12px;bottom:10px;z-index:3;background:none;border:1px solid var(--line);
   border-radius:99px;padding:5px 12px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--ink-2);cursor:pointer;transition:.16s}
 .stage-replay:hover{background:var(--bg-3);color:var(--ink)}
 
 /* ---------------- category strip ---------------- */
-.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line-2);
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;background:var(--bg-2);
   border:1px solid var(--line-2);border-radius:var(--radius);overflow:hidden}
-.cats a{background:var(--bg-2);padding:20px 18px;transition:.16s}
+.cats a{background:var(--bg-2);padding:20px 18px;transition:.16s;
+  box-shadow:-1px 0 0 var(--line-2), 0 -1px 0 var(--line-2)}
 .cats a:hover{background:var(--bg-3)}
 .cats b{display:block;font-weight:600;font-size:15px;margin-bottom:2px}
 .cats span{font-size:12.5px;color:var(--ink-2)}
 
 /* ---------------- product grid ---------------- */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:clamp(14px,1.6vw,22px)}
+@media (min-width:1001px){ #featured{grid-template-columns:repeat(3,1fr)} }
 .card{background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--radius);
   overflow:hidden;display:flex;flex-direction:column;transition:.18s}
-.card:hover{border-color:var(--line);transform:translateY(-2px);box-shadow:var(--shadow)}
+.card:hover,.card:focus-within{border-color:var(--line);transform:translateY(-2px);box-shadow:var(--shadow)}
 .card-img{aspect-ratio:4/3;background:var(--stage);position:relative;overflow:hidden}
 .card-img img{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s ease}
 .card-img img.in{opacity:1}
 .card-img.photo img{object-fit:cover}
-.card-img .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3);font-size:10.5px;
+.card-img .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-2);font-size:10.5px;
   letter-spacing:.14em;text-transform:uppercase}
 .card-tag{position:absolute;top:10px;left:10px;z-index:2;background:var(--bg-2);border:1px solid var(--line-2);
   font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border-radius:99px;color:var(--ink-2)}
@@ -167,13 +172,14 @@ button{font:inherit;color:inherit}
   stroke:var(--ink-3);fill:none;stroke-width:1.7;pointer-events:none}
 input,select,textarea{font:inherit;color:var(--ink);background:var(--bg-2);border:1px solid var(--line);
   border-radius:var(--radius);padding:10px 12px;width:100%;transition:.16s}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ember)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ember-text)}
 .search input{padding-left:34px}
 select{width:auto;cursor:pointer;padding-right:30px}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{background:var(--bg-2);border:1px solid var(--line);border-radius:99px;padding:7px 14px;
   font-size:12.5px;cursor:pointer;transition:.16s;white-space:nowrap}
 .chip:hover{background:var(--bg-3)}
+.chip:active{transform:translateY(1px)}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .count-line{font-size:12.5px;color:var(--ink-2);margin:0 0 18px}
 .empty{padding:60px 0;text-align:center;color:var(--ink-2)}
@@ -192,8 +198,8 @@ select{width:auto;cursor:pointer;padding-right:30px}
 .qty button{width:30px;height:30px;background:none;border:0;cursor:pointer;color:var(--ink-2)}
 .qty button:hover{color:var(--ink)}
 .qty span{min-width:26px;text-align:center;font-size:13.5px;font-variant-numeric:tabular-nums}
-.o-del{background:none;border:0;cursor:pointer;color:var(--ink-3);font-size:12px;text-decoration:underline}
-.o-del:hover{color:var(--ember)}
+.o-del{background:none;border:0;cursor:pointer;color:var(--ink-2);font-size:12px;text-decoration:underline}
+.o-del:hover{color:var(--ember-text)}
 .panel{background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--radius);padding:22px}
 .panel h3{margin:0 0 16px;font-size:17px;font-weight:600}
 .field{margin-bottom:13px}
@@ -204,7 +210,7 @@ select{width:auto;cursor:pointer;padding-right:30px}
 .totals .big{color:var(--ink);font-weight:600;font-size:17px;margin-top:8px}
 .order-actions{display:flex;flex-direction:column;gap:8px;margin-top:16px}
 .hintline{font-size:12px;color:var(--ink-2);margin:12px 0 0}
-.ok{color:var(--ember);font-size:12.5px;margin:10px 0 0;min-height:17px}
+.ok{color:var(--ember-text);font-size:12.5px;margin:10px 0 0;min-height:17px}
 
 /* ---------------- misc blocks ---------------- */
 .cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-2);
@@ -212,11 +218,12 @@ select{width:auto;cursor:pointer;padding-right:30px}
 .cols4>div{background:var(--bg-2);padding:26px 22px}
 .cols4 h3{margin:0 0 8px;font-size:16px;font-weight:600}
 .cols4 p{margin:0;font-size:13.5px;color:var(--ink-2)}
-.quote{padding-block:clamp(56px,8vw,110px);padding-inline:24px;text-align:center}
+.quote{padding-block:clamp(40px,5vw,76px);padding-inline:24px;text-align:center}
 .quote blockquote{margin:0 auto;max-width:17ch;font-family:'Instrument Serif',Georgia,serif;
   font-style:italic;font-size:clamp(28px,5.4vw,62px);line-height:1.08}
 .visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(22px,3vw,48px);align-items:center}
-.visit-grid img{border-radius:var(--radius);border:1px solid var(--line-2);width:100%;height:auto}
+.visit-grid img{border-radius:var(--radius);border:1px solid var(--line-2);width:100%;height:auto;
+  aspect-ratio:4/5;object-fit:cover}
 .dl{display:grid;grid-template-columns:118px 1fr;gap:11px 18px;font-size:14px;
   border-top:1px solid var(--line);padding-top:20px;margin:22px 0 0}
 .dl dt{color:var(--ink-2);margin:0}
@@ -264,6 +271,22 @@ footer{border-top:1px solid var(--line-2);padding-block:34px 44px;color:var(--in
   .o-thumb{width:64px}
   .o-right{grid-column:1/-1;justify-content:space-between}
   .row2{grid-template-columns:1fr}
+  .card-foot{flex-direction:column;align-items:stretch;gap:9px}
+  .card-foot .btn{justify-content:center;padding-block:11px}
+  .hero-note div{padding:0 14px 0 0;border-left:0}
+  .hero-note{gap:0 4px}
+}
+@media (pointer:coarse){
+  /* every control reaches 44x44 on a finger, without changing how it looks */
+  .chip{padding:11px 16px}
+  .icon-btn{width:44px;height:44px}
+  .btn{padding-block:12px}
+  .btn-sm{padding:12px 16px}
+  .qty button{width:44px;height:44px}
+  .qty span{min-width:30px}
+  .o-del{padding:13px 2px}
+  .stage-replay{padding:11px 14px}
+  .nav-links a{padding:12px}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -1124,6 +1147,9 @@ BUILDERS.dresser = function(mk, o){
 
 // The sign traced off the photograph into outlines: each letter, the frame
 // and the tree are separate solids, so they can be built up in order.
+// A rounder chamfer is what makes the edges read as milled rather than cut,
+// but it multiplies the bevel rings — so a phone gets one ring fewer.
+var BEVEL_SEG = window.innerWidth < 760 ? 2 : 3;
 function shapeOf(sh){
   var o = sh.o.map(function(q){ return new T.Vector2(q[0], q[1]); });
   if(T.ShapeUtils.isClockWise(o)) o.reverse();
@@ -1149,7 +1175,7 @@ function buildTree(mat, box, depth){
     var tp = TREE_PARTS.p[i];
     var geo = new T.ExtrudeGeometry(tp.s.map(shapeOf), {
       depth: depth, bevelEnabled: true, bevelThickness: depth*0.17,
-      bevelSize: depth*0.13, bevelSegments: 2, curveSegments: 1
+      bevelSize: depth*0.13, bevelSegments: BEVEL_SEG, curveSegments: 1
     });
     geo.computeVertexNormals();
     geo.scale(s, s, 1);
@@ -1176,7 +1202,7 @@ function buildLogo(mat, depth){
     var lp = LOGO_PARTS[i];
     var geo = new T.ExtrudeGeometry(lp.s.map(shapeOf), {
       depth: depth, bevelEnabled: true, bevelThickness: depth*0.13,
-      bevelSize: depth*0.10, bevelSegments: 2, curveSegments: 1
+      bevelSize: depth*0.10, bevelSegments: BEVEL_SEG, curveSegments: 1
     });
     geo.computeVertexNormals();
     scaleUV(geo, 3.2, 3.2);
@@ -1537,7 +1563,10 @@ function initHero(){
   hR.setClearColor(0x000000, 0);
   hR.outputEncoding = T.sRGBEncoding;
   hR.toneMapping = T.ACESFilmicToneMapping;
-  hR.toneMappingExposure = 1.02;
+  hR.toneMappingExposure = 1.06;
+  hR.shadowMap.enabled = true;                 // every mesh already asks to cast one
+  hR.shadowMap.type = T.PCFShadowMap;          // PCFSoft ignores shadow.radius and costs more
+  hR.shadowMap.autoUpdate = false;             // the sign only moves while it is being built
 
   hScene = new T.Scene();
   hCam = new T.PerspectiveCamera(17, 4/3, 0.05, 60);
@@ -1550,19 +1579,19 @@ function initHero(){
   hScene.environment = hpm.fromEquirectangular(heq).texture;
   hpm.dispose(); heq.dispose();
 
-  var k = new T.DirectionalLight(0xffffff, 1.45); k.position.set(1.8, 3.0, 3.6); hScene.add(k);
-  var f = new T.DirectionalLight(0xffffff, 0.45); f.position.set(-2.6, 1.2, -2.0); hScene.add(f);
+  var k = new T.DirectionalLight(0xffffff, 1.42); k.position.set(1.05, 1.95, 4.3); hScene.add(k);
+  var f = new T.DirectionalLight(0xffffff, 0.52); f.position.set(-2.6, 1.2, -2.0); hScene.add(f);
   var r = new T.DirectionalLight(0xFFF0DC, 0.70); r.position.set(-1.4, 2.2, -3.2); hScene.add(r);
 
   var wood = new T.MeshPhysicalMaterial({ color:0xffffff, roughness:1.0, metalness:0.0,
-    clearcoat:0.20, clearcoatRoughness:0.45, envMapIntensity:0.85 });
+    clearcoat:0.38, clearcoatRoughness:0.22, envMapIntensity:1.05 });
   wood.normalScale = new T.Vector2(0.42, 0.42);
   dress(wood, buildTex(woodCanvas('#8A5C27','#492A0F','#BC8C4E'), 1.2, 0.44, 0.82));
 
-  logoNode = buildLogo(wood, 0.055);
+  logoNode = buildLogo(wood, 0.070);
   hScene.add(logoNode);
 
-  var tree = buildTree(wood, { x:-0.368, y:-0.024, z:0.008, w:0.316 }, 0.042);
+  var tree = buildTree(wood, { x:-0.368, y:-0.024, z:0.008, w:0.316 }, 0.052);
   logoNode.add(tree.root);
 
   // the letters first, left to right, then the frame, then the tree grows
@@ -1585,8 +1614,37 @@ function initHero(){
 
   var bb = new T.Box3().setFromObject(logoNode);
   var bs = bb.getSize(new T.Vector3());
-  hCam.userData.target = bb.getCenter(new T.Vector3());
+  var mid = bb.getCenter(new T.Vector3());
+  hCam.userData.target = mid;
   hCam.userData.box = bs;
+
+  // The sign hangs on something. A shadow-only plane just behind it gives the
+  // mounted-on-a-wall read without painting over the stage colour. It is only
+  // as big as the shadow can reach: a full-viewport plane would cost a shadow
+  // lookup on every pixel of the stage for nothing.
+  var wall = new T.Mesh(new T.PlaneGeometry(bs.x + 0.42, bs.y + 0.42),
+                        new T.ShadowMaterial({ opacity: 0.22, transparent: true }));
+  wall.position.set(mid.x, mid.y, bb.min.z - 0.022);
+  wall.receiveShadow = true;
+  hScene.add(wall);
+
+  // Aim the key at the sign and fit its shadow camera to it: the default is a
+  // 10-unit frustum on a 512 map, which on a sign this size is all staircase.
+  var off = k.position.clone();
+  k.position.copy(mid).add(off);
+  k.target.position.copy(mid);
+  hScene.add(k.target);
+  k.castShadow = true;
+  var res = window.innerWidth < 760 ? 512 : 1024;   // the frustum is tight, so this is ~1.5mm a texel
+  k.shadow.mapSize.set(res, res);
+  k.shadow.radius = 4;
+  k.shadow.bias = -0.0006;
+  k.shadow.normalBias = 0.010;
+  var span = Math.max(bs.x, bs.y) * 0.62 + 0.14, dist = off.length();
+  var sc = k.shadow.camera;
+  sc.left = -span; sc.right = span; sc.top = span; sc.bottom = -span;
+  sc.near = Math.max(0.1, dist - 1.4); sc.far = dist + 1.4;
+  sc.updateProjectionMatrix();
 
   bindHero(canvas);
   window.onThemeChange = function(){ hDirty = true; };
@@ -1679,7 +1737,8 @@ function heroTick(now){
   var r = box.getBoundingClientRect();
   if(r.bottom <= 0 || r.top >= window.innerHeight || $('#view-home').hidden) return;
 
-  if(asmRun){ asmT += dt; if(layoutAssembly()) asmRun = false; hDirty = true; }
+  if(asmRun){ asmT += dt; if(layoutAssembly()) asmRun = false; hDirty = true;
+                hR.shadowMap.needsUpdate = true; }
   if(!REDUCE && !hHeld && !asmRun){ hIdle += dt * 0.20; hDirty = true; }
 
   var az = 0.20 + Math.sin(hIdle) * 0.19 + dragAz;
@@ -1688,7 +1747,7 @@ function heroTick(now){
   var vf = hCam.fov * Math.PI/180, hf = 2*Math.atan(Math.tan(vf/2) * hCam.aspect);
   // turning the logo sweeps a wider box, so fit the diagonal of width and depth
   var sweep = Math.abs(bs.x*Math.cos(az)) + Math.abs(bs.z*Math.sin(az));
-  var d = Math.max((sweep/2)/Math.tan(hf/2), (bs.y/2)/Math.tan(vf/2)) * 1.16 + bs.z;
+  var d = Math.max((sweep/2)/Math.tan(hf/2), (bs.y/2)/Math.tan(vf/2)) * 1.09 + bs.z;
   var cd = Math.cos(el) * d;
   hCam.position.set(t.x + cd*Math.sin(az), t.y + Math.sin(el)*d, t.z + cd*Math.cos(az));
   hCam.lookAt(t);
