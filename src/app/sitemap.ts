@@ -4,14 +4,28 @@ import { db } from '@/lib/db';
 
 const base = process.env.APP_URL ?? 'http://localhost:3000';
 
+// Built when it is asked for, not when the site is compiled. Most hosts run
+// `next build` without database credentials, and a sitemap is not worth
+// failing a deploy over.
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, categories] = await Promise.all([
-    db.product.findMany({
-      where: { status: 'PUBLISHED' },
-      select: { slug: true, updatedAt: true },
-    }),
-    db.category.findMany({ where: { isPublished: true }, select: { slug: true } }),
-  ]);
+  let products: { slug: string; updatedAt: Date }[] = [];
+  let categories: { slug: string }[] = [];
+
+  try {
+    [products, categories] = await Promise.all([
+      db.product.findMany({
+        where: { status: 'PUBLISHED' },
+        select: { slug: true, updatedAt: true },
+      }),
+      db.category.findMany({ where: { isPublished: true }, select: { slug: true } }),
+    ]);
+  } catch {
+    // Database unreachable: still serve the pages that do not depend on it,
+    // rather than handing a search engine a 500.
+  }
 
   const staticPages = [
     { url: '', priority: 1 },
