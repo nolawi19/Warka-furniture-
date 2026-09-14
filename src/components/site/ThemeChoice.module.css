@@ -1,0 +1,20 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 13px 2px;
+  border-bottom: 1px solid var(--line-2);
+}
+.label { font-size: var(--text-sm); color: var(--ink-2); }
+
+.group { display: flex; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.group button {
+  padding: 9px 14px;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  color: var(--ink-2);
+  min-height: 40px;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.group button[aria-pressed='true'] { background: var(--ink); color: var(--bg); }

@@ -9,7 +9,7 @@
   margin-bottom: var(--space-4);
 }
 .crumbs a:hover { color: var(--ink); text-decoration: underline; }
-.crumbs span[aria-hidden] { color: var(--ink-3); }
+.crumbs span[aria-hidden] { color: var(--ink-2); }
 
 .title { font-size: var(--text-h1); margin-bottom: var(--space-3); }
 

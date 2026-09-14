@@ -8,7 +8,7 @@
   padding-block: clamp(20px, 2.4vw, 32px) var(--space-5);
 }
 .crumbs a:hover { color: var(--ink); text-decoration: underline; }
-.crumbs span[aria-hidden] { color: var(--ink-3); }
+.crumbs span[aria-hidden] { color: var(--ink-2); }
 
 .layout {
   display: grid;

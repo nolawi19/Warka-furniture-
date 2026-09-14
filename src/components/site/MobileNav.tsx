@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { SessionUser } from '@/lib/auth';
+import { ThemeChoice } from './ThemeChoice';
 import styles from './MobileNav.module.css';
 
 const LINKS = [
@@ -123,6 +124,9 @@ export function MobileNav({ user, cartCount }: { user: SessionUser | null; cartC
             </nav>
 
             <div className={styles.panelFoot}>
+              {/* On a narrow phone the header has no room for the toggle, so
+                  the choice lives here instead of disappearing entirely. */}
+              <ThemeChoice />
               <Link href="/cart" className={styles.footLink}>
                 Basket{cartCount > 0 ? ` (${cartCount})` : ''}
               </Link>

@@ -1,0 +1,70 @@
+.back { font-size: var(--text-xs); color: var(--ink-2); display: inline-block; margin-bottom: var(--space-3); }
+.back:hover { color: var(--ink); }
+
+.top { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-6); }
+
+.statusCard, .contactCard {
+  background: var(--bg-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+.cardLabel {
+  font-size: var(--text-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.address { font-style: normal; font-size: var(--text-sm); line-height: 1.7; }
+.address a { color: var(--ember-text); }
+.address a:hover { text-decoration: underline; }
+.notes { font-size: var(--text-xs); color: var(--ink-2); font-style: italic; }
+.zone { font-size: var(--text-xs); color: var(--ink-2); }
+
+.totals { display: grid; gap: 6px; padding: var(--space-4) 0; font-size: var(--text-sm); }
+.totals > div { display: flex; justify-content: space-between; gap: var(--space-4); }
+.totals dt { color: var(--ink-2); }
+.totals dd { font-variant-numeric: tabular-nums; }
+.grand { border-top: 1px solid var(--line); padding-top: 8px; margin-top: 4px; font-weight: 600; font-size: var(--text-body); }
+.grand dt { color: var(--ink) !important; }
+
+.payments { display: grid; gap: var(--space-3); }
+.payments > li {
+  background: var(--bg-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+.paymentHead { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-3); }
+.paymentHead strong { text-transform: capitalize; }
+.amount { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+.paymentMeta { display: grid; gap: 5px; font-size: var(--text-xs); }
+.paymentMeta > div { display: grid; grid-template-columns: 120px 1fr; gap: var(--space-3); }
+.paymentMeta dt { color: var(--ink-2); }
+.paymentMeta dd { font-family: ui-monospace, Menlo, monospace; word-break: break-all; }
+.problem { color: var(--danger); font-family: inherit !important; }
+
+.events { margin-top: var(--space-3); font-size: var(--text-xs); }
+.events summary { cursor: pointer; color: var(--ink-2); padding: 6px 0; }
+.events ul { display: grid; gap: 4px; padding-top: var(--space-2); color: var(--ink-2); }
+.events code { font-family: ui-monospace, Menlo, monospace; }
+
+.history {
+  display: grid;
+  gap: var(--space-3);
+  background: var(--bg-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+.history li { display: flex; flex-direction: column; gap: 2px; font-size: var(--text-sm); }
+.historyNote { font-size: var(--text-xs); color: var(--ink-2); font-style: italic; }
+
+@media (max-width: 860px) {
+  .top { grid-template-columns: 1fr; }
+}

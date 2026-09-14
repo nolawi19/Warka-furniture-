@@ -160,6 +160,18 @@
   .wordmark em { display: none; }
 }
 
+/* At 320 the six controls in .actions came to 213px inside a 288px row and
+   pushed the page sideways. Search, basket and menu stay; the theme toggle
+   moves into the drawer, where there is room to label it properly. */
+@media (max-width: 420px) {
+  .inner { gap: var(--space-2); }
+  .actions { gap: 4px; }
+  .brand { gap: 7px; }
+  .mark { height: 21px; }
+  .wordmark strong { font-size: 15px; }
+  .cart { padding-inline: 10px; gap: 6px; }
+}
+
 @media (pointer: coarse) {
   .iconLink { width: 44px; height: 44px; }
   .cart { padding-block: 12px; }
