@@ -8,6 +8,27 @@ file. Search for the heading in **bold** to find it.
 
 ---
 
+## 0. Opening it
+
+`index.html` **is** the website. It is not a document — it is a web page, so it
+has to be opened by a browser.
+
+- **Windows**: right-click the file → *Open with* → Chrome or Edge.
+  To make that permanent: *Open with* → *Choose another app* → Chrome →
+  tick *Always use this app*.
+- **Mac**: right-click → *Open With* → Safari or Chrome.
+- **Phone**: send it to yourself and open it from the Files app, or just use
+  the hosted link.
+
+If it opens in Notepad, TextEdit or a code editor and you see the source code,
+the file is fine — the computer just handed it to the wrong program.
+
+There is also a **Download this site** button at the bottom of the page itself.
+It rebuilds the whole site into one fresh `warka-furniture.html` you can keep,
+copy to a USB stick, or give to whoever puts it online.
+
+---
+
 ## 1. Phone number and email  — **`0. SHOP DETAILS`**
 
 ```js
