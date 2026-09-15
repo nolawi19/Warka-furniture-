@@ -29,8 +29,24 @@ The seed loads the shop's real catalogue out of `index.html`: 7 categories,
 9 product lines, 102 variants, the 3 known prices and the 6 photographs. It is
 not demo data.
 
-It also creates an admin from `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`.
+### The admin account
+
+The seed also owns the admin, from `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`.
 **Set a real password before doing this anywhere but your own machine.**
+
+Changing that password later is the same command:
+
+```bash
+# edit SEED_ADMIN_PASSWORD in .env, then
+npm run db:seed
+```
+
+It finds the account by email and resets the password on it — the same row,
+never a second admin — and also puts the role back to ADMIN, re-enables the
+account, and clears any failed-attempt lockout. Sessions opened with the old
+password stop working, which is the point. Nothing else about the account
+(name, orders, addresses) is touched, and re-seeding does not overwrite prices
+you have set in the admin.
 
 ---
 

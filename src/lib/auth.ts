@@ -2,14 +2,13 @@ import 'server-only';
 
 import { cookies } from 'next/headers';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
-import bcrypt from 'bcryptjs';
 import type { Role, User } from '@prisma/client';
 
 import { db } from './db';
+import { hashPassword, verifyPassword } from './password';
 
 export const SESSION_COOKIE = 'warka_session';
 const SESSION_DAYS = 30;
-const BCRYPT_ROUNDS = 12;
 
 // A brute-force window, not a lockout the attacker can use to lock out a real
 // customer forever: it expires on its own.
@@ -18,13 +17,9 @@ const LOCKOUT_MINUTES = 15;
 
 export type SessionUser = Pick<User, 'id' | 'email' | 'name' | 'role' | 'phone'>;
 
-export function hashPassword(plain: string): Promise<string> {
-  return bcrypt.hash(plain, BCRYPT_ROUNDS);
-}
-
-export function verifyPassword(plain: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(plain, hash);
-}
+// Re-exported so every existing `from '@/lib/auth'` import keeps working. The
+// implementation moved to ./password, where the seed can reach it too.
+export { hashPassword, verifyPassword };
 
 // The cookie carries a random token; the database stores only its SHA-256.
 // A leaked database backup therefore does not hand anyone a live session.

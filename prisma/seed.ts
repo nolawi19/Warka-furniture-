@@ -8,7 +8,11 @@
  * both of which the shop is meant to correct in the admin.
  */
 import { PrismaClient, type MovementReason } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+
+// The very same function the login uses to check a password. Imported rather
+// than reimplemented, so the seed can never hash at a different cost than
+// verifyPassword expects.
+import { hashPassword } from '../src/lib/password';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const legacy = require('./_legacy-catalogue.cjs') as {
@@ -104,21 +108,61 @@ async function main() {
   console.log('Seeding Warka Furniture …');
 
   // ---------------------------------------------------------------- staff
-  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? 'admin@warkafurniture.et';
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? 'warka-dev-admin';
+  // The seed owns the admin account: whatever is in SEED_ADMIN_PASSWORD is what
+  // signs in after it runs. It used to have an empty `update`, so a second run
+  // against an existing row changed nothing and a new password in .env was
+  // silently ignored. It now sets the password on every run, on the SAME row —
+  // matched by email, so it never makes a second admin.
+  const adminEmail = (process.env.SEED_ADMIN_EMAIL ?? '').trim() || 'admin@warkafurniture.et';
+  // An unset variable and an empty one mean the same thing here. `.env.example`
+  // ships SEED_ADMIN_PASSWORD="", and hashing that would lock the shop out of
+  // its own admin, so ?? is not enough — the emptiness has to be caught.
+  const adminPassword = (process.env.SEED_ADMIN_PASSWORD ?? '').trim() || 'warka-dev-admin';
+  const usingDefaultPassword = adminPassword === 'warka-dev-admin';
+
+  const adminHash = await hashPassword(adminPassword);
+  const existingAdmin = await db.user.findUnique({
+    where: { email: adminEmail },
+    select: { id: true },
+  });
 
   const admin = await db.user.upsert({
     where: { email: adminEmail },
-    update: {},
+    update: {
+      // Re-hashed every run so .env is the source of truth for this login.
+      passwordHash: adminHash,
+      // If this account was demoted or switched off by hand, the seed is how
+      // you get back in. Everything else about it — name, orders, addresses —
+      // is left exactly as it is.
+      role: 'ADMIN',
+      isActive: true,
+      // Failed attempts belong to the old password. Keeping the lockout would
+      // mean fixing the password and still being refused for 15 minutes.
+      failedLoginCount: 0,
+      lockedUntil: null,
+      // Sessions minted before this moment were authorised by the previous
+      // password, so currentUser() will refuse them. That is the point.
+      credentialsChangedAt: new Date(),
+    },
     create: {
       email: adminEmail,
       name: 'Warka Admin',
       role: 'ADMIN',
-      passwordHash: await bcrypt.hash(adminPassword, 12),
+      passwordHash: adminHash,
       emailVerified: new Date(),
     },
   });
-  console.log(`  admin: ${admin.email}`);
+
+  console.log(
+    `  admin: ${admin.email} (${existingAdmin ? 'password updated in place' : 'created'})`,
+  );
+  if (usingDefaultPassword) {
+    console.log(
+      '  WARNING: SEED_ADMIN_PASSWORD is not set, so the admin password is the\n' +
+        '           built-in default. Set it in .env and run this again before\n' +
+        '           putting the shop anywhere but your own machine.',
+    );
+  }
 
   // ---------------------------------------------------------------- categories
   const categoryIdByKey = new Map<string, string>();
@@ -203,7 +247,12 @@ async function main() {
         update: {
           label: item.spec,
           options,
-          priceSantim,
+          // priceSantim is deliberately absent. Once a variant exists, its
+          // price belongs to whoever is running the shop — set in Admin ->
+          // Products, or by scripts/set-prices.ts. Re-seeding is how the admin
+          // password gets reset, and that must not quietly undo a price the
+          // shop set last week. Only a brand-new variant takes the catalogue
+          // figure, below.
           position: i,
           ...dims,
         },
