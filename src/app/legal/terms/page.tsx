@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { SHOP } from '@/lib/shop-details';
+import { getShop } from '@/lib/site/shop';
 import styles from '../../prose.module.css';
 
 export const metadata: Metadata = {
@@ -9,7 +9,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/legal/terms' },
 };
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const SHOP = await getShop();
   return (
     <div className="wrap">
       <div className={styles.page}>

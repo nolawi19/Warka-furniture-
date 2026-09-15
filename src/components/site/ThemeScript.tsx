@@ -3,8 +3,16 @@
  * page paints light, then flips — which on a dark-mode phone at night is a
  * flash in the face.
  */
-const script = `(function(){try{var t=localStorage.getItem('warka.theme');if(t!=='dark'&&t!=='light'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
+function script(fallback: 'light' | 'dark' | 'system'): string {
+  // A saved choice always wins. Without one, the shop's own default applies,
+  // and only 'system' defers to the device.
+  const otherwise =
+    fallback === 'system'
+      ? `t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';`
+      : `t='${fallback}';`;
+  return `(function(){try{var t=localStorage.getItem('warka.theme');if(t!=='dark'&&t!=='light'){${otherwise}}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
+}
 
-export function ThemeScript() {
-  return <script dangerouslySetInnerHTML={{ __html: script }} />;
+export function ThemeScript({ fallback = 'light' }: { fallback?: 'light' | 'dark' | 'system' }) {
+  return <script dangerouslySetInnerHTML={{ __html: script(fallback) }} />;
 }

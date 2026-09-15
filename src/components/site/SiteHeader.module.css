@@ -170,3 +170,17 @@
   .cart { padding-block: 12px; }
   .navLink { padding-block: 12px; }
 }
+
+/* An uploaded logo, when the shop has chosen one over the wordmark. Capped by
+   the header's own height so a large upload cannot push the bar open. */
+.logoImage {
+  display: block;
+  height: calc(var(--header-h) - 26px);
+  max-height: 44px;
+  width: auto;
+  max-width: 190px;
+  object-fit: contain;
+}
+@media (max-width: 420px) {
+  .logoImage { max-width: 130px; }
+}

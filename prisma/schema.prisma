@@ -45,13 +45,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions   Session[]
-  addresses  Address[]
-  orders     Order[]
-  cart       Cart?
-  wishlist   WishlistItem[]
-  reviews    Review[]
-  auditLogs  AuditLog[]
+  sessions  Session[]
+  addresses Address[]
+  orders    Order[]
+  cart      Cart?
+  wishlist  WishlistItem[]
+  reviews   Review[]
+  auditLogs AuditLog[]
 
   @@index([role])
 }
@@ -59,15 +59,15 @@ model User {
 // Server-side sessions rather than a bare JWT: a session can be revoked the
 // moment an account is compromised, which a self-contained token cannot be.
 model Session {
-  id        String   @id @default(cuid())
-  tokenHash String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
   lastSeenAt DateTime @default(now())
-  userAgent String?
-  ip        String?
+  userAgent  String?
+  ip         String?
 
   @@index([userId])
   @@index([expiresAt])
@@ -79,22 +79,22 @@ enum AddressKind {
 }
 
 model Address {
-  id         String      @id @default(cuid())
-  userId     String
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  kind       AddressKind @default(DELIVERY)
-  label      String?
-  fullName   String
-  phone      String
-  line1      String
-  line2      String?
-  city       String
-  subCity    String?
-  country    String      @default("ET")
-  notes      String?
-  isDefault  Boolean     @default(false)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      AddressKind @default(DELIVERY)
+  label     String?
+  fullName  String
+  phone     String
+  line1     String
+  line2     String?
+  city      String
+  subCity   String?
+  country   String      @default("ET")
+  notes     String?
+  isDefault Boolean     @default(false)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
   @@index([userId])
 }
@@ -102,19 +102,35 @@ model Address {
 // ---------------------------------------------------------------- catalogue
 
 model Category {
-  id          String    @id @default(cuid())
-  slug        String    @unique
+  id          String   @id @default(cuid())
+  slug        String   @unique
   name        String
   nameAm      String?
   blurb       String?
-  position    Int       @default(0)
-  isPublished Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  position    Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // A category may sit under another one. Self-relations in Prisma need both
+  // sides named; "Furniture -> Bedroom -> products" is two rows, not a new
+  // table. Deleting a parent lifts its children to the top rather than taking
+  // them with it, because losing a branch of the shop to one click is not a
+  // recoverable mistake.
+  parentId String?
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+
+  isFeatured Boolean @default(false)
+  imageUrl   String?
+
+  seoTitle       String?
+  seoDescription String?
 
   products Product[]
 
   @@index([isPublished, position])
+  @@index([parentId, position])
 }
 
 enum ProductStatus {
@@ -137,6 +153,17 @@ model Product {
   isFeatured  Boolean       @default(false)
   position    Int           @default(0)
 
+  // A one-line version for cards and search results, where the full
+  // description is too much. Optional: a product without one falls back to the
+  // first sentence of the long description rather than showing a gap.
+  shortDescription String?
+  brand            String?
+  tags             String[] @default([])
+
+  seoTitle       String?
+  seoDescription String?
+  seoImageUrl    String?
+
   // Search haystack, maintained on write so a query stays a single index hit.
   searchText String @default("")
 
@@ -156,20 +183,26 @@ model ProductVariant {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  sku   String  @unique
+  sku     String @unique
   // Human-readable combination, e.g. "180 cm · cream · plain base".
-  label String
+  label   String
   // The axes that produced it, e.g. {"size":"180 cm","colour":"cream"}.
-  options Json    @default("{}")
+  options Json   @default("{}")
 
   // Null price means "ask in the shop" — a real state for made-to-measure
   // furniture, not a missing value.
   priceSantim     Int?
   salePriceSantim Int?
 
-  stock         Int     @default(0)
-  trackStock    Boolean @default(true)
-  allowBackorder Boolean @default(false)
+  stock             Int     @default(0)
+  trackStock        Boolean @default(true)
+  allowBackorder    Boolean @default(false)
+  // What the admin considers "running low" for this line. A bench and a bolt
+  // of fabric do not run low at the same number.
+  lowStockThreshold Int     @default(3)
+  // What it costs the shop to build. Never shown to a customer; it exists so
+  // the admin can see margin.
+  costSantim        Int?
 
   widthCm  Int?
   depthCm  Int?
@@ -199,13 +232,13 @@ model ProductImage {
   variantId String?
   variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 
-  url      String
-  alt      String
-  width    Int?
-  height   Int?
+  url       String
+  alt       String
+  width     Int?
+  height    Int?
   // A tiny inline placeholder so a card reserves its space and never shifts.
-  blurData String?
-  position Int     @default(0)
+  blurData  String?
+  position  Int     @default(0)
   isPrimary Boolean @default(false)
 
   createdAt DateTime @default(now())
@@ -270,7 +303,7 @@ enum OrderStatus {
 }
 
 model Order {
-  id     String @id @default(cuid())
+  id        String @id @default(cuid())
   // Short human reference shown to the customer and used as the payment
   // provider's merchant order id.
   reference String @unique
@@ -289,9 +322,9 @@ model Order {
   // Every figure below is computed on the server from current prices. Nothing
   // the browser sends is trusted.
   subtotalSantim Int
-  shippingSantim Int @default(0)
-  discountSantim Int @default(0)
-  taxSantim      Int @default(0)
+  shippingSantim Int    @default(0)
+  discountSantim Int    @default(0)
+  taxSantim      Int    @default(0)
   totalSantim    Int
   currency       String @default("ETB")
 
@@ -317,9 +350,9 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  items    OrderItem[]
-  payments Payment[]
-  history  OrderStatusHistory[]
+  items     OrderItem[]
+  payments  Payment[]
+  history   OrderStatusHistory[]
   movements InventoryMovement[]
 
   @@index([userId, placedAt])
@@ -336,10 +369,10 @@ model OrderItem {
 
   // Snapshot: what the customer actually bought, at the price they saw. The
   // product can be renamed or delisted later without rewriting this.
-  productName String
+  productName  String
   variantLabel String
-  sku         String
-  imageUrl    String?
+  sku          String
+  imageUrl     String?
 
   unitPriceSantim Int
   qty             Int
@@ -349,16 +382,16 @@ model OrderItem {
 }
 
 model OrderStatusHistory {
-  id      String      @id @default(cuid())
-  orderId String
-  order   Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  from    OrderStatus?
-  to      OrderStatus
-  note    String?
+  id         String       @id @default(cuid())
+  orderId    String
+  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  from       OrderStatus?
+  to         OrderStatus
+  note       String?
   // Null actor means the transition came from a verified payment webhook.
-  actorId String?
+  actorId    String?
   actorLabel String?
-  createdAt DateTime @default(now())
+  createdAt  DateTime     @default(now())
 
   @@index([orderId, createdAt])
 }
@@ -392,10 +425,10 @@ model Payment {
   refundedSantim Int    @default(0)
 
   // The reference we hand the provider, and what it hands back.
-  providerRef    String? @unique
-  providerTxnId  String?
-  checkoutUrl    String?
-  failureReason  String?
+  providerRef   String? @unique
+  providerTxnId String?
+  checkoutUrl   String?
+  failureReason String?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -410,7 +443,7 @@ model Payment {
 // Every callback we receive, verified or not, is written here before it is
 // acted on. Replays are caught by the unique dedupeKey.
 model PaymentEvent {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   paymentId String?
   payment   Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
 
@@ -418,12 +451,12 @@ model PaymentEvent {
   kind      String
   dedupeKey String @unique
 
-  signatureValid Boolean @default(false)
-  processed      Boolean @default(false)
+  signatureValid Boolean   @default(false)
+  processed      Boolean   @default(false)
   processedAt    DateTime?
   error          String?
 
-  payload   Json
+  payload    Json
   receivedAt DateTime @default(now())
 
   @@index([provider, receivedAt])
@@ -464,20 +497,33 @@ enum DiscountKind {
   FIXED
 }
 
+enum DiscountScope {
+  ALL
+  PRODUCTS
+  CATEGORIES
+}
+
 model Coupon {
   id   String @id @default(cuid())
   code String @unique
+  // What the admin calls it in the list. The code is what a customer types.
+  name String @default("")
+
+  scope       DiscountScope @default(ALL)
+  // Ids the scope applies to. Empty with scope ALL, which is the common case.
+  productIds  String[]      @default([])
+  categoryIds String[]      @default([])
 
   kind  DiscountKind
   // Percent (1-100) or santim off, read according to kind.
   value Int
 
-  minOrderSantim Int      @default(0)
+  minOrderSantim Int       @default(0)
   maxRedemptions Int?
-  redemptions    Int      @default(0)
+  redemptions    Int       @default(0)
   startsAt       DateTime?
   endsAt         DateTime?
-  isActive       Boolean  @default(true)
+  isActive       Boolean   @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -508,9 +554,9 @@ model Review {
 }
 
 model AuditLog {
-  id      String  @id @default(cuid())
-  actorId String?
-  actor   User?   @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  id         String  @id @default(cuid())
+  actorId    String?
+  actor      User?   @relation(fields: [actorId], references: [id], onDelete: SetNull)
   actorLabel String?
 
   action     String
@@ -527,31 +573,237 @@ model AuditLog {
 }
 
 model DeliveryZone {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  feeSantim   Int      @default(0)
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  feeSantim       Int      @default(0)
   // Free above this order value; null means never free.
   freeAboveSantim Int?
-  etaDays     String?
-  isActive    Boolean  @default(true)
-  position    Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  etaDays         String?
+  isActive        Boolean  @default(true)
+  position        Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 // Architecture for notifications exists; nothing is "sent" until a real
 // provider is configured. A row here records intent and outcome.
 model NotificationLog {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   channel   String
   template  String
   toAddress String
   orderId   String?
-  status    String   @default("QUEUED")
+  status    String    @default("QUEUED")
   error     String?
   sentAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   @@index([status, createdAt])
+}
+
+// ============================================================================
+// Site content
+//
+// Everything below exists so the shop can be run without editing code. The
+// shape is deliberately the same everywhere: a row holds a DRAFT and a
+// PUBLISHED copy, the public site reads only the published one, and the admin
+// edits only the draft until someone presses Publish. A Revision is written at
+// the moment of publishing, so there is always a way back.
+// ============================================================================
+
+/**
+ * One row per settings group — 'store', 'theme', 'typography', 'nav.header',
+ * 'footer', 'seo', 'social', 'announcement', 'payments', 'notifications'.
+ * The payload is JSON validated by a zod schema in src/lib/site/schemas.ts, so
+ * it is typed where it matters (in code) without a migration every time a
+ * colour is added. An unknown key is ignored and a missing one falls back to
+ * the built-in default, which is why an empty table still renders the site.
+ */
+model SiteSetting {
+  key            String   @id
+  draft          Json     @default("{}")
+  published      Json?
+  updatedAt      DateTime @updatedAt
+  updatedById    String?
+  updatedByLabel String?
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/**
+ * A page built out of blocks. 'home' is the homepage; system pages cannot be
+ * deleted because a shop with no /shop route is broken in a way the admin
+ * cannot fix from the admin.
+ */
+model Page {
+  id    String @id @default(cuid())
+  slug  String @unique
+  title String
+
+  isSystem Boolean    @default(false)
+  status   PageStatus @default(DRAFT)
+
+  // Block trees. draftBlocks is what the builder edits; publishedBlocks is
+  // what a visitor sees. They are separate columns rather than one column and
+  // a flag, so publishing is a copy and never a race.
+  draftBlocks     Json  @default("[]")
+  publishedBlocks Json?
+
+  seoTitle       String?
+  seoDescription String?
+  seoImageUrl    String?
+  noIndex        Boolean @default(false)
+  canonicalUrl   String?
+
+  showInNav Boolean @default(false)
+  position  Int     @default(0)
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, position])
+}
+
+/**
+ * An uploaded file. The bytes live on disk under public/uploads; this row is
+ * what the admin searches, renames and picks from.
+ */
+model MediaAsset {
+  id        String @id @default(cuid())
+  url       String @unique
+  filename  String
+  mimeType  String
+  sizeBytes Int
+
+  width  Int?
+  height Int?
+  // Empty alt is a legitimate choice for a decorative image, so it is "" and
+  // not null — null would mean "nobody has decided yet", which is a different
+  // thing and the admin warns about it.
+  alt    String  @default("")
+  title  String?
+  folder String  @default("")
+
+  createdAt      DateTime @default(now())
+  createdById    String?
+  createdByLabel String?
+
+  @@index([folder, createdAt])
+  @@index([createdAt])
+}
+
+enum BannerPlacement {
+  ANNOUNCEMENT
+  HOMEPAGE_TOP
+  HOMEPAGE_MIDDLE
+  SHOP_TOP
+  PRODUCT_PAGE
+}
+
+/**
+ * A scheduled piece of promotion. Separate from a block because it has a start
+ * and an end and has to switch itself on and off without anyone publishing
+ * anything.
+ */
+model Banner {
+  id        String          @id @default(cuid())
+  name      String
+  placement BannerPlacement @default(ANNOUNCEMENT)
+
+  headline  String?
+  body      String?
+  imageUrl  String?
+  linkUrl   String?
+  linkLabel String?
+
+  bgColor   String?
+  textColor String?
+
+  startsAt DateTime?
+  endsAt   DateTime?
+
+  isActive      Boolean @default(false)
+  isDismissible Boolean @default(true)
+  position      Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([placement, isActive, position])
+}
+
+/**
+ * A snapshot taken when something is published. Revisions are never deleted
+ * automatically: the whole point is that the copy from before last Tuesday is
+ * still there.
+ */
+model Revision {
+  id String @id @default(cuid())
+
+  // 'page' | 'setting'. The id is the page id or the setting key.
+  entityType String
+  entityId   String
+  label      String?
+  summary    String?
+  snapshot   Json
+
+  actorId    String?
+  actorLabel String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId, createdAt])
+}
+
+enum AdminNoticeKind {
+  NEW_ORDER
+  LOW_STOCK
+  OUT_OF_STOCK
+  PAYMENT_ISSUE
+  NEW_CUSTOMER
+  SYSTEM
+}
+
+/**
+ * Something the admin should look at. Written by the code that notices it —
+ * an order being placed, stock crossing a threshold — never generated for
+ * display.
+ */
+model AdminNotification {
+  id    String          @id @default(cuid())
+  kind  AdminNoticeKind
+  title String
+  body  String?
+
+  entityType String?
+  entityId   String?
+  href       String?
+
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([readAt, createdAt])
+  @@index([kind, createdAt])
+}
+
+/**
+ * A person who asked to hear from the workshop. Stored so the newsletter
+ * control in the footer does something real; nothing is sent from here until a
+ * mail provider is configured, and the admin can export the list.
+ */
+model NewsletterSubscriber {
+  id     String @id @default(cuid())
+  email  String @unique
+  name   String?
+  source String @default("footer")
+
+  isConfirmed  Boolean   @default(false)
+  unsubscribedAt DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([createdAt])
 }

@@ -2,16 +2,20 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { SHOP } from '@/lib/shop-details';
+import { getShop } from '@/lib/site/shop';
 import styles from '../prose.module.css';
 
-export const metadata: Metadata = {
-  title: 'Visit the workshop',
-  description: `Come and see a piece before you order it. Warka Furniture is in ${SHOP.area}, open ${SHOP.openingHours}.`,
-  alternates: { canonical: '/visit' },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const shop = await getShop();
+  return {
+    title: 'Visit the workshop',
+    description: `Come and see a piece before you order it. ${shop.name} is in ${shop.area}, open ${shop.openingHours}.`,
+    alternates: { canonical: '/visit' },
+  };
+}
 
-export default function VisitPage() {
+export default async function VisitPage() {
+  const SHOP = await getShop();
   return (
     <div className="wrap">
       <div className={styles.page}>

@@ -4,12 +4,13 @@ import { db } from '@/lib/db';
 import { formatMoney } from '@/lib/money';
 import { STATUS_LABEL } from '@/lib/orders';
 import { allProviders, availableProviders } from '@/lib/payments/engine';
-import { SHOP } from '@/lib/shop-details';
+import { getShop } from '@/lib/site/shop';
 import styles from './page.module.css';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminOverview() {
+  const SHOP = await getShop();
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86_400_000);
 

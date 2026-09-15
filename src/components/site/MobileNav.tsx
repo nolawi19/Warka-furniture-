@@ -5,10 +5,11 @@ import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { SessionUser } from '@/lib/auth';
+import type { NavItem } from '@/lib/site/schemas';
 import { ThemeChoice } from './ThemeChoice';
 import styles from './MobileNav.module.css';
 
-const LINKS = [
+const FALLBACK_LINKS = [
   { href: '/shop', label: 'Shop everything' },
   { href: '/collections', label: 'Collections' },
   { href: '/craft', label: 'Our craft' },
@@ -16,7 +17,27 @@ const LINKS = [
   { href: '/contact', label: 'Contact' },
 ];
 
-export function MobileNav({ user, cartCount }: { user: SessionUser | null; cartCount: number }) {
+export function MobileNav({
+  user,
+  cartCount,
+  nav,
+}: {
+  user: SessionUser | null;
+  cartCount: number;
+  nav?: NavItem[];
+}) {
+  // The drawer shows whatever the header shows, plus Contact, which is only in
+  // the footer on a wide screen and is the link people reach for on a phone.
+  const LINKS =
+    nav && nav.length > 0
+      ? [
+          ...nav.map((i) => ({ href: i.href, label: i.label })),
+          ...(nav.some((i) => i.href === '/contact')
+            ? []
+            : [{ href: '/contact', label: 'Contact' }]),
+        ]
+      : FALLBACK_LINKS;
+
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);

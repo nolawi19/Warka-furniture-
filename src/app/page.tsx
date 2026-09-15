@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { Hero } from '@/components/hero/Hero';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { getCategories, getPhotographedProducts } from '@/lib/catalogue';
-import { SHOP } from '@/lib/shop-details';
+import { getShop } from '@/lib/site/shop';
 import styles from './page.module.css';
 
 export const revalidate = 300;
 
 export default async function HomePage() {
+  const SHOP = await getShop();
   const [categories, showroom] = await Promise.all([
     getCategories(),
     getPhotographedProducts(6),

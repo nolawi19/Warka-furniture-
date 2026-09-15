@@ -7,7 +7,7 @@ import { db } from '@/lib/db';
 import { formatMoney } from '@/lib/money';
 import { CUSTOMER_TIMELINE, STATUS_LABEL } from '@/lib/orders';
 import { settlePayment } from '@/lib/payments/engine';
-import { SHOP } from '@/lib/shop-details';
+import { getShop } from '@/lib/site/shop';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
@@ -27,6 +27,7 @@ export default async function OrderPage({
   params: Params;
   searchParams: Search;
 }) {
+  const SHOP = await getShop();
   const { reference } = await params;
   const { from } = await searchParams;
 

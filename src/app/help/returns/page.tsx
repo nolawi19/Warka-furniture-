@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { SHOP } from '@/lib/shop-details';
+import { getShop } from '@/lib/site/shop';
 import styles from '../../prose.module.css';
 
 export const metadata: Metadata = {
@@ -9,7 +9,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/help/returns' },
 };
 
-export default function ReturnsPage() {
+export default async function ReturnsPage() {
+  const SHOP = await getShop();
   return (
     <div className="wrap">
       <div className={styles.page}>

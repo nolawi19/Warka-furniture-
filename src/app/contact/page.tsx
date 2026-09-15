@@ -1,15 +1,19 @@
 import type { Metadata } from 'next';
 
-import { SHOP } from '@/lib/shop-details';
+import { getShop } from '@/lib/site/shop';
 import styles from '../prose.module.css';
 
-export const metadata: Metadata = {
-  title: 'Contact',
-  description: `Talk to Warka Furniture in ${SHOP.area}, Addis Ababa, about a piece made to your measurement.`,
-  alternates: { canonical: '/contact' },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const shop = await getShop();
+  return {
+    title: 'Contact',
+    description: `Talk to ${shop.name} in ${shop.area}, ${shop.city}, about a piece made to your measurement.`,
+    alternates: { canonical: '/contact' },
+  };
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const SHOP = await getShop();
   return (
     <div className="wrap">
       <div className={styles.page}>

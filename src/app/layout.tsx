@@ -2,12 +2,15 @@ import type { Metadata, Viewport } from 'next';
 import { Archivo, Instrument_Serif, Noto_Sans_Ethiopic } from 'next/font/google';
 
 import '@/styles/globals.css';
+import { AnnouncementBar } from '@/components/site/AnnouncementBar';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { ThemeScript } from '@/components/site/ThemeScript';
 import { currentUser } from '@/lib/auth';
 import { getCartSummary } from '@/lib/cart';
-import { SHOP } from '@/lib/shop-details';
+import { getBanners } from '@/lib/site/banners';
+import { getPublishedSettings } from '@/lib/site/settings';
+import { buildThemeCss } from '@/lib/site/theme-css';
 
 // next/font downloads these at build time and serves them from our own origin,
 // so a visitor in Addis makes no request to Google and the page cannot be
@@ -38,35 +41,43 @@ const ethiopic = Noto_Sans_Ethiopic({
 
 const siteUrl = process.env.APP_URL ?? 'http://localhost:3000';
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: 'Warka Furniture — beds, dressing tables and drawers made in Addis Ababa',
-    template: '%s · Warka Furniture',
-  },
-  description:
-    'Warka Furniture builds buttoned beds, dressing tables, mirrors, chests of drawers and office pedestals to your measurement in Addis Ababa.',
-  applicationName: 'Warka Furniture',
-  keywords: [
-    'furniture Addis Ababa',
-    'buttoned bed Ethiopia',
-    'dressing table Addis',
-    'chest of drawers Ethiopia',
-    'made to measure furniture',
-  ],
-  openGraph: {
-    type: 'website',
-    locale: 'en_ET',
-    siteName: 'Warka Furniture',
-    url: siteUrl,
-    title: 'Warka Furniture — made to your measurement in Addis Ababa',
-    description:
-      'Buttoned beds, dressing tables, mirrors, chests and pedestals, in the board and the colour you pick.',
-  },
-  twitter: { card: 'summary_large_image' },
-  robots: { index: true, follow: true },
-  alternates: { canonical: '/' },
-};
+/**
+ * Title, description, keywords and indexing all come from Admin -> SEO now.
+ * Until anything is published there, the schema defaults are the exact strings
+ * that used to be hardcoded here, so the metadata does not change.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getPublishedSettings();
+  const { seo, store } = settings;
+  const canonicalBase = seo.canonicalHost.trim() || siteUrl;
+
+  return {
+    metadataBase: new URL(canonicalBase),
+    title: {
+      default: seo.defaultTitle,
+      template: seo.titleTemplate.includes('%s') ? seo.titleTemplate : `%s · ${store.name}`,
+    },
+    description: seo.defaultDescription,
+    applicationName: store.name,
+    keywords: seo.keywords.length > 0 ? seo.keywords : undefined,
+    openGraph: {
+      type: 'website',
+      locale: 'en_ET',
+      siteName: store.name,
+      url: canonicalBase,
+      title: seo.defaultTitle,
+      description: seo.defaultDescription,
+      images: seo.ogImageUrl ? [{ url: seo.ogImageUrl }] : undefined,
+    },
+    twitter: { card: 'summary_large_image' },
+    // One switch takes the whole site out of the index. It is in the admin
+    // because "we are not ready to be found yet" is a normal thing to want.
+    robots: seo.allowIndexing
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
+    alternates: { canonical: '/' },
+  };
+}
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -81,40 +92,62 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [user, cart] = await Promise.all([currentUser(), getCartSummary()]);
+  const [user, cart, settings, announcements] = await Promise.all([
+    currentUser(),
+    getCartSummary(),
+    getPublishedSettings(),
+    getBanners('ANNOUNCEMENT'),
+  ]);
+
+  const { store, theme, typography, buttons, seo, social, footer, header } = settings;
+  const nav = settings['nav.header'];
+
+  // Emitted after tokens.css, so anything the admin has not set keeps the
+  // stylesheet's own value. A shop on the defaults ships a handful of lines.
+  const themeCss = buildThemeCss({ theme, typography, buttons });
 
   const organisation = {
     '@context': 'https://schema.org',
     '@type': 'FurnitureStore',
-    name: 'Warka Furniture',
-    description:
-      'Beds, dressing tables, mirrors, chests of drawers and office furniture, made to measure in Addis Ababa.',
+    name: store.name,
+    description: seo.defaultDescription,
     url: siteUrl,
-    telephone: SHOP.phone,
-    email: SHOP.email,
+    telephone: store.phone,
+    email: store.email,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: SHOP.area,
-      addressLocality: 'Addis Ababa',
-      addressCountry: 'ET',
+      streetAddress: store.area,
+      addressLocality: store.city,
+      addressCountry: store.country,
     },
-    openingHours: SHOP.openingHours,
-    currenciesAccepted: 'ETB',
+    openingHours: store.openingHours,
+    currenciesAccepted: store.currency,
+    sameAs: social.links.filter((l) => l.isVisible && l.url).map((l) => l.url),
   };
 
   return (
     <html
       lang="en"
-      data-theme="light"
+      data-theme={theme.defaultTheme === 'system' ? undefined : theme.defaultTheme}
       className={`${archivo.variable} ${instrument.variable} ${ethiopic.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <style id="warka-theme" dangerouslySetInnerHTML={{ __html: themeCss }} />
+      </head>
       <body>
-        <ThemeScript />
+        <ThemeScript fallback={theme.defaultTheme} />
         <a className="skip-link" href="#main">
           Skip to the content
         </a>
-        <SiteHeader user={user} cartCount={cart.count} />
+        {announcements[0] && <AnnouncementBar banner={announcements[0]} />}
+        <SiteHeader
+          user={user}
+          cartCount={cart.count}
+          nav={nav.items}
+          settings={header}
+          store={store}
+        />
         <main id="main">{children}</main>
         <SiteFooter />
         <script

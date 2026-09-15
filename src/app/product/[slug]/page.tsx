@@ -7,7 +7,7 @@ import { ProductGallery } from '@/components/shop/ProductGallery';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { getProductBySlug, getRelatedProducts } from '@/lib/catalogue';
 import { effectivePriceSantim } from '@/lib/money';
-import { SHOP } from '@/lib/shop-details';
+import { getShop } from '@/lib/site/shop';
 import styles from './page.module.css';
 
 type Params = Promise<{ slug: string }>;
@@ -39,6 +39,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function ProductPage({ params }: { params: Params }) {
+  const SHOP = await getShop();
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) notFound();

@@ -1,0 +1,57 @@
+.bar {
+  background: var(--ink);
+  color: var(--ink-inverse);
+  font-size: var(--text-sm);
+  /* Hidden until the dismissal check has run — no flash of a bar the visitor
+     already closed. Falls back to visible if JS never arrives. */
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.bar[data-ready='true'] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .bar { opacity: 1; transition: none; }
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 38px;
+  padding-block: 7px;
+}
+
+.text {
+  flex: 1;
+  text-align: center;
+  line-height: 1.35;
+}
+.text strong { font-weight: 600; }
+
+.link {
+  margin-left: 8px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.close {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  color: inherit;
+  border-radius: var(--radius);
+  opacity: 0.75;
+  transition: opacity var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.close:hover { opacity: 1; background: rgba(255, 255, 255, 0.14); }
+.close svg { width: 15px; height: 15px; }
+
+@media (pointer: coarse) {
+  .close { width: 44px; height: 44px; }
+}
+
+@media (max-width: 560px) {
+  .text { text-align: left; font-size: var(--text-xs); }
+}
