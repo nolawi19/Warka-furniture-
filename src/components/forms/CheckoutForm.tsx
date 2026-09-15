@@ -3,33 +3,36 @@
 import { useActionState, useEffect, useRef, useState } from 'react';
 
 import { placeOrderAction, type CheckoutState } from '@/app/actions/checkout';
+import { ActionButton } from '@/components/ui/ActionButton';
 import { formatMoney } from '@/lib/money';
 import styles from './CheckoutForm.module.css';
 
-type Provider = { id: string; label: string; description: string; methods: string[] };
+type Method = {
+  id: string;
+  providerId: string;
+  label: string;
+  hint: string;
+  kind: 'wallet' | 'bank' | 'card';
+};
 type Zone = { slug: string; name: string; feeSantim: number; etaDays: string | null };
 
-const METHOD_LABEL: Record<string, string> = {
-  telebirr: 'Telebirr',
-  'cbe-birr': 'CBE Birr',
-  'awash-birr': 'Awash Birr',
-  visa: 'Visa',
-  mastercard: 'Mastercard',
-};
-
 export function CheckoutForm({
-  providers,
+  methods,
+  paymentsLive,
+  nothingToCharge,
   zones,
   defaults,
 }: {
-  providers: Provider[];
+  methods: Method[];
+  paymentsLive: boolean;
+  nothingToCharge: boolean;
   zones: Zone[];
   defaults: { name: string; email: string; phone: string };
 }) {
   const [state, formAction, pending] = useActionState<CheckoutState, FormData>(placeOrderAction, {
     ok: false,
   });
-  const [provider, setProvider] = useState(providers[0]?.id ?? '');
+  const [method, setMethod] = useState(methods[0]?.id ?? '');
   const [zone, setZone] = useState(zones[0]?.slug ?? '');
   const summaryRef = useRef<HTMLDivElement>(null);
 
@@ -115,53 +118,109 @@ export function CheckoutForm({
           <span className={styles.stepNum}>3</span> How you pay
         </h2>
 
-        <fieldset className={styles.providers} id="provider">
+        {nothingToCharge && (
+          <div className={styles.freeNotice}>
+            <strong>Nothing will be charged</strong>
+            <p>
+              Your basket comes to <b>0 ETB</b>, so no payment is taken and no card or wallet is
+              charged. The methods below are what this shop accepts when there is a balance to
+              pay.
+            </p>
+          </div>
+        )}
+
+        {!paymentsLive && (
+          <div className={styles.notLive} role="status">
+            <strong>Online payment is not switched on yet</strong>
+            <p>
+              These are the methods the shop is set up to take, but the payment account has no
+              credentials yet, so nothing can be charged through the site today. Your basket is
+              saved — place the order and the workshop will call you.
+            </p>
+          </div>
+        )}
+
+        <fieldset className={styles.methods} id="method">
           <legend className="sr-only">Payment method</legend>
-          {providers.map((p) => (
-            <label key={p.id} className={styles.provider} data-checked={provider === p.id}>
+          {methods.map((m) => (
+            <label
+              key={m.id}
+              className={styles.method}
+              data-checked={method === m.id}
+              data-dimmed={!paymentsLive || nothingToCharge}
+            >
               <input
                 type="radio"
-                name="provider"
-                value={p.id}
-                checked={provider === p.id}
-                onChange={() => setProvider(p.id)}
+                name="method"
+                value={m.id}
+                checked={method === m.id}
+                onChange={() => setMethod(m.id)}
               />
-              <span className={styles.providerBody}>
-                <strong>{p.label}</strong>
-                <span>{p.description}</span>
-                <span className={styles.methods}>
-                  {p.methods.map((m) => (
-                    <span key={m} className={styles.method}>
-                      {METHOD_LABEL[m] ?? m}
-                    </span>
-                  ))}
-                </span>
+              <span className={styles.methodIcon} data-kind={m.kind} aria-hidden="true">
+                    {m.kind === 'card' ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <rect x="2.5" y="5.5" width="19" height="13" rx="2" />
+                        <path d="M2.5 10h19" />
+                      </svg>
+                    ) : m.kind === 'bank' ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                        <path d="M3 9.5 12 4l9 5.5M5 10v8M9.7 10v8M14.3 10v8M19 10v8M3 20h18" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                        <rect x="6.5" y="2.5" width="11" height="19" rx="2.4" />
+                        <path d="M10.6 18.4h2.8" />
+                      </svg>
+                    )}
+              </span>
+              <span className={styles.methodBody}>
+                <strong>{m.label}</strong>
+                <span>{m.hint}</span>
               </span>
             </label>
           ))}
         </fieldset>
 
-        {state.errors?.provider && <p className={styles.error}>{state.errors.provider}</p>}
+        {state.errors?.method && <p className={styles.error}>{state.errors.method}</p>}
 
-        <p className={styles.secure}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-            <rect x="5" y="10.5" width="14" height="9.5" rx="1.6" />
-            <path d="M8.4 10.5V7.8a3.6 3.6 0 1 1 7.2 0v2.7" />
-          </svg>
-          You finish the payment on the provider’s own secure page. Warka never sees or stores
-          your card or wallet details.
-        </p>
+        {!nothingToCharge && paymentsLive && (
+          <p className={styles.secure}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+              <rect x="5" y="10.5" width="14" height="9.5" rx="1.6" />
+              <path d="M8.4 10.5V7.8a3.6 3.6 0 1 1 7.2 0v2.7" />
+            </svg>
+            You finish the payment on Chapa’s own secure page, where you confirm the method
+            above. Warka never sees or stores your card or wallet details.
+          </p>
+        )}
       </section>
 
-      <button type="submit" className={styles.submit} disabled={pending || !provider}>
-        {pending ? 'Taking you to payment…' : 'Continue to payment'}
-      </button>
+      <ActionButton
+        as="button"
+        type="submit"
+        variant="primary"
+        size="lg"
+        fullWidth
+        loading={pending}
+        icon={nothingToCharge || !paymentsLive ? 'none' : 'arrow'}
+        disabled={!nothingToCharge && paymentsLive && !method}
+      >
+        {pending
+          ? 'Placing your order…'
+          : nothingToCharge
+            ? 'Place the order — 0 ETB'
+            : paymentsLive
+              ? 'Continue to payment'
+              : 'Place the order'}
+      </ActionButton>
 
       <p className={styles.fineprint}>
         {selectedZone?.feeSantim === 0
           ? 'Delivery for this area is quoted after the order is placed.'
           : `Delivery to ${selectedZone?.name} is ${formatMoney(selectedZone?.feeSantim ?? 0)}.`}{' '}
-        Nothing is charged until you complete the payment.
+        {nothingToCharge
+          ? 'Nothing is charged, because the total is 0 ETB.'
+          : 'Nothing is charged until you complete the payment.'}
       </p>
     </form>
   );

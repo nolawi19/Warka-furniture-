@@ -1,8 +1,16 @@
 import Link from 'next/link';
 
-import { SignLoader } from './SignLoader';
+import { ActionButton } from '@/components/ui/ActionButton';
 import styles from './Hero.module.css';
 
+/**
+ * The hero.
+ *
+ * The 3D sign that used to sit in the right-hand panel is gone, along with
+ * three.js and its render loop. What replaces it is the wordmark set as type:
+ * it paints with the first frame, costs nothing to render, and carries the
+ * same name.
+ */
 export function Hero({ pieceCount }: { pieceCount: number }) {
   return (
     <section className={`wrap ${styles.hero}`} aria-labelledby="hero-heading">
@@ -19,12 +27,12 @@ export function Hero({ pieceCount }: { pieceCount: number }) {
         </p>
 
         <div className={styles.cta}>
-          <Link href="/shop" className={styles.primary}>
+          <ActionButton as="link" href="/shop" variant="primary" size="lg" icon="arrow">
             Shop the catalogue
-          </Link>
-          <Link href="/craft" className={styles.secondary}>
+          </ActionButton>
+          <ActionButton as="link" href="/craft" variant="ghost" size="lg">
             How we build
-          </Link>
+          </ActionButton>
         </div>
 
         <dl className={styles.facts}>
@@ -44,7 +52,22 @@ export function Hero({ pieceCount }: { pieceCount: number }) {
       </div>
 
       <div className={styles.stageColumn}>
-        <SignLoader />
+        <div className={styles.plate}>
+          <p className={styles.plateKicker}>Est. Kebena, Addis Ababa</p>
+
+          <p className={styles.wordmark}>
+            <span className={styles.wordmarkMain}>WARKA</span>
+            <span className={styles.wordmarkSub}>Furniture</span>
+          </p>
+
+          <p className={`am ${styles.amharic}`} lang="am">
+            ዋርካ የአንጨት ስራዎች
+          </p>
+
+          <p className={styles.plateNote}>
+            The warka is the sycamore fig — the tree a village meets under.
+          </p>
+        </div>
       </div>
     </section>
   );

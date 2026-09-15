@@ -30,14 +30,6 @@
   padding-block: var(--space-2);
 }
 
-.mark {
-  /* The traced crown is wider than it is tall; height is what must stay
-     constant beside the wordmark. */
-  height: 24px;
-  width: auto;
-  color: var(--ember-text);
-  flex: none;
-}
 
 .wordmark {
   display: flex;
@@ -47,10 +39,12 @@
 }
 .wordmark strong {
   font-weight: 700;
-  font-stretch: 112%;
-  letter-spacing: 0.04em;
-  font-size: 16px;
+  font-stretch: 118%;
+  letter-spacing: 0.06em;
+  font-size: 17px;
+  transition: color 140ms var(--ease-out);
 }
+.brand:hover .wordmark strong { color: var(--ember-text); }
 .wordmark em {
   font-style: normal;
   font-size: 10.5px;
@@ -167,8 +161,7 @@
   .inner { gap: var(--space-2); }
   .actions { gap: 4px; }
   .brand { gap: 7px; }
-  .mark { height: 21px; }
-  .wordmark strong { font-size: 15px; }
+  .wordmark strong { font-size: 15px; letter-spacing: 0.04em; }
   .cart { padding-inline: 10px; gap: 6px; }
 }
 

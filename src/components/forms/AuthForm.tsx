@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useActionState, useEffect, useRef } from 'react';
 
 import type { FormState } from '@/app/actions/auth';
+import { ActionButton } from '@/components/ui/ActionButton';
 import styles from './AuthForm.module.css';
 
 type Field = {
@@ -117,15 +118,9 @@ export function AuthForm({
         );
       })}
 
-      <button type="submit" className={styles.submit} disabled={pending}>
-        {pending
-          ? mode === 'register'
-            ? 'Creating your account…'
-            : 'Signing in…'
-          : mode === 'register'
-            ? 'Create account'
-            : 'Sign in'}
-      </button>
+      <ActionButton as="button" type="submit" variant="primary" size="lg" fullWidth loading={pending}>
+        {mode === 'register' ? 'Create account' : 'Sign in'}
+      </ActionButton>
 
       <p className={styles.alt}>
         {mode === 'register' ? (

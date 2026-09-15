@@ -107,9 +107,7 @@ export default async function AdminOrderDetail({
                     {item.sku}
                   </td>
                   <td className={styles.right}>{item.qty}</td>
-                  <td className={styles.right}>
-                    {item.unitPriceSantim === 0 ? 'Quote' : formatMoney(item.lineTotalSantim)}
-                  </td>
+                  <td className={styles.right}>{formatMoney(item.lineTotalSantim)}</td>
                 </tr>
               ))}
             </tbody>

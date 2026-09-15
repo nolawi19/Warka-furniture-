@@ -8,7 +8,14 @@ import { getProvider, registerProvider } from './provider';
 // Registered once, on first import.
 registerProvider(chapaProvider);
 
-export { availableProviders, allProviders, getProvider } from './provider';
+export {
+  availableProviders,
+  allProviders,
+  getProvider,
+  availableMethods,
+  allMethods,
+  findMethod,
+} from './provider';
 
 /**
  * Settles a payment against the provider and, only if the provider says the

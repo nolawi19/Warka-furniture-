@@ -33,3 +33,10 @@
 .state { min-height: 18px; font-size: var(--text-xs); color: var(--danger); }
 .note { font-size: 11px; color: var(--ink-2); }
 .terminal { font-size: var(--text-xs); color: var(--ink-2); }
+
+/* The armed state of a destructive action: filled, so it is unmistakable. */
+.confirming {
+  background: var(--danger) !important;
+  color: #fff !important;
+  border-color: var(--danger) !important;
+}

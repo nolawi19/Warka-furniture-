@@ -5,6 +5,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import type {
   CheckoutSession,
   PaymentIntent,
+  PaymentMethod,
   PaymentProvider,
   VerifiedPayment,
   WebhookCheck,
@@ -67,12 +68,28 @@ type VerifyResponse = {
   } | null;
 };
 
+/**
+ * What Chapa settles for an Ethiopian merchant.
+ *
+ * The customer picks one here so the shop knows what they intended and the
+ * choice is recorded on the Payment row. The final selection still happens on
+ * Chapa's own hosted page: their initialize endpoint takes no payment-method
+ * field, and inventing one would be guessing at somebody else's API.
+ */
+const CHAPA_METHODS: readonly PaymentMethod[] = [
+  { id: 'telebirr', providerId: 'chapa', label: 'Telebirr', hint: 'Ethio Telecom wallet', kind: 'wallet' },
+  { id: 'cbe-birr', providerId: 'chapa', label: 'CBE Birr', hint: 'Commercial Bank of Ethiopia', kind: 'bank' },
+  { id: 'awash-birr', providerId: 'chapa', label: 'Awash Birr', hint: 'Awash Bank wallet', kind: 'wallet' },
+  { id: 'visa', providerId: 'chapa', label: 'Visa', hint: 'Debit or credit card', kind: 'card' },
+  { id: 'mastercard', providerId: 'chapa', label: 'Mastercard', hint: 'Debit or credit card', kind: 'card' },
+] as const;
+
 export const chapaProvider: PaymentProvider = {
   id: 'chapa',
   label: 'Card, Telebirr or bank',
   description:
     'Pay with Telebirr, CBE Birr, Awash Birr, or a Visa or Mastercard. You are taken to Chapa’s secure page and back here when it is done.',
-  methods: ['telebirr', 'cbe-birr', 'awash-birr', 'visa', 'mastercard'],
+  methods: CHAPA_METHODS,
 
   isConfigured() {
     return secretKey().length > 0 && webhookSecret().length > 0;
@@ -98,7 +115,9 @@ export const chapaProvider: PaymentProvider = {
       callback_url: intent.callbackUrl,
       return_url: intent.returnUrl,
       'customization[title]': 'Warka Furniture',
-      'customization[description]': `Order ${intent.reference}`,
+      'customization[description]': intent.method
+        ? `Order ${intent.reference} · ${intent.method}`
+        : `Order ${intent.reference}`,
     });
 
     try {

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
 import { updateOrderStatusAction } from '@/app/actions/admin';
+import { ActionButton } from '@/components/ui/ActionButton';
 import styles from './OrderStatusControl.module.css';
 
 export function OrderStatusControl({
@@ -46,12 +47,12 @@ export function OrderStatusControl({
           const destructive = DESTRUCTIVE.includes(option.value);
           const isConfirming = confirming === option.value;
           return (
-            <button
+            <ActionButton
               key={option.value}
-              type="button"
-              className={styles.button}
-              data-destructive={destructive}
-              data-confirming={isConfirming}
+              as="button"
+              size="sm"
+              variant={destructive ? 'danger' : 'ghost'}
+              className={isConfirming ? styles.confirming : undefined}
               disabled={pending}
               onClick={() => {
                 if (destructive && !isConfirming) {
@@ -62,7 +63,7 @@ export function OrderStatusControl({
               }}
             >
               {isConfirming ? `Really ${option.label.toLowerCase()}?` : option.label}
-            </button>
+            </ActionButton>
           );
         })}
       </div>

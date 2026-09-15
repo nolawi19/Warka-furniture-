@@ -13,6 +13,11 @@ export function formatMoney(
 ): string {
   if (santim === null || santim === undefined) return 'Price on request';
   const { currency = CURRENCY, locale = 'en-ET', withSantim = false } = opts;
+
+  // Zero is spelled out in full. "Br 0" reads like a missing value; "0 ETB"
+  // reads like a deliberate price, which is what it is.
+  if (santim === 0) return `0 ${currency}`;
+
   const value = santim / 100;
   const digits = withSantim || santim % 100 !== 0 ? 2 : 0;
   const body = new Intl.NumberFormat(locale, {

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState, useTransition } from 'react';
 
 import { addToCartAction } from '@/app/actions/cart';
+import { ActionButton } from '@/components/ui/ActionButton';
 import { formatMoney } from '@/lib/money';
 import styles from './ProductBuy.module.css';
 
@@ -81,6 +82,7 @@ export function ProductBuy({
   });
   const [qty, setQty] = useState(1);
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [added, setAdded] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -108,10 +110,15 @@ export function ProductBuy({
   function add() {
     if (!current) return;
     setFeedback(null);
+    setAdded(false);
+    // The request goes out immediately. Nothing waits on an animation, and the
+    // tick below is driven by the result rather than by a timer guessing at it.
     startTransition(async () => {
       const result = await addToCartAction(current.id, qty);
       if (result.ok) {
-        setFeedback({ tone: 'ok', text: `Added to your basket.` });
+        setFeedback({ tone: 'ok', text: 'Added to your basket.' });
+        setAdded(true);
+        window.setTimeout(() => setAdded(false), 1400);
         router.refresh();
       } else {
         setFeedback({ tone: 'error', text: result.message ?? 'That did not work.' });
@@ -224,14 +231,19 @@ export function ProductBuy({
           </button>
         </div>
 
-        <button
-          type="button"
-          className={styles.add}
+        <ActionButton
+          as="button"
+          variant="primary"
+          size="lg"
+          icon="cart"
+          fullWidth
           onClick={add}
-          disabled={pending || !inStock}
+          loading={pending}
+          success={added}
+          disabled={!inStock}
         >
-          {pending ? 'Adding…' : inStock ? 'Add to basket' : 'Out of stock'}
-        </button>
+          {inStock ? 'Add to basket' : 'Out of stock'}
+        </ActionButton>
       </div>
 
       {/* Announced, and placed where the person is already looking. */}

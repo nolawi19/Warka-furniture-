@@ -7,7 +7,8 @@ import { currentUser } from '@/lib/auth';
 import { getCart } from '@/lib/cart';
 import { db } from '@/lib/db';
 import { createPendingOrder, priceCart } from '@/lib/orders';
-import { getProvider } from '@/lib/payments/engine';
+import { findMethod, getProvider } from '@/lib/payments/engine';
+import { transitionOrder } from '@/lib/orders';
 
 const CheckoutSchema = z.object({
   name: z.string().trim().min(2, 'Tell us who the order is for.').max(80),
@@ -19,7 +20,9 @@ const CheckoutSchema = z.object({
   subCity: z.string().trim().max(80).optional().or(z.literal('')),
   notes: z.string().trim().max(500).optional().or(z.literal('')),
   zone: z.string().trim().max(60).optional().or(z.literal('')),
-  provider: z.string().trim().min(1, 'Choose how you would like to pay.').max(40),
+  // Optional: a zero-total order, or a shop whose payment account is not yet
+  // configured, has no method to choose.
+  method: z.string().trim().max(40).optional().or(z.literal('')),
 });
 
 export type CheckoutState = {
@@ -47,11 +50,6 @@ export async function placeOrderAction(
     return { ok: false, message: 'Your basket is empty.' };
   }
 
-  const provider = getProvider(input.provider);
-  if (!provider || !provider.isConfigured()) {
-    return { ok: false, errors: { provider: 'That payment method is not available.' } };
-  }
-
   const user = await currentUser();
 
   // Priced again here, from the database. Whatever the browser had on screen
@@ -61,12 +59,29 @@ export async function placeOrderAction(
     return { ok: false, message: priced.problems[0] };
   }
 
-  if (priced.totalSantim <= 0) {
-    return {
-      ok: false,
-      message:
-        'Everything in your basket is made to measure, so there is nothing to pay yet. Send the order and we will quote you first.',
-    };
+  // Decided from the server's own recalculation, not from anything the form
+  // said. A zero total needs no gateway; a non-zero one does.
+  const needsPayment = priced.totalSantim > 0;
+
+  const method = needsPayment && input.method ? findMethod(input.method) : null;
+  const provider = method ? getProvider(method.providerId) : null;
+
+  if (needsPayment) {
+    if (!input.method) {
+      return { ok: false, errors: { method: 'Choose how you would like to pay.' } };
+    }
+    if (!method || !provider) {
+      return { ok: false, errors: { method: 'That payment method is not available.' } };
+    }
+    if (!provider.isConfigured()) {
+      return {
+        ok: false,
+        errors: {
+          method:
+            'Online payment is not switched on yet, so that method cannot be used. Call the workshop and they will take the order.',
+        },
+      };
+    }
   }
 
   const created = await createPendingOrder(
@@ -93,12 +108,27 @@ export async function placeOrderAction(
   });
   if (!order) return { ok: false, message: 'Could not open that order.' };
 
+  // ---------------------------------------------------------------- free
+  // Nothing is owed, so nothing is collected. The order is settled without
+  // contacting a gateway, and the history says exactly that — it is not
+  // dressed up as a payment that succeeded, because none happened.
+  if (!needsPayment || !provider || !method) {
+    await transitionOrder(
+      created.orderId,
+      'PAID',
+      { id: user?.id ?? null, label: 'system' },
+      'Nothing to collect: the order total is 0 ETB. No payment was taken.',
+    );
+    redirect(`/order/${order.reference}?from=free`);
+  }
+
   const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
 
   const payment = await db.payment.create({
     data: {
       orderId: created.orderId,
       provider: provider.id,
+      method: method.id,
       status: 'PENDING',
       amountSantim: order.totalSantim,
       currency: order.currency,
@@ -107,6 +137,7 @@ export async function placeOrderAction(
   });
 
   const session = await provider.createSession({
+    method: method.label,
     orderId: created.orderId,
     reference: order.reference,
     amountSantim: order.totalSantim,

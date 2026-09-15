@@ -1,7 +1,5 @@
 import Link from 'next/link';
 
-import { WarkaMark } from './WarkaMark';
-
 import type { SessionUser } from '@/lib/auth';
 import { isStaff } from '@/lib/auth';
 import { ThemeToggle } from './ThemeToggle';
@@ -26,8 +24,9 @@ export function SiteHeader({
   return (
     <header className={styles.header}>
       <div className={`wrap ${styles.inner}`}>
+        {/* Text only. The 3D sign and the traced tree mark are both gone;
+            this paints with the first frame and costs nothing. */}
         <Link href="/" className={styles.brand} aria-label="Warka Furniture, home">
-          <WarkaMark className={styles.mark} />
           <span className={styles.wordmark}>
             <strong>WARKA</strong>
             <em>Furniture</em>

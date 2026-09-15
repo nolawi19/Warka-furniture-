@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
 import { removeFromCartAction, setQtyAction } from '@/app/actions/cart';
+import { ActionButton } from '@/components/ui/ActionButton';
 import { formatMoney } from '@/lib/money';
 import type { CartLine } from '@/lib/cart';
 import styles from './CartLines.module.css';
@@ -96,14 +97,16 @@ export function CartLines({ lines }: { lines: CartLine[] }) {
               {line.unitPriceSantim !== null && line.qty > 1 && (
                 <p className={styles.each}>{formatMoney(line.unitPriceSantim)} each</p>
               )}
-              <button
-                type="button"
+              <ActionButton
+                as="button"
+                variant="quiet"
+                size="sm"
                 className={styles.remove}
                 onClick={() => remove(line.variantId)}
                 disabled={pending}
               >
                 Remove
-              </button>
+              </ActionButton>
             </div>
           </li>
         ))}

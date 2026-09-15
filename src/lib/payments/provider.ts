@@ -25,6 +25,8 @@ export type PaymentIntent = {
   customer: { name: string; email: string; phone: string };
   returnUrl: string;
   callbackUrl: string;
+  /** What the customer said they intend to pay with, for the record. */
+  method?: string;
 };
 
 export type CheckoutSession =
@@ -43,6 +45,22 @@ export type WebhookCheck =
   | { ok: true; reference: string; dedupeKey: string; kind: string; payload: unknown }
   | { ok: false; reason: string };
 
+/**
+ * One payment method as the customer sees it at checkout.
+ *
+ * `providerId` says which adapter settles it. Several methods can share an
+ * adapter — Telebirr, CBE Birr and a Visa card all settle through Chapa — but
+ * the shopper still picks the one they actually intend to use, and that choice
+ * is recorded on the Payment row.
+ */
+export type PaymentMethod = {
+  id: string;
+  providerId: string;
+  label: string;
+  hint: string;
+  kind: 'wallet' | 'bank' | 'card';
+};
+
 export interface PaymentProvider {
   /** Stable machine name, stored on the Payment row. */
   readonly id: string;
@@ -50,7 +68,7 @@ export interface PaymentProvider {
   readonly label: string;
   readonly description: string;
   /** Methods this provider actually settles for a shop in Ethiopia. */
-  readonly methods: readonly string[];
+  readonly methods: readonly PaymentMethod[];
   /** False when credentials are absent — the option is then never offered. */
   isConfigured(): boolean;
   createSession(intent: PaymentIntent): Promise<CheckoutSession>;
@@ -80,4 +98,24 @@ export function availableProviders(): PaymentProvider[] {
 
 export function allProviders(): PaymentProvider[] {
   return [...registry.values()];
+}
+
+/**
+ * Every method the shop can actually take money through right now.
+ *
+ * Empty when no provider has credentials. Checkout uses that to show a
+ * configuration notice instead of a button that cannot work — it never
+ * pretends a payment route exists.
+ */
+export function availableMethods(): PaymentMethod[] {
+  return availableProviders().flatMap((p) => [...p.methods]);
+}
+
+/** Every method that is built, configured or not. For the admin's benefit. */
+export function allMethods(): PaymentMethod[] {
+  return [...registry.values()].flatMap((p) => [...p.methods]);
+}
+
+export function findMethod(id: string): PaymentMethod | null {
+  return allMethods().find((m) => m.id === id) ?? null;
 }

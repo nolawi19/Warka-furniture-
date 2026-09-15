@@ -51,9 +51,13 @@
   padding: 10px 16px;
   font-size: var(--text-sm);
   cursor: pointer;
-  transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+  transition:
+    border-color 140ms var(--ease-out),
+    background 140ms var(--ease-out),
+    transform 90ms var(--ease-out);
 }
-.option:hover { border-color: var(--ink-3); }
+.option:hover { border-color: var(--ink-3); transform: translateY(-1px); }
+.option:active { transform: scale(0.97); transition-duration: 90ms; }
 .option[aria-pressed='true'] {
   border-color: var(--ink);
   background: var(--ink);
@@ -96,20 +100,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.add {
-  flex: 1;
-  min-height: 48px;
-  background: var(--ember);
-  color: var(--ember-ink);
-  border-radius: var(--radius);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: filter var(--dur-fast) var(--ease-out), transform var(--dur-instant) var(--ease-out);
-}
-.add:hover:not(:disabled) { filter: brightness(1.08); }
-.add:active:not(:disabled) { transform: translateY(1px); }
-.add:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Reserved height: a message appearing must not shove the page down. */
 .feedback {
@@ -135,5 +125,4 @@
 
 @media (max-width: 420px) {
   .actions { flex-wrap: wrap; }
-  .add { width: 100%; flex: none; }
 }

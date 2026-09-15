@@ -53,6 +53,8 @@ export default async function OrderPage({
   // Coming back from the gateway. The redirect proves nothing, so we ask the
   // provider directly — this is the same call the webhook makes, and whichever
   // arrives first wins. It is safe to run twice.
+  // ?from=free means the order was settled without a gateway because there was
+  // nothing to collect. There is nothing to verify, so nothing is asked.
   if (from === 'gateway') {
     const pending = order.payments.find(
       (p) => p.status === 'PENDING' || p.status === 'PROCESSING',
@@ -74,6 +76,9 @@ export default async function OrderPage({
   const o = fresh ?? order;
 
   const payment = o.payments[0] ?? null;
+  // A zero-value order has no Payment row at all, because nothing was
+  // collected. It is settled, but it was never "paid" and must not say so.
+  const wasFree = o.totalSantim === 0 && o.payments.length === 0;
   const isFailed = o.status === 'PAYMENT_FAILED';
   const isCancelled = o.status === 'CANCELLED' || o.status === 'REFUNDED';
   const currentStep = CUSTOMER_TIMELINE.indexOf(o.status);
@@ -91,13 +96,18 @@ export default async function OrderPage({
 
         {/* -------------------------------------------------- status banner */}
         <div className={styles.banner} data-tone={isFailed ? 'error' : isCancelled ? 'muted' : o.status === 'DELIVERED' ? 'ok' : 'info'}>
-          <h2 className={styles.bannerTitle}>{STATUS_LABEL[o.status]}</h2>
+          <h2 className={styles.bannerTitle}>
+            {wasFree && o.status === 'PAID' ? 'No payment needed' : STATUS_LABEL[o.status]}
+          </h2>
           <p>
             {o.status === 'PENDING_PAYMENT' &&
               'We are waiting for the payment to come through. If you have just paid, this usually updates within a minute.'}
             {o.status === 'PAYMENT_FAILED' &&
               'The payment did not go through, so nothing has been charged. Your order is held — you can try paying again.'}
-            {o.status === 'PAID' && 'Payment confirmed. The workshop has your order.'}
+            {o.status === 'PAID' &&
+              (wasFree
+                ? 'This order came to 0 ETB, so nothing was charged and no card or wallet was used. The workshop has it.'
+                : 'Payment confirmed. The workshop has your order.')}
             {o.status === 'CONFIRMED' && 'The workshop has checked your measurements and accepted the order.'}
             {o.status === 'PREPARING' && 'Being built now.'}
             {o.status === 'READY' && 'Finished and waiting to go out.'}
@@ -160,9 +170,9 @@ export default async function OrderPage({
                   <span>{item.variantLabel}</span>
                   <span className={styles.sku}>{item.sku}</span>
                 </span>
-                <span className={styles.itemTotal}>
-                  {item.unitPriceSantim === 0 ? 'To be quoted' : formatMoney(item.lineTotalSantim)}
-                </span>
+                {/* The stored figure, whatever it is. A zero line reads
+                    "0 ETB", which is what was actually charged. */}
+                <span className={styles.itemTotal}>{formatMoney(item.lineTotalSantim)}</span>
               </li>
             ))}
           </ul>

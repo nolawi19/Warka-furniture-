@@ -127,3 +127,19 @@ the frame, and the warka tree cut as pierced fretwork. **The silhouette is the
 brand.** Depth, bevel, material, lighting and shadow are the things meant to be
 tuned; the shapes are not. The flat mark in the header is generated from the
 same data, so the two can never drift apart.
+
+---
+
+## Prices are currently set to 0 ETB
+
+Every variant is at **0 ETB** for testing, and the UI says so plainly. The real
+prices were saved before the switch:
+
+```bash
+npx tsx scripts/set-prices.ts restore   # puts the original prices back
+npx tsx scripts/set-prices.ts zero      # sets everything to 0 again
+```
+
+A basket that comes to zero is settled without contacting a payment gateway.
+The order page says **"No payment needed"**, not "Payment confirmed", and no
+Payment row is written — because nothing was collected.
