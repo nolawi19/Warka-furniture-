@@ -212,3 +212,24 @@ ul, ol {
     min-height: 44px;
   }
 }
+
+/* A plain input for admin list rows, where a full Field label would be noise
+   because the column heading already says what the box is. Admin only. */
+.admin-input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.admin-input:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: -1px;
+}
+@media (pointer: coarse) {
+  .admin-input { padding-block: 11px; }
+}

@@ -1,0 +1,60 @@
+.nav {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+}
+
+.group { display: grid; }
+
+.groupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 10px 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: left;
+  border-radius: var(--radius);
+}
+.groupHead:hover { color: var(--ink-2); }
+.groupHead svg {
+  width: 14px;
+  height: 14px;
+  transform: rotate(-90deg);
+  transition: transform 140ms var(--ease-out);
+}
+.groupHead svg[data-open='true'] { transform: rotate(0deg); }
+
+.list { display: grid; gap: 1px; }
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  font-size: 13.5px;
+  line-height: 1.2;
+  color: var(--ink-2);
+  border-radius: var(--radius);
+  /* No transform, no shadow: this is a tool, and a nav item that moves under
+     the cursor is one more thing to aim at. */
+  transition: background 120ms var(--ease-out), color 120ms var(--ease-out);
+}
+.link:hover { background: var(--bg-3); color: var(--ink); }
+.link[data-active='true'] {
+  background: var(--ember-soft);
+  color: var(--ember-text);
+  font-weight: 500;
+}
+
+.icon { width: 17px; height: 17px; flex: none; opacity: 0.85; }
+.link[data-active='true'] .icon { opacity: 1; }
+
+@media (pointer: coarse) {
+  .link { padding-block: 12px; }
+  .groupHead { padding-block: 12px 8px; }
+}

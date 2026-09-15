@@ -7,7 +7,8 @@ import { currentUser } from '@/lib/auth';
 import { getCart } from '@/lib/cart';
 import { db } from '@/lib/db';
 import { createPendingOrder, priceCart } from '@/lib/orders';
-import { findMethod, getProvider } from '@/lib/payments/engine';
+import { getProvider } from '@/lib/payments/engine';
+import { enabledMethods } from '@/lib/site/payment-methods';
 import { transitionOrder } from '@/lib/orders';
 
 const CheckoutSchema = z.object({
@@ -63,7 +64,15 @@ export async function placeOrderAction(
   // said. A zero total needs no gateway; a non-zero one does.
   const needsPayment = priced.totalSantim > 0;
 
-  const method = needsPayment && input.method ? findMethod(input.method) : null;
+  // findMethod knows every method that is BUILT. What the shop will actually
+  // accept is the narrower list, so the chosen id is checked against that —
+  // otherwise a hand-made request could pay through a method the admin turned
+  // off, or one with no credentials at all.
+  const offered = needsPayment ? await enabledMethods() : [];
+  const method =
+    needsPayment && input.method
+      ? (offered.find((m) => m.id === input.method) ?? null)
+      : null;
   const provider = method ? getProvider(method.providerId) : null;
 
   if (needsPayment) {

@@ -1,0 +1,60 @@
+.list { display: grid; gap: 6px; }
+
+.row {
+  position: relative;
+  border-radius: var(--radius);
+  /* Opacity only — transforming a row mid-drag fights the browser's own drag
+     image and makes the drop target jump. */
+  transition: opacity 120ms var(--ease-out);
+}
+.row[data-dragging='true'] { opacity: 0.4; }
+
+/* The drop indicator: a solid rule exactly where the row will land. */
+.row[data-line-above='true']::before,
+.row[data-line-below='true']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--ember);
+  border-radius: 2px;
+  pointer-events: none;
+}
+.row[data-line-above='true']::before { top: -4px; }
+.row[data-line-below='true']::after { bottom: -4px; }
+
+.handleGroup { display: inline-flex; align-items: center; gap: 2px; flex: none; }
+
+.handle {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 30px;
+  color: var(--ink-3);
+  cursor: grab;
+  border-radius: var(--radius);
+}
+.handle:hover { color: var(--ink-2); background: var(--bg-3); }
+.handle:active { cursor: grabbing; }
+.handle svg { width: 17px; height: 17px; }
+
+.arrows { display: grid; gap: 1px; }
+.arrows button {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 15px;
+  color: var(--ink-3);
+  border-radius: var(--radius-sm);
+}
+.arrows button:hover:not(:disabled) { color: var(--ink); background: var(--bg-3); }
+.arrows button:disabled { opacity: 0.3; cursor: not-allowed; }
+.arrows svg { width: 13px; height: 13px; }
+
+@media (pointer: coarse) {
+  /* Touch cannot drag an HTML5 draggable, so the arrows are the interface. */
+  .handle { display: none; }
+  .arrows button { width: 44px; height: 30px; }
+  .arrows svg { width: 17px; height: 17px; }
+}

@@ -51,6 +51,13 @@ function paletteBlock(palette: Partial<Palette>): string {
   return lines.join('\n');
 }
 
+const HOVER: Record<ButtonPreset['hover'], { filter: string; lift: string; invert: string }> = {
+  none: { filter: 'none', lift: '0px', invert: '0' },
+  brighten: { filter: 'brightness(1.08)', lift: '-1px', invert: '0' },
+  lift: { filter: 'none', lift: '-2px', invert: '0' },
+  invert: { filter: 'none', lift: '0px', invert: '1' },
+};
+
 const SHADOWS: Record<ButtonPreset['shadow'], string> = {
   none: 'none',
   soft: 'var(--shadow-1)',
@@ -69,6 +76,15 @@ function buttonBlock(name: string, preset: ButtonPreset): string {
   if (preset.bg) lines.push(`  --btn-${name}-bg: ${css(preset.bg)};`);
   if (preset.text) lines.push(`  --btn-${name}-text: ${css(preset.text)};`);
   if (preset.border) lines.push(`  --btn-${name}-border: ${css(preset.border)};`);
+
+  // Hover is two variables rather than a class, because the button's own rule
+  // lives in a CSS module whose class name is hashed and cannot be targeted
+  // from here.
+  const hover = HOVER[preset.hover] ?? HOVER.brighten;
+  lines.push(`  --btn-${name}-hover-filter: ${hover.filter};`);
+  lines.push(`  --btn-${name}-hover-lift: ${hover.lift};`);
+  lines.push(`  --btn-${name}-hover-invert: ${hover.invert};`);
+
   return lines.join('\n');
 }
 
@@ -148,11 +164,3 @@ export function buildThemeCss(args: {
     .filter(Boolean)
     .join('\n');
 }
-
-/** Hover behaviour is a class on the button, not a variable. */
-export const BUTTON_HOVER_CLASS: Record<ButtonPreset['hover'], string> = {
-  none: '',
-  brighten: 'btn-hover-brighten',
-  lift: 'btn-hover-lift',
-  invert: 'btn-hover-invert',
-};

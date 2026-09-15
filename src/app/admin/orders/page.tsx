@@ -3,7 +3,7 @@ import type { Prisma } from '@prisma/client';
 
 import { db } from '@/lib/db';
 import { formatMoney } from '@/lib/money';
-import { StatusBadge } from '../page';
+import { StatusBadge } from '@/components/admin/StatusBadge';
 import styles from '../page.module.css';
 
 export const dynamic = 'force-dynamic';

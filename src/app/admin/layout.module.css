@@ -1,71 +1,133 @@
+/* A tool, not a showroom: flat surfaces, one accent, no motion that is not
+   feedback. The public site is where the shop performs. */
+
 .shell {
   display: grid;
-  grid-template-columns: 216px 1fr;
-  min-height: calc(100vh - var(--header-h));
-  align-items: stretch;
+  grid-template-columns: 236px minmax(0, 1fr);
+  min-height: 100dvh;
+  background: var(--bg);
 }
 
 .side {
-  border-right: 1px solid var(--line-2);
-  padding: var(--space-5) var(--space-4);
+  position: sticky;
+  top: 0;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
-  position: sticky;
-  top: var(--header-h);
-  height: calc(100vh - var(--header-h));
+  background: var(--bg-2);
+  border-right: 1px solid var(--line-2);
 }
 
-.brand { display: flex; align-items: baseline; gap: 7px; }
-.brand a { font-weight: 700; font-stretch: 112%; letter-spacing: 0.04em; }
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  padding-top: calc(var(--space-4) + env(safe-area-inset-top, 0px));
+  border-bottom: 1px solid var(--line-2);
+}
+.brand a {
+  font-size: 15px;
+  font-weight: 700;
+  font-stretch: 118%;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+}
 .brand span {
-  font-size: var(--text-micro);
-  letter-spacing: var(--tracking-micro);
+  font-size: 10px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-2);
+  color: var(--ink-3);
 }
 
-.nav { display: grid; gap: 1px; }
-.nav a {
-  display: block;
-  padding: 9px 11px;
-  border-radius: var(--radius);
-  font-size: var(--text-sm);
-  color: var(--ink-2);
-  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+.sideScroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-3);
 }
-.nav a:hover { background: var(--bg-3); color: var(--ink); }
 
-.who { margin-top: auto; display: flex; flex-direction: column; gap: 4px; font-size: var(--text-xs); }
-.whoName { font-weight: 600; color: var(--ink); }
-.whoRole { color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.1em; font-size: 10px; }
+.who {
+  padding: var(--space-3) var(--space-4);
+  padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--line-2);
+  display: grid;
+  gap: 3px;
+}
+.whoName { font-size: var(--text-sm); color: var(--ink); }
+.whoRole {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
 .signOut {
-  text-align: left;
+  justify-self: start;
+  margin-top: 6px;
+  font-size: var(--text-xs);
   color: var(--ink-2);
   text-decoration: underline;
-  cursor: pointer;
-  padding: 8px 0;
-  font-size: var(--text-xs);
+  text-underline-offset: 3px;
 }
 .signOut:hover { color: var(--danger); }
-.viewSite { color: var(--ink-2); }
-.viewSite:hover { color: var(--ink); text-decoration: underline; }
+.viewSite {
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+}
+.viewSite:hover { color: var(--ink-2); }
 
-.main { padding: var(--space-5) clamp(16px, 3vw, 40px) var(--space-8); min-width: 0; }
+.column { display: flex; flex-direction: column; min-width: 0; }
 
-@media (max-width: 860px) {
-  .shell { grid-template-columns: 1fr; }
-  .side {
-    position: static;
-    height: auto;
-    border-right: 0;
-    border-bottom: 1px solid var(--line-2);
-    flex-direction: row;
-    align-items: center;
-    gap: var(--space-4);
-    flex-wrap: wrap;
-  }
-  .nav { display: flex; gap: 2px; flex-wrap: wrap; }
-  .who { margin-top: 0; margin-left: auto; flex-direction: row; align-items: center; gap: var(--space-3); }
-  .whoRole { display: none; }
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px var(--space-5);
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line-2);
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .topbar { background: var(--bg); }
+}
+
+.topSpacer { flex: 1; }
+
+.topBrand {
+  display: none;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+}
+.topBrand span {
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-5);
+  padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 1000px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .side { display: none; }
+  .topBrand { display: flex; }
+  .main { padding: var(--space-4); }
+}
+
+@media (max-width: 560px) {
+  .topbar { padding-inline: var(--space-4); }
+  .main { padding: var(--space-3); }
 }

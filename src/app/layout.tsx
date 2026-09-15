@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 import { Archivo, Instrument_Serif, Noto_Sans_Ethiopic } from 'next/font/google';
 
 import '@/styles/globals.css';
@@ -6,7 +7,8 @@ import { AnnouncementBar } from '@/components/site/AnnouncementBar';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { ThemeScript } from '@/components/site/ThemeScript';
-import { currentUser } from '@/lib/auth';
+import { MaintenanceScreen } from '@/components/site/MaintenanceScreen';
+import { currentUser, isStaff } from '@/lib/auth';
 import { getCartSummary } from '@/lib/cart';
 import { getBanners } from '@/lib/site/banners';
 import { getPublishedSettings } from '@/lib/site/settings';
@@ -92,15 +94,27 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [user, cart, settings, announcements] = await Promise.all([
+  const [user, cart, settings, announcements, headerList] = await Promise.all([
     currentUser(),
     getCartSummary(),
     getPublishedSettings(),
     getBanners('ANNOUNCEMENT'),
+    headers(),
   ]);
 
-  const { store, theme, typography, buttons, seo, social, footer, header } = settings;
+  const { store, theme, typography, buttons, seo, social, header } = settings;
   const nav = settings['nav.header'];
+
+  // Closed to the public, open to whoever is running it. The check is here,
+  // on the server, in the layout every public route passes through — not in
+  // middleware, which cannot reach the database, and not in a client component,
+  // where "am I staff" would be the browser's opinion.
+  // /login and /admin are never covered: the way back in has to stay open, and
+  // the admin does its own far stricter check on every page anyway.
+  const pathname = headerList.get('x-pathname') ?? '';
+  const inAdmin = pathname.startsWith('/admin');
+  const alwaysOpen = pathname.startsWith('/login') || inAdmin;
+  const closed = store.maintenanceMode && !isStaff(user) && !alwaysOpen;
 
   // Emitted after tokens.css, so anything the admin has not set keeps the
   // stylesheet's own value. A shop on the defaults ships a handful of lines.
@@ -137,23 +151,40 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <ThemeScript fallback={theme.defaultTheme} />
-        <a className="skip-link" href="#main">
-          Skip to the content
-        </a>
-        {announcements[0] && <AnnouncementBar banner={announcements[0]} />}
-        <SiteHeader
-          user={user}
-          cartCount={cart.count}
-          nav={nav.items}
-          settings={header}
-          store={store}
-        />
-        <main id="main">{children}</main>
-        <SiteFooter />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}
-        />
+        {inAdmin ? (
+          // The admin brings its own shell. Wrapping a tool in the shop's
+          // header and footer gives it a second navigation that goes nowhere
+          // useful and a footer full of links for customers.
+          children
+        ) : closed ? (
+          <MaintenanceScreen
+            name={store.name}
+            nameAm={store.nameAm}
+            message={store.maintenanceMessage}
+            phone={store.phone}
+            phoneHref={store.phoneHref}
+          />
+        ) : (
+          <>
+            <a className="skip-link" href="#main">
+              Skip to the content
+            </a>
+            {announcements[0] && <AnnouncementBar banner={announcements[0]} />}
+            <SiteHeader
+              user={user}
+              cartCount={cart.count}
+              nav={nav.items}
+              settings={header}
+              store={store}
+            />
+            <main id="main">{children}</main>
+            <SiteFooter />
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}
+            />
+          </>
+        )}
       </body>
     </html>
   );

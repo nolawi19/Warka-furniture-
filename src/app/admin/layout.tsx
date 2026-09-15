@@ -1,8 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { requireStaff } from '@/lib/admin-guard';
 import { logoutAction } from '@/app/actions/auth';
+import { AdminDrawer } from '@/components/admin/shell/AdminDrawer';
+import { AdminSearch } from '@/components/admin/shell/AdminSearch';
+import { AdminSidebar } from '@/components/admin/shell/AdminSidebar';
+import { NotificationBell } from '@/components/admin/shell/NotificationBell';
+import { requireStaff } from '@/lib/admin-guard';
+import { getShop } from '@/lib/site/shop';
 import styles from './layout.module.css';
 
 export const metadata: Metadata = {
@@ -11,34 +16,22 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
 };
 
-const NAV = [
-  { href: '/admin', label: 'Overview', exact: true },
-  { href: '/admin/orders', label: 'Orders' },
-  { href: '/admin/products', label: 'Products' },
-  { href: '/admin/inventory', label: 'Inventory' },
-];
-
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   // Server-side, on every admin page. Not a hidden link.
   const user = await requireStaff();
+  const shop = await getShop();
 
   return (
     <div className={styles.shell}>
       <aside className={styles.side}>
         <div className={styles.brand}>
-          <Link href="/">Warka</Link>
+          <Link href="/admin">{shop.name.split(/\s+/)[0]}</Link>
           <span>Admin</span>
         </div>
 
-        <nav aria-label="Admin">
-          <ul className={styles.nav}>
-            {NAV.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href}>{item.label}</Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <div className={styles.sideScroll}>
+          <AdminSidebar />
+        </div>
 
         <div className={styles.who}>
           <p className={styles.whoName}>{user.name}</p>
@@ -54,7 +47,19 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
       </aside>
 
-      <main className={styles.main}>{children}</main>
+      <div className={styles.column}>
+        <header className={styles.topbar}>
+          <AdminDrawer />
+          <Link href="/admin" className={styles.topBrand}>
+            {shop.name.split(/\s+/)[0]} <span>Admin</span>
+          </Link>
+          <div className={styles.topSpacer} />
+          <AdminSearch />
+          <NotificationBell />
+        </header>
+
+        <main className={styles.main}>{children}</main>
+      </div>
     </div>
   );
 }

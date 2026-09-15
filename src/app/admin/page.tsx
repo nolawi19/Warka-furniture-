@@ -5,6 +5,7 @@ import { formatMoney } from '@/lib/money';
 import { STATUS_LABEL } from '@/lib/orders';
 import { allProviders, availableProviders } from '@/lib/payments/engine';
 import { getShop } from '@/lib/site/shop';
+import { StatusBadge } from '@/components/admin/StatusBadge';
 import styles from './page.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -218,23 +219,5 @@ function Stat({ label, value, note }: { label: string; value: string; note: stri
       <p className={styles.statValue}>{value}</p>
       <p className={styles.statNote}>{note}</p>
     </div>
-  );
-}
-
-export function StatusBadge({ status }: { status: keyof typeof STATUS_LABEL }) {
-  const tone =
-    status === 'DELIVERED'
-      ? 'ok'
-      : status === 'PAYMENT_FAILED' || status === 'CANCELLED'
-        ? 'error'
-        : status === 'PENDING_PAYMENT'
-          ? 'muted'
-          : status === 'REFUNDED'
-            ? 'warn'
-            : 'info';
-  return (
-    <span className={styles.badge} data-tone={tone}>
-      {STATUS_LABEL[status]}
-    </span>
   );
 }

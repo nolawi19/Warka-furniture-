@@ -6,7 +6,8 @@ import { CheckoutForm } from '@/components/forms/CheckoutForm';
 import { currentUser } from '@/lib/auth';
 import { getCart } from '@/lib/cart';
 import { db } from '@/lib/db';
-import { allMethods, availableMethods } from '@/lib/payments/engine';
+import { allMethods } from '@/lib/payments/engine';
+import { enabledMethods } from '@/lib/site/payment-methods';
 import { formatMoney } from '@/lib/money';
 import styles from './page.module.css';
 
@@ -29,7 +30,8 @@ export default async function CheckoutPage() {
   // Every method the shop can actually settle today. When credentials are
   // missing this is empty, and the form says so rather than offering a route
   // that would fail at the gateway.
-  const live = availableMethods();
+  // Configured AND not switched off in Admin -> Payments.
+  const live = await enabledMethods();
   const built = allMethods();
   const paymentsLive = live.length > 0;
 

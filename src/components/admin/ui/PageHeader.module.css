@@ -1,0 +1,22 @@
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+.text { min-width: 0; }
+.title {
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+}
+.description {
+  margin-top: 4px;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  max-width: 64ch;
+}
+.actions { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }

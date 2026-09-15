@@ -5,7 +5,7 @@ import { OrderStatusControl } from '@/components/admin/OrderStatusControl';
 import { db } from '@/lib/db';
 import { formatMoney } from '@/lib/money';
 import { nextStatuses, STATUS_LABEL } from '@/lib/orders';
-import { StatusBadge } from '../../page';
+import { StatusBadge } from '@/components/admin/StatusBadge';
 import styles from '../../page.module.css';
 import local from './page.module.css';
 

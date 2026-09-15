@@ -1,0 +1,34 @@
+.bell {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: color 120ms var(--ease-out), border-color 120ms var(--ease-out);
+}
+.bell:hover { color: var(--ink); border-color: var(--ink-3); }
+.bell svg { width: 18px; height: 18px; }
+
+.count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding-inline: 5px;
+  display: grid;
+  place-items: center;
+  font-size: 10.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  background: var(--danger);
+  border-radius: var(--radius-pill);
+}
+
+@media (pointer: coarse) {
+  .bell { width: 44px; height: 44px; }
+}

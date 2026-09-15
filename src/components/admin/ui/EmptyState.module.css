@@ -1,0 +1,22 @@
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-7) var(--space-4);
+  text-align: center;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-2);
+}
+.title { font-size: var(--text-lg); color: var(--ink); }
+.body { font-size: var(--text-sm); color: var(--ink-2); max-width: 46ch; }
+.action {
+  margin-top: var(--space-2);
+  padding: 9px 16px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ember-ink);
+  background: var(--ember);
+  border-radius: var(--radius);
+}
+.action:hover { filter: brightness(1.07); }

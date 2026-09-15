@@ -175,9 +175,21 @@
   transition: filter var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out),
               transform var(--dur-instant) var(--ease-out);
 }
-.btnPrimary { background: var(--ember); color: var(--ember-ink); }
+.btnPrimary {
+  background: var(--btn-primary-bg, var(--ember));
+  color: var(--btn-primary-text, var(--ember-ink));
+  border-radius: var(--btn-primary-radius, var(--radius));
+  font-weight: var(--btn-primary-weight, 500);
+  text-transform: var(--btn-primary-transform, none);
+  box-shadow: var(--btn-primary-shadow, none);
+}
 .btnPrimary:hover { filter: brightness(1.08); }
-.btnGhost { border-color: var(--line); color: var(--ink); }
+.btnGhost {
+  border-color: var(--btn-ghost-border, var(--line));
+  color: var(--btn-ghost-text, var(--ink));
+  background: var(--btn-ghost-bg, transparent);
+  border-radius: var(--btn-ghost-radius, var(--radius));
+}
 .btnGhost:hover { background: var(--bg-3); }
 .btnPrimary:active, .btnGhost:active { transform: translateY(1px); }
 

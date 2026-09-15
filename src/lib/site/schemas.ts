@@ -200,12 +200,24 @@ const ButtonPresetSchema = z.object({
 
 export type ButtonPreset = z.infer<typeof ButtonPresetSchema>;
 
+/**
+ * The four button styles the site actually has. Naming them after the code's
+ * own variants rather than an invented Primary/Secondary/Outline/Ghost set
+ * keeps every control here connected to something real on the page.
+ */
 export const ButtonsSchema = z.object({
   primary: ButtonPresetSchema.default({}),
-  secondary: ButtonPresetSchema.default({}),
-  outline: ButtonPresetSchema.default({}),
   ghost: ButtonPresetSchema.default({}),
+  quiet: ButtonPresetSchema.default({}),
+  danger: ButtonPresetSchema.default({}),
 });
+
+export const BUTTON_VARIANTS = [
+  { id: 'primary', label: 'Primary', hint: 'Add to basket, Pay, Shop the catalogue.' },
+  { id: 'ghost', label: 'Outline', hint: 'Bordered buttons beside a primary one.' },
+  { id: 'quiet', label: 'Text', hint: 'Text-only actions with no box around them.' },
+  { id: 'danger', label: 'Danger', hint: 'Remove, cancel, delete.' },
+] as const;
 
 export type ButtonsSettings = z.infer<typeof ButtonsSchema>;
 

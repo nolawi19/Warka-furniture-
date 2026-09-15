@@ -18,7 +18,12 @@
   gap: 8px;
 
   border: 1px solid transparent;
-  border-radius: var(--radius);
+  /* Every fallback is the value this button had before it was editable, so
+     an untouched shop looks exactly as it did. */
+  border-radius: var(--btn-primary-radius, var(--radius));
+  font-weight: var(--btn-primary-weight, 500);
+  text-transform: var(--btn-primary-transform, none);
+  box-shadow: var(--btn-primary-shadow, none);
   font-family: inherit;
   font-weight: 600;
   line-height: 1.2;
@@ -41,7 +46,11 @@
 /* ---------------------------------------------------------------- size */
 
 .btn[data-size='sm'] { font-size: var(--text-xs); padding: 8px 14px; min-height: 36px; }
-.btn[data-size='md'] { font-size: var(--text-sm); padding: 11px 18px; min-height: 44px; }
+.btn[data-size='md'] {
+  font-size: var(--text-sm);
+  padding: var(--btn-primary-pad-y, 11px) var(--btn-primary-pad-x, 18px);
+  min-height: 44px;
+}
 .btn[data-size='lg'] { font-size: var(--text-body); padding: 14px 24px; min-height: 50px; }
 .btn[data-full='true'] { width: 100%; }
 
@@ -52,8 +61,8 @@
 /* ---------------------------------------------------------------- variant */
 
 .btn[data-variant='primary'] {
-  background: var(--ember);
-  color: var(--ember-ink);
+  background: var(--btn-primary-bg, var(--ember));
+  color: var(--btn-primary-text, var(--ember-ink));
 }
 .btn[data-variant='primary']:hover:not(:disabled) {
   filter: brightness(1.07);
@@ -61,8 +70,10 @@
 }
 
 .btn[data-variant='ghost'] {
-  border-color: var(--line);
-  color: var(--ink);
+  border-color: var(--btn-ghost-border, var(--line));
+  color: var(--btn-ghost-text, var(--ink));
+  background: var(--btn-ghost-bg, transparent);
+  border-radius: var(--btn-ghost-radius, var(--radius));
   background: transparent;
 }
 .btn[data-variant='ghost']:hover:not(:disabled) {
@@ -71,14 +82,16 @@
 }
 
 .btn[data-variant='quiet'] {
-  color: var(--ink-2);
+  color: var(--btn-quiet-text, var(--ink-2));
+  border-radius: var(--btn-quiet-radius, var(--radius));
   background: transparent;
 }
 .btn[data-variant='quiet']:hover:not(:disabled) { color: var(--ink); background: var(--bg-3); }
 
 .btn[data-variant='danger'] {
-  border-color: color-mix(in srgb, var(--danger) 34%, transparent);
-  color: var(--danger);
+  border-color: var(--btn-danger-border, color-mix(in srgb, var(--danger) 34%, transparent));
+  color: var(--btn-danger-text, var(--danger));
+  border-radius: var(--btn-danger-radius, var(--radius));
   background: transparent;
 }
 .btn[data-variant='danger']:hover:not(:disabled) { background: var(--danger-soft); }
@@ -87,7 +100,12 @@
 
 /* Lift on hover, land on press. 1.5% is enough to feel and small enough that
    a row of buttons does not visibly reflow. */
-.btn:hover:not(:disabled) { transform: translateY(-1px) scale(1.015); }
+.btn:hover:not(:disabled) {
+  /* Defaults reproduce the original lift exactly; Admin -> Buttons overrides
+     the two variables behind it. */
+  transform: translateY(var(--btn-primary-hover-lift, -1px)) scale(1.015);
+  filter: var(--btn-primary-hover-filter, none);
+}
 .btn:active:not(:disabled) {
   transform: translateY(0) scale(0.975);
   transition-duration: 90ms;

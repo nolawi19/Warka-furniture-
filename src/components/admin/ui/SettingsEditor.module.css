@@ -1,0 +1,76 @@
+.editor { display: grid; gap: var(--space-4); }
+
+.bar {
+  position: sticky;
+  top: calc(58px + env(safe-area-inset-top, 0px));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding: 10px var(--space-4);
+  background: var(--bg-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-lg);
+}
+
+.status { display: flex; align-items: center; gap: 8px; }
+.statusText { font-size: var(--text-xs); color: var(--ink-2); }
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ok);
+  flex: none;
+}
+.dot[data-unpublished='true'] { background: var(--warn); }
+.dot[data-state='dirty'] { background: var(--warn); }
+.dot[data-state='saving'] { background: var(--info); }
+.dot[data-state='error'] { background: var(--danger); }
+
+.controls { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+
+.ghostButton {
+  padding: 7px 12px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: color 120ms var(--ease-out), border-color 120ms var(--ease-out);
+}
+.ghostButton:hover { color: var(--ink); border-color: var(--ink-3); }
+
+.publishButton {
+  padding: 8px 15px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ember-ink);
+  background: var(--ember);
+  border-radius: var(--radius);
+  transition: filter 120ms var(--ease-out);
+}
+.publishButton:hover:not(:disabled) { filter: brightness(1.08); }
+.publishButton:disabled { opacity: 0.55; cursor: progress; }
+
+.description { font-size: var(--text-sm); color: var(--ink-2); max-width: 70ch; }
+
+.message {
+  padding: 9px 12px;
+  font-size: var(--text-sm);
+  border-radius: var(--radius);
+}
+.message[data-tone='ok'] { background: var(--ok-soft); color: var(--ok); }
+.message[data-tone='error'] { background: var(--danger-soft); color: var(--danger); }
+
+.body { display: grid; gap: var(--space-4); }
+
+@media (pointer: coarse) {
+  .ghostButton, .publishButton { padding-block: 12px; }
+}
+@media (max-width: 560px) {
+  .bar { position: static; }
+  .controls { width: 100%; }
+}

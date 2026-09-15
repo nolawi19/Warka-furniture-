@@ -1,0 +1,21 @@
+.preview {
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  background: var(--bg);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  max-width: 600px;
+}
+.url { font-size: var(--text-xs); color: var(--ink-2); }
+.title {
+  margin-top: 3px;
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--info);
+}
+.snippet {
+  margin-top: 4px;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
