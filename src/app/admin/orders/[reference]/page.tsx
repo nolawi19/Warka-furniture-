@@ -6,6 +6,7 @@ import { db } from '@/lib/db';
 import { formatMoney } from '@/lib/money';
 import { nextStatuses, STATUS_LABEL } from '@/lib/orders';
 import { StatusBadge } from '@/components/admin/StatusBadge';
+import { DeliveryPin } from '@/components/site/DeliveryPin';
 import styles from '../../page.module.css';
 import local from './page.module.css';
 
@@ -78,6 +79,8 @@ export default async function AdminOrderDetail({
             <a href={`mailto:${order.email}`}>{order.email}</a>
           </address>
           {order.deliveryNotes && <p className={local.notes}>“{order.deliveryNotes}”</p>}
+          {/* What the driver actually navigates to. */}
+          <DeliveryPin lat={order.deliveryLat} lng={order.deliveryLng} />
           {order.deliveryZone && <p className={local.zone}>Zone: {order.deliveryZone}</p>}
         </div>
       </div>

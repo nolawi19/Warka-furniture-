@@ -79,6 +79,9 @@ enum AddressKind {
 }
 
 model Address {
+  // Saved alongside the written address, for the same reason as on an order.
+  latitude  Float?
+  longitude Float?
   id        String      @id @default(cuid())
   userId    String
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -340,6 +343,12 @@ model Order {
   deliveryCountry String  @default("ET")
   deliveryNotes   String?
   deliveryZone    String?
+
+  // Where the customer actually dropped the pin. Addis Ababa has very little
+  // formal street addressing, so a coordinate is often the only precise thing
+  // a customer can give — and the only thing a driver can use.
+  deliveryLat Float?
+  deliveryLng Float?
 
   placedAt    DateTime  @default(now())
   paidAt      DateTime?

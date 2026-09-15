@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from 'react';
 
 import { placeOrderAction, type CheckoutState } from '@/app/actions/checkout';
+import { LocationPicker, type Position } from '@/components/forms/LocationPicker';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { formatMoney } from '@/lib/money';
 import styles from './CheckoutForm.module.css';
@@ -34,6 +35,7 @@ export function CheckoutForm({
   });
   const [method, setMethod] = useState(methods[0]?.id ?? '');
   const [zone, setZone] = useState(zones[0]?.slug ?? '');
+  const [position, setPosition] = useState<Position>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
 
   const errorEntries = Object.entries(state.errors ?? {});
@@ -103,19 +105,56 @@ export function CheckoutForm({
           ))}
         </fieldset>
 
+        {/* A pin, not a street address. Most of Addis has no house numbers,
+            and a driver navigates by landmark and by phone — so the useful
+            thing to collect is the spot itself. */}
+        <LocationPicker value={position} onChange={setPosition} />
+
         <div className={styles.grid}>
-          <Field name="line1" label="Street and building" autoComplete="address-line1" error={state.errors?.line1} span />
-          <Field name="line2" label="Flat, floor or landmark" autoComplete="address-line2" error={state.errors?.line2} span optional />
-          <Field name="city" label="City" autoComplete="address-level2" defaultValue="Addis Ababa" error={state.errors?.city} />
-          <Field name="subCity" label="Sub-city" autoComplete="address-level3" error={state.errors?.subCity} optional />
-          <Field name="notes" label="Anything the driver should know" error={state.errors?.notes} span optional textarea />
+          <Field
+            name="notes"
+            label="Directions for the driver"
+            hint="The landmark to look for, the gate colour, which floor — whatever you would say on the phone."
+            error={state.errors?.notes}
+            span
+            optional
+            textarea
+          />
         </div>
       </section>
 
-      {/* ---------------------------------------------------- 3. how */}
+      {/* ------------------------------------------------ discount code */}
+      <section className={styles.step} aria-labelledby="step-discount">
+        <h2 id="step-discount" className={styles.stepTitle}>
+          <span className={styles.stepNum}>3</span> Discount code
+          <span className={styles.optional}>if you have one</span>
+        </h2>
+        <div className={styles.couponRow}>
+          <label htmlFor="coupon" className="sr-only">
+            Discount code
+          </label>
+          <input
+            id="coupon"
+            name="coupon"
+            type="text"
+            autoComplete="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+            placeholder="SPRING10"
+            className={styles.couponInput}
+          />
+        </div>
+        {/* The code is checked on the server when the order is placed, against
+            the live coupon table. Nothing here decides whether it is valid. */}
+        <p className={styles.couponNote}>
+          The discount is worked out when you place the order, and shown on your order page.
+        </p>
+      </section>
+
+      {/* ---------------------------------------------------- 4. how */}
       <section className={styles.step} aria-labelledby="step-payment">
         <h2 id="step-payment" className={styles.stepTitle}>
-          <span className={styles.stepNum}>3</span> How you pay
+          <span className={styles.stepNum}>4</span> How you pay
         </h2>
 
         {nothingToCharge && (

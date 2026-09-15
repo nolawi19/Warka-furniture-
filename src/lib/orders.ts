@@ -103,7 +103,7 @@ export async function priceCart(
     include: {
       variant: {
         include: {
-          product: { select: { name: true, status: true, id: true } },
+          product: { select: { name: true, status: true, id: true, categoryId: true } },
           images: { orderBy: { position: 'asc' }, take: 1 },
         },
       },
@@ -112,6 +112,9 @@ export async function priceCart(
 
   const lines: PricedLine[] = [];
   const problems: string[] = [];
+  // What each priced line belongs to, so a discount limited to some products
+  // or categories can be worked out against the right part of the basket.
+  const eligible: { productId: string; categoryId: string; lineTotal: number }[] = [];
   let subtotal = 0;
   let quoteOnly = 0;
 
@@ -151,6 +154,7 @@ export async function priceCart(
 
     const lineTotal = price * item.qty;
     subtotal += lineTotal;
+    eligible.push({ productId: v.product.id, categoryId: v.product.categoryId, lineTotal });
     lines.push({
       variantId: v.id,
       productName: v.product.name,
@@ -190,10 +194,28 @@ export async function priceCart(
       subtotal >= coupon.minOrderSantim;
 
     if (live && coupon) {
-      discount =
-        coupon.kind === 'PERCENT'
-          ? Math.floor((subtotal * Math.min(100, coupon.value)) / 100)
-          : Math.min(coupon.value, subtotal);
+      // A discount limited to some products applies to those lines only. The
+      // percentage comes off what it covers, not off the whole basket, and a
+      // fixed amount can never exceed what it covers either.
+      const base =
+        coupon.scope === 'PRODUCTS'
+          ? eligible
+              .filter((l) => coupon.productIds.includes(l.productId))
+              .reduce((sum, l) => sum + l.lineTotal, 0)
+          : coupon.scope === 'CATEGORIES'
+            ? eligible
+                .filter((l) => coupon.categoryIds.includes(l.categoryId))
+                .reduce((sum, l) => sum + l.lineTotal, 0)
+            : subtotal;
+
+      if (base === 0) {
+        problems.push('That discount does not apply to anything in your basket.');
+      } else {
+        discount =
+          coupon.kind === 'PERCENT'
+            ? Math.floor((base * Math.min(100, coupon.value)) / 100)
+            : Math.min(coupon.value, base);
+      }
     } else if (coupon) {
       problems.push('That discount code cannot be used on this order.');
     } else {
@@ -233,6 +255,9 @@ export type DeliveryDetails = {
   subCity?: string | null;
   notes?: string | null;
   zoneSlug?: string | null;
+  /** Where the customer dropped the pin, if they did. */
+  lat?: number;
+  lng?: number;
 };
 
 /**
@@ -278,6 +303,8 @@ export async function createPendingOrder(
         deliverySubCity: delivery.subCity ?? null,
         deliveryNotes: delivery.notes ?? null,
         deliveryZone: delivery.zoneSlug ?? null,
+        deliveryLat: delivery.lat ?? null,
+        deliveryLng: delivery.lng ?? null,
         items: {
           create: priced.lines.map((l) => ({
             variantId: l.variantId,
@@ -331,12 +358,48 @@ export async function createPendingOrder(
       });
     }
 
+    // Record the coupon on the order and count the redemption. Without this a
+    // usage limit is a number nobody ever increments — the discount would be
+    // priced in, the limit would read "0 of 50 used" forever, and the code
+    // would work for the fifty-first customer too.
+    //
+    // The guard on redemptions is what makes the limit hold under load: two
+    // people checking out at once both passed the check in priceCart, and only
+    // the one whose UPDATE matches a row gets the discount recorded.
+    if (couponCode && priced.discountSantim > 0) {
+      const coupon = await tx.coupon.findUnique({
+        where: { code: couponCode.toUpperCase() },
+        select: { id: true, maxRedemptions: true },
+      });
+      if (coupon) {
+        const claimed = await tx.coupon.updateMany({
+          where:
+            coupon.maxRedemptions === null
+              ? { id: coupon.id }
+              : { id: coupon.id, redemptions: { lt: coupon.maxRedemptions } },
+          data: { redemptions: { increment: 1 } },
+        });
+        if (claimed.count === 0) {
+          throw new Error('COUPON_EXHAUSTED');
+        }
+        await tx.order.update({ where: { id: created.id }, data: { couponId: coupon.id } });
+      }
+    }
+
     await tx.cartItem.deleteMany({ where: { cartId } });
     return created;
   }).catch((err: Error) => {
     if (err.message.startsWith('OVERSOLD:')) return null;
+    if (err.message === 'COUPON_EXHAUSTED') return 'COUPON_EXHAUSTED' as const;
     throw err;
   });
+
+  if (order === 'COUPON_EXHAUSTED') {
+    return {
+      ok: false,
+      problems: ['That discount code has just been used up. Remove it and try again.'],
+    };
+  }
 
   if (!order) {
     return {

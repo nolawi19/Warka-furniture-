@@ -3,9 +3,12 @@
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
+import { notifyAdmin } from '@/lib/admin/notifications';
 import { currentUser } from '@/lib/auth';
 import { getCart } from '@/lib/cart';
 import { db } from '@/lib/db';
+import { formatMoney } from '@/lib/money';
+import { getPublishedSetting } from '@/lib/site/settings';
 import { createPendingOrder, priceCart } from '@/lib/orders';
 import { getProvider } from '@/lib/payments/engine';
 import { enabledMethods } from '@/lib/site/payment-methods';
@@ -15,15 +18,20 @@ const CheckoutSchema = z.object({
   name: z.string().trim().min(2, 'Tell us who the order is for.').max(80),
   email: z.string().trim().toLowerCase().email('Enter a valid email address.').max(160),
   phone: z.string().trim().min(6, 'We need a number for the delivery driver.').max(30),
-  line1: z.string().trim().min(3, 'Where should we bring it?').max(160),
-  line2: z.string().trim().max(160).optional().or(z.literal('')),
-  city: z.string().trim().min(2, 'Which city?').max(80),
-  subCity: z.string().trim().max(80).optional().or(z.literal('')),
+  // Where it goes is a pin on a map now, not a street address: most of Addis
+  // Ababa has no house numbers, and a coordinate is the precise thing a
+  // customer can actually give.
+  lat: z.coerce.number().min(-90).max(90).optional().or(z.literal('')),
+  lng: z.coerce.number().min(-180).max(180).optional().or(z.literal('')),
   notes: z.string().trim().max(500).optional().or(z.literal('')),
   zone: z.string().trim().max(60).optional().or(z.literal('')),
   // Optional: a zero-total order, or a shop whose payment account is not yet
   // configured, has no method to choose.
   method: z.string().trim().max(40).optional().or(z.literal('')),
+  // Optional, and validated by priceCart against the coupon table rather than
+  // here: an unknown or expired code is a message to the customer, not a
+  // malformed form.
+  coupon: z.string().trim().max(30).optional().or(z.literal('')),
 });
 
 export type CheckoutState = {
@@ -52,10 +60,27 @@ export async function placeOrderAction(
   }
 
   const user = await currentUser();
+  const store = await getPublishedSetting('store');
+
+  // "" is what an untouched map sends. Treat it as no pin rather than as 0,0,
+  // which is a spot in the Atlantic.
+  const lat = typeof input.lat === 'number' ? input.lat : undefined;
+  const lng = typeof input.lng === 'number' ? input.lng : undefined;
+  const hasPin = lat !== undefined && lng !== undefined;
+
+  if (!hasPin && !(input.notes || '').trim()) {
+    return {
+      ok: false,
+      errors: { notes: 'Put a pin on the map, or tell the driver where to come.' },
+    };
+  }
 
   // Priced again here, from the database. Whatever the browser had on screen
   // is irrelevant — this figure is the one that goes to the gateway.
-  const priced = await priceCart(cart.id, { deliveryZoneSlug: input.zone || undefined });
+  const priced = await priceCart(cart.id, {
+    deliveryZoneSlug: input.zone || undefined,
+    couponCode: input.coupon || undefined,
+  });
   if (priced.problems.length > 0) {
     return { ok: false, message: priced.problems[0] };
   }
@@ -100,13 +125,19 @@ export async function placeOrderAction(
       name: input.name,
       email: input.email,
       phone: input.phone,
-      line1: input.line1,
-      line2: input.line2 || null,
-      city: input.city,
-      subCity: input.subCity || null,
+      // deliveryLine1 is what every existing screen prints as "the address",
+      // so it gets something a person can read: the driver's own directions
+      // when there are any, and the coordinate otherwise.
+      line1: (input.notes || '').trim() || (hasPin ? `Pinned location ${lat!.toFixed(5)}, ${lng!.toFixed(5)}` : 'No address given'),
+      line2: null,
+      city: store.city,
+      subCity: null,
       notes: input.notes || null,
       zoneSlug: input.zone || null,
+      lat,
+      lng,
     },
+    input.coupon || undefined,
   );
 
   if (!created.ok) return { ok: false, message: created.problems[0] };
@@ -116,6 +147,22 @@ export async function placeOrderAction(
     select: { totalSantim: true, currency: true, reference: true },
   });
   if (!order) return { ok: false, message: 'Could not open that order.' };
+
+  // The shop wants to know an order arrived, and it wants to know before the
+  // payment resolves — a pending order still has to be built. Notifying can
+  // never fail the checkout; notifyAdmin swallows its own errors.
+  await notifyAdmin({
+    kind: 'NEW_ORDER',
+    title: `Order ${order.reference}`,
+    body: `${input.name} · ${formatMoney(order.totalSantim)}`,
+    entityType: 'order',
+    entityId: created.orderId,
+    href: `/admin/orders/${order.reference}`,
+  });
+
+  // Stock was decremented inside the order transaction, so this reads the
+  // figures that are now true rather than the ones from before the order.
+  await warnAboutStock(cart.id ? priced.lines.map((l) => l.variantId) : []);
 
   // ---------------------------------------------------------------- free
   // Nothing is owed, so nothing is collected. The order is settled without
@@ -170,4 +217,50 @@ export async function placeOrderAction(
   });
 
   redirect(session.checkoutUrl);
+}
+
+/**
+ * Tell the admin when a line has just crossed its own low-stock threshold.
+ *
+ * Only for variants that actually track stock: a made-to-order bench has a
+ * stock of zero for ever and is not news. Deduplicated on the notification
+ * side, so a variant sitting at one does not produce a notice per order.
+ */
+async function warnAboutStock(variantIds: string[]): Promise<void> {
+  if (variantIds.length === 0) return;
+
+  const variants = await db.productVariant.findMany({
+    where: { id: { in: variantIds }, trackStock: true, allowBackorder: false },
+    select: {
+      id: true,
+      label: true,
+      stock: true,
+      lowStockThreshold: true,
+      product: { select: { name: true, id: true } },
+    },
+  });
+
+  for (const v of variants) {
+    if (v.stock <= 0) {
+      await notifyAdmin({
+        kind: 'OUT_OF_STOCK',
+        title: `${v.product.name} is out of stock`,
+        body: v.label,
+        entityType: 'variant',
+        entityId: v.id,
+        href: `/admin/products/${v.product.id}`,
+        dedupe: true,
+      });
+    } else if (v.stock <= v.lowStockThreshold) {
+      await notifyAdmin({
+        kind: 'LOW_STOCK',
+        title: `${v.product.name} is running low`,
+        body: `${v.label} · ${v.stock} left`,
+        entityType: 'variant',
+        entityId: v.id,
+        href: `/admin/inventory`,
+        dedupe: true,
+      });
+    }
+  }
 }

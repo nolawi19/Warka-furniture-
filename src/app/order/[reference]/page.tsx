@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { DeliveryPin } from '@/components/site/DeliveryPin';
 import { currentUser, isStaff } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { formatMoney } from '@/lib/money';
@@ -221,6 +222,7 @@ export default async function OrderPage({
             {o.deliveryPhone}
           </address>
           {o.deliveryNotes && <p className={styles.notes}>“{o.deliveryNotes}”</p>}
+          <DeliveryPin lat={o.deliveryLat} lng={o.deliveryLng} />
         </section>
 
         <footer className={styles.foot}>

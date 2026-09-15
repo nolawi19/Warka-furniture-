@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { db } from '../db';
+import { notifyAdmin } from '../admin/notifications';
 import { transitionOrder } from '../orders';
 import { chapaProvider } from './chapa';
 import { getProvider, registerProvider } from './provider';
@@ -66,6 +67,23 @@ export async function settlePayment(
         { label: `payment:${provider.id}` },
         `Gateway reported ${verified.status.toLowerCase()} (${trigger})`,
       ).catch(() => {});
+
+      // A customer whose payment failed is holding reserved stock and has no
+      // order. Somebody should ring them.
+      const order = await db.order.findUnique({
+        where: { id: payment.orderId },
+        select: { reference: true, name: true, phone: true },
+      });
+      if (order) {
+        await notifyAdmin({
+          kind: 'PAYMENT_ISSUE',
+          title: `Payment ${verified.status.toLowerCase()} on ${order.reference}`,
+          body: `${order.name} · ${order.phone}`,
+          entityType: 'order',
+          entityId: payment.orderId,
+          href: `/admin/orders/${order.reference}`,
+        });
+      }
     }
 
     return { status: verified.status, changed: true };

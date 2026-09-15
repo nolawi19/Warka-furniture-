@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { z } from 'zod';
 
+import { notifyAdmin } from '@/lib/admin/notifications';
 import { db } from '@/lib/db';
 import {
   clearFailedLogins,
@@ -79,6 +80,15 @@ export async function registerAction(_prev: FormState, formData: FormData): Prom
 
   const user = await db.user.create({
     data: { name, email, phone, passwordHash: await hashPassword(password), role: 'CUSTOMER' },
+  });
+
+  await notifyAdmin({
+    kind: 'NEW_CUSTOMER',
+    title: `${user.name} registered`,
+    body: user.email,
+    entityType: 'user',
+    entityId: user.id,
+    href: `/admin/customers/${user.id}`,
   });
 
   await createSession(user.id, await clientMeta());
