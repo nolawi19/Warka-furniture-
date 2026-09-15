@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from 'react';
 
 import { placeOrderAction, type CheckoutState } from '@/app/actions/checkout';
+import { BankPicker, type BankOption } from '@/components/forms/BankPicker';
 import { LocationPicker, type Position } from '@/components/forms/LocationPicker';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { formatMoney } from '@/lib/money';
@@ -22,12 +23,14 @@ export function CheckoutForm({
   paymentsLive,
   nothingToCharge,
   zones,
+  banks,
   defaults,
 }: {
   methods: Method[];
   paymentsLive: boolean;
   nothingToCharge: boolean;
   zones: Zone[];
+  banks: BankOption[];
   defaults: { name: string; email: string; phone: string };
 }) {
   const [state, formAction, pending] = useActionState<CheckoutState, FormData>(placeOrderAction, {
@@ -221,6 +224,10 @@ export function CheckoutForm({
         </fieldset>
 
         {state.errors?.method && <p className={styles.error}>{state.errors.method}</p>}
+
+        {/* Which bank the money is coming from. Recorded, not charged —
+            the payment itself still happens on the gateway's own page. */}
+        {!nothingToCharge && <BankPicker banks={banks} />}
 
         {!nothingToCharge && paymentsLive && (
           <p className={styles.secure}>

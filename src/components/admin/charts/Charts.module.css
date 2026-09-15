@@ -1,0 +1,85 @@
+.figure { display: grid; gap: var(--space-3); }
+
+.svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+/* Recessive: the axis is a hairline, not a rule competing with the bars. */
+.axis { stroke: var(--line); stroke-width: 1; }
+
+.bar {
+  fill: var(--ember);
+  /* Validated against both surfaces: #bc431e on light, #d2451d on dark. */
+  opacity: 0.82;
+  transition: opacity 120ms var(--ease-out);
+}
+.bar[data-peak='true'] { opacity: 1; }
+.bar:hover { opacity: 1; }
+
+.tick { fill: var(--ink-3); font-size: 11px; font-family: inherit; }
+
+.caption {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+.captionDim { color: var(--ink-3); font-size: var(--text-xs); }
+
+/* ------------------------------------------------------------ ranked rows */
+
+.ranked { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+.ranked thead th {
+  text-align: left;
+  padding-bottom: 8px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+  border-bottom: 1px solid var(--line-2);
+}
+.ranked tbody th, .ranked tbody td {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line-2);
+  font-weight: 400;
+  vertical-align: baseline;
+}
+.ranked tbody tr:last-child th, .ranked tbody tr:last-child td { border-bottom: none; }
+
+.rankedName { position: relative; text-align: left; padding-right: var(--space-4) !important; }
+.rankedLabel { color: var(--ink); }
+.rankedSub { display: block; font-size: var(--text-xs); color: var(--ink-3); margin-top: 1px; }
+
+/* The bar sits under the text as a quiet second encoding of the number
+   beside it, so nothing is carried by colour alone. */
+.rankedBar {
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--ember);
+  opacity: 0.55;
+  max-width: 100%;
+}
+
+.rankedNum {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------------- no data */
+
+.noData {
+  display: grid;
+  gap: 5px;
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+}
+.noDataTitle { font-size: var(--text-body); color: var(--ink); }
+.noDataBody { font-size: var(--text-xs); color: var(--ink-3); max-width: 44ch; margin-inline: auto; line-height: 1.5; }

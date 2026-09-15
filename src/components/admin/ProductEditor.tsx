@@ -33,6 +33,11 @@ export function ProductEditor({
     materials: string;
     status: string;
     isFeatured: boolean;
+    shortDescription: string;
+    brand: string;
+    tags: string;
+    seoTitle: string;
+    seoDescription: string;
   };
   categories: Category[];
   variants: Variant[];
@@ -100,6 +105,54 @@ export function ProductEditor({
         <label className={styles.field}>
           <span>Materials</span>
           <textarea name="materials" defaultValue={product.materials} rows={2} maxLength={2000} />
+
+        <label className={styles.field}>
+          <span>Short description</span>
+          <input
+            name="shortDescription"
+            defaultValue={product.shortDescription}
+            maxLength={300}
+            placeholder="One line for cards and search results"
+          />
+        </label>
+
+        <div className={styles.row}>
+          <label className={styles.field}>
+            <span>Brand</span>
+            <input name="brand" defaultValue={product.brand} maxLength={80} placeholder="Warka" />
+          </label>
+          <label className={styles.field}>
+            <span>Tags</span>
+            <input
+              name="tags"
+              defaultValue={product.tags}
+              maxLength={400}
+              placeholder="bedroom, buttoned, made to measure"
+            />
+            <small>Separated by commas. They are searchable on the shop.</small>
+          </label>
+        </div>
+
+        <div className={styles.row}>
+          <label className={styles.field}>
+            <span>Search title</span>
+            <input
+              name="seoTitle"
+              defaultValue={product.seoTitle}
+              maxLength={160}
+              placeholder="Leave blank to use the product name"
+            />
+          </label>
+          <label className={styles.field}>
+            <span>Search description</span>
+            <input
+              name="seoDescription"
+              defaultValue={product.seoDescription}
+              maxLength={320}
+              placeholder="Leave blank to use the short description"
+            />
+          </label>
+        </div>
         </label>
 
         <label className={styles.check}>

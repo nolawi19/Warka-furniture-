@@ -4,6 +4,9 @@ import { PaymentsEditor } from '@/components/admin/settings/PaymentsEditor';
 import { PageHeader } from '@/components/admin/ui/PageHeader';
 import { requireStaff } from '@/lib/admin-guard';
 import { availableProviders } from '@/lib/payments/engine';
+import { BankList } from '@/components/admin/settings/BankList';
+import { db } from '@/lib/db';
+import { seedBanks } from '@/lib/payments/bank-sync';
 import { methodStates } from '@/lib/site/payment-methods';
 import { getDraftSetting, getSettingState } from '@/lib/site/settings';
 
@@ -12,10 +15,18 @@ export const dynamic = 'force-dynamic';
 
 export default async function PaymentsPage() {
   await requireStaff();
-  const [value, state, methods] = await Promise.all([
+  // Idempotent: it only writes when the table is empty, so an existing shop
+  // that upgrades gets the starting list without re-running the whole seed.
+  await seedBanks();
+
+  const [value, state, methods, banks] = await Promise.all([
     getDraftSetting('payments'),
     getSettingState('payments'),
     methodStates(),
+    db.bank.findMany({
+      orderBy: [{ kind: 'asc' }, { position: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true, shortName: true, kind: true, isActive: true, isSupported: true, chapaId: true },
+    }),
   ]);
 
   return (
@@ -39,6 +50,10 @@ export default async function PaymentsPage() {
           configured: m.configured,
         }))}
       />
+
+      <div style={{ marginTop: 'var(--space-4)' }}>
+        <BankList banks={banks} gatewayReady={Boolean(process.env.CHAPA_SECRET_KEY?.trim())} />
+      </div>
     </>
   );
 }

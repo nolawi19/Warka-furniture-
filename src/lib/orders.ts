@@ -258,6 +258,8 @@ export type DeliveryDetails = {
   /** Where the customer dropped the pin, if they did. */
   lat?: number;
   lng?: number;
+  /** Which bank or wallet they said they would pay from. */
+  bankId?: string | null;
 };
 
 /**
@@ -305,6 +307,7 @@ export async function createPendingOrder(
         deliveryZone: delivery.zoneSlug ?? null,
         deliveryLat: delivery.lat ?? null,
         deliveryLng: delivery.lng ?? null,
+        bankId: delivery.bankId ?? null,
         items: {
           create: priced.lines.map((l) => ({
             variantId: l.variantId,

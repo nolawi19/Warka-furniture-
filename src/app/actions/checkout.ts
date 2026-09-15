@@ -32,6 +32,9 @@ const CheckoutSchema = z.object({
   // here: an unknown or expired code is a message to the customer, not a
   // malformed form.
   coupon: z.string().trim().max(30).optional().or(z.literal('')),
+  // Which bank or wallet the customer intends to pay from. Recorded on the
+  // order so the shop knows what to expect; it does not itself move money.
+  bank: z.string().trim().max(40).optional().or(z.literal('')),
 });
 
 export type CheckoutState = {
@@ -136,6 +139,7 @@ export async function placeOrderAction(
       zoneSlug: input.zone || null,
       lat,
       lng,
+      bankId: input.bank || null,
     },
     input.coupon || undefined,
   );

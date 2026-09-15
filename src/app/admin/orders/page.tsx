@@ -1,145 +1,193 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import type { Prisma } from '@prisma/client';
 
+import { StatusBadge } from '@/components/admin/StatusBadge';
+import { EmptyState } from '@/components/admin/ui/EmptyState';
+import { PageHeader } from '@/components/admin/ui/PageHeader';
+import { Table, cell } from '@/components/admin/ui/Table';
+import { requireStaff } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
 import { formatMoney } from '@/lib/money';
-import { StatusBadge } from '@/components/admin/StatusBadge';
-import styles from '../page.module.css';
+import { STATUS_LABEL } from '@/lib/orders';
+import type { OrderStatus, Prisma } from '@prisma/client';
+import styles from './page.module.css';
 
+export const metadata: Metadata = { title: 'Orders' };
 export const dynamic = 'force-dynamic';
 
-const FILTERS = [
-  { key: 'all', label: 'All' },
-  { key: 'open', label: 'Needs work' },
-  { key: 'unpaid', label: 'Unpaid' },
-  { key: 'done', label: 'Delivered' },
-] as const;
+type Search = Promise<{ q?: string; status?: string; sort?: string }>;
 
-export default async function AdminOrders({
-  searchParams,
-}: {
-  searchParams: Promise<{ filter?: string; q?: string }>;
-}) {
-  const { filter = 'all', q } = await searchParams;
+const SORTS = {
+  newest: { label: 'Newest first', order: { placedAt: 'desc' } as const },
+  oldest: { label: 'Oldest first', order: { placedAt: 'asc' } as const },
+  largest: { label: 'Largest first', order: { totalSantim: 'desc' } as const },
+  smallest: { label: 'Smallest first', order: { totalSantim: 'asc' } as const },
+} as const;
 
-  const where: Prisma.OrderWhereInput =
-    filter === 'open'
-      ? { status: { in: ['PAID', 'CONFIRMED', 'PREPARING', 'READY', 'SHIPPED', 'OUT_FOR_DELIVERY'] } }
-      : filter === 'unpaid'
-        ? { status: { in: ['PENDING_PAYMENT', 'PAYMENT_FAILED'] } }
-        : filter === 'done'
-          ? { status: 'DELIVERED' }
-          : {};
+type SortKey = keyof typeof SORTS;
 
-  const search: Prisma.OrderWhereInput = q?.trim()
-    ? {
-        OR: [
-          { reference: { contains: q.trim().toUpperCase() } },
-          { name: { contains: q.trim(), mode: 'insensitive' } },
-          { email: { contains: q.trim(), mode: 'insensitive' } },
-          { phone: { contains: q.trim() } },
-        ],
-      }
-    : {};
+/** Groups worth filtering by, rather than eleven separate statuses. */
+const GROUPS: Record<string, { label: string; statuses: OrderStatus[] }> = {
+  open: {
+    label: 'Needs doing',
+    statuses: ['PAID', 'CONFIRMED', 'PREPARING', 'READY', 'SHIPPED', 'OUT_FOR_DELIVERY'],
+  },
+  unpaid: { label: 'Waiting to pay', statuses: ['PENDING_PAYMENT'] },
+  problem: { label: 'Problems', statuses: ['PAYMENT_FAILED'] },
+  done: { label: 'Delivered', statuses: ['DELIVERED'] },
+  closed: { label: 'Cancelled or refunded', statuses: ['CANCELLED', 'REFUNDED'] },
+};
 
-  const orders = await db.order.findMany({
-    where: { ...where, ...search },
-    orderBy: { placedAt: 'desc' },
-    take: 100,
-    select: {
-      id: true,
-      reference: true,
-      name: true,
-      phone: true,
-      status: true,
-      totalSantim: true,
-      placedAt: true,
-      _count: { select: { items: true } },
-    },
-  });
+export default async function AdminOrders({ searchParams }: { searchParams: Search }) {
+  await requireStaff();
+  const params = await searchParams;
+
+  const term = params.q?.trim() ?? '';
+  const group = params.status && GROUPS[params.status] ? params.status : '';
+  const sort: SortKey = params.sort && params.sort in SORTS ? (params.sort as SortKey) : 'newest';
+
+  const where: Prisma.OrderWhereInput = {
+    ...(group ? { status: { in: GROUPS[group].statuses } } : {}),
+    ...(term
+      ? {
+          OR: [
+            { reference: { contains: term, mode: 'insensitive' } },
+            { name: { contains: term, mode: 'insensitive' } },
+            { email: { contains: term, mode: 'insensitive' } },
+            { phone: { contains: term, mode: 'insensitive' } },
+          ],
+        }
+      : {}),
+  };
+
+  const [orders, total] = await Promise.all([
+    db.order.findMany({
+      where,
+      orderBy: SORTS[sort].order,
+      take: 200,
+      select: {
+        id: true,
+        reference: true,
+        name: true,
+        email: true,
+        status: true,
+        totalSantim: true,
+        placedAt: true,
+        paidAt: true,
+        _count: { select: { items: true } },
+      },
+    }),
+    db.order.count(),
+  ]);
+
+  // Keeping the other controls' state when one of them changes is the whole
+  // point of building these as links rather than a form per control.
+  const link = (patch: Record<string, string>) => {
+    const next = new URLSearchParams();
+    const merged = { q: term, status: group, sort, ...patch };
+    for (const [k, v] of Object.entries(merged)) if (v && !(k === 'sort' && v === 'newest')) next.set(k, v);
+    const qs = next.toString();
+    return qs ? `/admin/orders?${qs}` : '/admin/orders';
+  };
 
   return (
     <>
-      <header className={styles.head}>
-        <h1 className={styles.title}>Orders</h1>
-        <p className={styles.sub}>Newest first. Showing up to 100.</p>
-      </header>
+      <PageHeader
+        title="Orders"
+        description={
+          term || group
+            ? `${orders.length} of ${total} orders match.`
+            : `${total} order${total === 1 ? '' : 's'} in total.`
+        }
+      />
 
-      <div className={styles.sectionHead}>
-        <nav aria-label="Filter orders">
-          <ul style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {FILTERS.map((f) => (
-              <li key={f.key}>
-                <Link
-                  href={f.key === 'all' ? '/admin/orders' : `/admin/orders?filter=${f.key}`}
-                  className={styles.badge}
-                  data-tone={filter === f.key ? 'info' : 'muted'}
-                >
-                  {f.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+      <form className={styles.controls} action="/admin/orders">
+        <input
+          type="search"
+          name="q"
+          defaultValue={term}
+          className="admin-input"
+          placeholder="Reference, name, email or phone"
+          aria-label="Search orders"
+        />
+        {group && <input type="hidden" name="status" value={group} />}
+        {sort !== 'newest' && <input type="hidden" name="sort" value={sort} />}
+        <button type="submit" className={styles.searchButton}>
+          Search
+        </button>
+      </form>
 
-        <form action="/admin/orders" method="get" role="search">
-          <label className="sr-only" htmlFor="order-search">
-            Search orders
-          </label>
-          <input
-            id="order-search"
-            name="q"
-            defaultValue={q ?? ''}
-            placeholder="Reference, name, phone…"
-            style={{
-              background: 'var(--bg-2)',
-              border: '1px solid var(--line)',
-              borderRadius: 'var(--radius)',
-              padding: '9px 12px',
-              fontSize: 'var(--text-sm)',
-              minWidth: 220,
-            }}
-          />
-        </form>
-      </div>
+      <nav className={styles.filters} aria-label="Filter and sort">
+        <Link href={link({ status: '' })} className={styles.chip} data-active={!group}>
+          Everything
+        </Link>
+        {Object.entries(GROUPS).map(([key, g]) => (
+          <Link key={key} href={link({ status: key })} className={styles.chip} data-active={group === key}>
+            {g.label}
+          </Link>
+        ))}
+        <span className={styles.spacer} />
+        {Object.entries(SORTS).map(([key, s]) => (
+          <Link key={key} href={link({ sort: key })} className={styles.chip} data-active={sort === key}>
+            {s.label}
+          </Link>
+        ))}
+      </nav>
 
       {orders.length === 0 ? (
-        <p className={styles.empty}>
-          {q ? `Nothing matches “${q}”.` : 'No orders in this view yet.'}
-        </p>
+        <EmptyState
+          title={total === 0 ? 'No orders yet' : 'Nothing matches'}
+          body={
+            total === 0
+              ? 'The first order a customer places will appear here.'
+              : 'Try part of a reference, a phone number, or clear the filter.'
+          }
+        />
       ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th scope="col">Reference</th>
-              <th scope="col">Customer</th>
-              <th scope="col">Items</th>
-              <th scope="col">Status</th>
-              <th scope="col" className={styles.right}>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((o) => (
-              <tr key={o.id}>
-                <td>
-                  <Link href={`/admin/orders/${o.reference}`} className={styles.ref}>
-                    {o.reference}
-                  </Link>
-                  <span className={styles.when}>
-                    {o.placedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+        <Table
+          head={
+            <>
+              <th>Reference</th>
+              <th>Customer</th>
+              <th className={cell.num}>Items</th>
+              <th className={cell.num}>Total</th>
+              <th>Status</th>
+              <th>Placed</th>
+            </>
+          }
+        >
+          {orders.map((o) => (
+            <tr key={o.id}>
+              <td>
+                <Link href={`/admin/orders/${o.reference}`} className={styles.reference}>
+                  {o.reference}
+                </Link>
+              </td>
+              <td>
+                {o.name}
+                <span className={cell.faint} style={{ display: 'block' }}>
+                  {o.email}
+                </span>
+              </td>
+              <td className={cell.num}>{o._count.items}</td>
+              <td className={cell.num}>{formatMoney(o.totalSantim)}</td>
+              <td>
+                <StatusBadge status={o.status} />
+                {!o.paidAt && o.status !== 'PENDING_PAYMENT' && o.totalSantim > 0 && (
+                  <span className={cell.faint} style={{ display: 'block' }}>
+                    not marked paid
                   </span>
-                </td>
-                <td>
-                  {o.name}
-                  <span className={styles.when}>{o.phone}</span>
-                </td>
-                <td>{o._count.items}</td>
-                <td><StatusBadge status={o.status} /></td>
-                <td className={styles.right}>{formatMoney(o.totalSantim)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                )}
+              </td>
+              <td className={cell.dim}>
+                {o.placedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                <span className={cell.faint} style={{ display: 'block' }}>
+                  {STATUS_LABEL[o.status]}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </Table>
       )}
     </>
   );

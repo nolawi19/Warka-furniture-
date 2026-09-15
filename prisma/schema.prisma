@@ -350,6 +350,10 @@ model Order {
   deliveryLat Float?
   deliveryLng Float?
 
+  /** Which bank or wallet the customer said they would pay from. */
+  bankId String?
+  bank   Bank?   @relation(fields: [bankId], references: [id], onDelete: SetNull)
+
   placedAt    DateTime  @default(now())
   paidAt      DateTime?
   shippedAt   DateTime?
@@ -497,6 +501,9 @@ model InventoryMovement {
   createdAt DateTime       @default(now())
 
   @@index([variantId, createdAt])
+  // Who made the change, when a person did. Order movements leave this null
+  // because the order reference already says what happened.
+  actorLabel String?
 }
 
 // ---------------------------------------------------------------- extras
@@ -815,4 +822,44 @@ model NewsletterSubscriber {
   createdAt    DateTime  @default(now())
 
   @@index([createdAt])
+}
+
+enum BankKind {
+  BANK
+  WALLET
+  MICROFINANCE
+}
+
+/**
+ * An Ethiopian bank or mobile wallet the shop can be paid through.
+ *
+ * Seeded with the licensed banks so the list is useful on day one, and
+ * refreshable from the payment gateway's own endpoint once credentials exist —
+ * the gateway is the only authority on which of these it can actually settle.
+ * `chapaId` is null until that sync has matched the row.
+ */
+model Bank {
+  id        String   @id @default(cuid())
+  name      String
+  shortName String?
+  slug      String   @unique
+  kind      BankKind @default(BANK)
+
+  /** The gateway's own identifier, filled in by a sync. Null means unmatched. */
+  chapaId   String?
+  swift     String?
+  logoUrl   String?
+
+  /** The shop can hide one it does not want to offer. */
+  isActive  Boolean  @default(true)
+  /** True once a gateway sync has confirmed the gateway supports it. */
+  isSupported Boolean @default(false)
+
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+
+  @@index([isActive, position])
 }

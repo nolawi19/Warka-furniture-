@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { ProductEditor } from '@/components/admin/ProductEditor';
+import { ProductImages } from '@/components/admin/catalogue/ProductImages';
 import { db } from '@/lib/db';
 import styles from '../../page.module.css';
 
@@ -13,10 +14,19 @@ export default async function EditProduct({ params }: { params: Promise<{ id: st
   const [product, categories] = await Promise.all([
     db.product.findUnique({
       where: { id },
-      include: { variants: { orderBy: { position: 'asc' } } },
+      include: {
+        variants: { orderBy: { position: 'asc' } },
+        images: { orderBy: [{ isPrimary: 'desc' }, { position: 'asc' }] },
+      },
     }),
     db.category.findMany({ orderBy: { position: 'asc' }, select: { id: true, name: true } }),
   ]);
+
+  const library = await db.mediaAsset.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 200,
+    select: { id: true, url: true, filename: true, alt: true },
+  });
 
   if (!product) notFound();
 
@@ -45,6 +55,11 @@ export default async function EditProduct({ params }: { params: Promise<{ id: st
           materials: product.materials ?? '',
           status: product.status,
           isFeatured: product.isFeatured,
+          shortDescription: product.shortDescription ?? '',
+          brand: product.brand ?? '',
+          tags: product.tags.join(', '),
+          seoTitle: product.seoTitle ?? '',
+          seoDescription: product.seoDescription ?? '',
         }}
         categories={categories}
         variants={product.variants.map((v) => ({
@@ -57,6 +72,19 @@ export default async function EditProduct({ params }: { params: Promise<{ id: st
           trackStock: v.trackStock,
         }))}
       />
+
+      <div style={{ marginTop: 'var(--space-5)' }}>
+        <ProductImages
+          productId={product.id}
+          images={product.images.map((i) => ({
+            id: i.id,
+            url: i.url,
+            alt: i.alt,
+            isPrimary: i.isPrimary,
+          }))}
+          library={library}
+        />
+      </div>
     </>
   );
 }

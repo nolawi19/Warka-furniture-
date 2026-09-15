@@ -70,6 +70,12 @@ const ProductSchema = z.object({
   materials: z.string().trim().max(2000).optional().or(z.literal('')),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
   isFeatured: z.coerce.boolean(),
+  shortDescription: z.string().trim().max(300).optional().or(z.literal('')),
+  brand: z.string().trim().max(80).optional().or(z.literal('')),
+  // One comma-separated box in the form; an array in the database.
+  tags: z.string().trim().max(400).optional().or(z.literal('')),
+  seoTitle: z.string().trim().max(160).optional().or(z.literal('')),
+  seoDescription: z.string().trim().max(320).optional().or(z.literal('')),
 });
 
 export async function saveProductAction(
@@ -87,6 +93,11 @@ export async function saveProductAction(
     materials: formData.get('materials'),
     status: formData.get('status'),
     isFeatured: formData.get('isFeatured') === 'on',
+    shortDescription: formData.get('shortDescription'),
+    brand: formData.get('brand'),
+    tags: formData.get('tags'),
+    seoTitle: formData.get('seoTitle'),
+    seoDescription: formData.get('seoDescription'),
   });
 
   if (!parsed.success) {
@@ -103,9 +114,32 @@ export async function saveProductAction(
   });
   if (clash) return { ok: false, message: `The address /product/${slug} is already taken.` };
 
-  const searchText = [input.name, input.description ?? '', input.materials ?? '']
+  const tags = (input.tags ?? '')
+    .split(',')
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .slice(0, 20);
+
+  // The haystack a shop search hits. Everything a customer might type goes in,
+  // including the tags and the brand.
+  const searchText = [
+    input.name,
+    input.shortDescription ?? '',
+    input.description ?? '',
+    input.materials ?? '',
+    input.brand ?? '',
+    tags.join(' '),
+  ]
     .join(' ')
     .toLowerCase();
+
+  const extraFields = {
+    shortDescription: input.shortDescription || null,
+    brand: input.brand || null,
+    tags,
+    seoTitle: input.seoTitle || null,
+    seoDescription: input.seoDescription || null,
+  };
 
   if (productId) {
     const before = await db.product.findUnique({ where: { id: productId } });
@@ -122,6 +156,7 @@ export async function saveProductAction(
         status: input.status,
         isFeatured: input.isFeatured,
         searchText,
+        ...extraFields,
       },
     });
 
@@ -152,6 +187,7 @@ export async function saveProductAction(
       status: input.status,
       isFeatured: input.isFeatured,
       searchText,
+      ...extraFields,
       // A product with no variant cannot be bought, so one is always made.
       variants: {
         create: {

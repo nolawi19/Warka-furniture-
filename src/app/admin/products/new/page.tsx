@@ -34,6 +34,11 @@ export default async function NewProduct() {
           materials: '',
           status: 'DRAFT',
           isFeatured: false,
+          shortDescription: '',
+          brand: '',
+          tags: '',
+          seoTitle: '',
+          seoDescription: '',
         }}
         categories={categories}
         variants={[]}

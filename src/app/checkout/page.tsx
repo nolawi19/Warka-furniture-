@@ -8,6 +8,7 @@ import { getCart } from '@/lib/cart';
 import { db } from '@/lib/db';
 import { allMethods } from '@/lib/payments/engine';
 import { enabledMethods } from '@/lib/site/payment-methods';
+import { seedBanks } from '@/lib/payments/bank-sync';
 import { formatMoney } from '@/lib/money';
 import styles from './page.module.css';
 
@@ -22,9 +23,17 @@ export default async function CheckoutPage() {
   const cart = await getCart();
   if (cart.lines.length === 0) redirect('/cart');
 
-  const [user, zones] = await Promise.all([
+  await seedBanks();
+
+  const [user, zones, banks] = await Promise.all([
     currentUser(),
     db.deliveryZone.findMany({ where: { isActive: true }, orderBy: { position: 'asc' } }),
+    // Gateway-confirmed ones first: those are the ones that will just work.
+    db.bank.findMany({
+      where: { isActive: true },
+      orderBy: [{ isSupported: 'desc' }, { kind: 'asc' }, { position: 'asc' }],
+      select: { id: true, name: true, shortName: true, kind: true, isSupported: true },
+    }),
   ]);
 
   // Every method the shop can actually settle today. When credentials are
@@ -66,6 +75,7 @@ export default async function CheckoutPage() {
             feeSantim: z.feeSantim,
             etaDays: z.etaDays,
           }))}
+          banks={banks}
           defaults={{
             name: user?.name ?? '',
             email: user?.email ?? '',
