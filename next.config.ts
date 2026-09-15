@@ -16,8 +16,23 @@ const nextConfig: NextConfig = {
       { key: 'X-Frame-Options', value: 'DENY' },
       { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' },
     ];
+    // The builder embeds /preview/<id> in an iframe. X-Frame-Options: DENY
+    // would refuse that even from our own origin, so preview — and only
+    // preview — allows same-origin framing. It is staff-only and noindex, and
+    // frame-ancestors 'self' is the modern header that actually gets obeyed.
+    const previewFramable = [
+      ...secure.filter((h) => h.key !== 'X-Frame-Options'),
+      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+      { key: 'Content-Security-Policy', value: "frame-ancestors 'self'" },
+      { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+    ];
+
+    // Next applies EVERY matching rule, so a broad '/:path*' would re-add
+    // X-Frame-Options: DENY on top of the preview rule and the iframe would
+    // still be refused. The catch-all therefore excludes /preview explicitly.
     return [
-      { source: '/:path*', headers: secure },
+      { source: '/preview/:path*', headers: previewFramable },
+      { source: '/:path((?!preview/).*)', headers: secure },
       // Admin must never reach an index.
       { source: '/admin/:path*', headers: [...secure, { key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
       { source: '/account/:path*', headers: [...secure, { key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },

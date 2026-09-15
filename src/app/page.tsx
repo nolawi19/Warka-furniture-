@@ -4,12 +4,25 @@ import Link from 'next/link';
 import { Hero } from '@/components/hero/Hero';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { getCategories, getPhotographedProducts } from '@/lib/catalogue';
+import { BlockRenderer } from '@/components/blocks/BlockRenderer';
+import { db } from '@/lib/db';
+import { parseBlocks } from '@/lib/site/blocks';
 import { getShop } from '@/lib/site/shop';
 import styles from './page.module.css';
 
 export const revalidate = 300;
 
 export default async function HomePage() {
+  // If the shop has built and published a homepage in the Website Builder,
+  // that is the homepage. Otherwise the original one below stands — so the
+  // site has a homepage from the first minute, and gains an editable one the
+  // moment somebody wants it.
+  const built = await db.page.findFirst({ where: { slug: 'home', status: 'PUBLISHED' } });
+  if (built?.publishedBlocks) {
+    const blocks = parseBlocks(built.publishedBlocks);
+    if (blocks.length > 0) return <BlockRenderer blocks={blocks} />;
+  }
+
   const SHOP = await getShop();
   const [categories, showroom] = await Promise.all([
     getCategories(),
