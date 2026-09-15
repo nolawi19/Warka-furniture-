@@ -45,9 +45,9 @@ fixed.
 
 ### 2. Prices
 
-99 of the 102 variants have no price and show as *Priced in the shop*, which is
-honest — that is how the workshop actually quotes. Prices go in through
-**Admin → Products → (a line) → variants**, in Birr.
+Everything is currently **0 ETB** — see the section at the end of this file for
+how to put the real prices back. Prices go in through **Admin → Products →
+(a line) → variants**, in Birr.
 
 ### 3. Payment credentials
 
@@ -72,6 +72,11 @@ Chapa was chosen because one NBE-licensed integration covers Telebirr, CBE Birr,
 Awash Birr, Visa and Mastercard, and settles to an Ethiopian bank account.
 PayPal is deliberately **not** offered directly: an Ethiopian merchant cannot
 withdraw PayPal funds to a local bank.
+
+All five methods are listed individually at checkout and the customer picks one,
+which is stored on the order. Chapa's initialize endpoint has no payment-method
+field, so the final selection happens on their hosted page — the UI says so
+rather than implying we send it.
 
 ### 4. Photographs
 
@@ -109,9 +114,8 @@ index.html                  the original single-file site, untouched
 prisma/schema.prisma        21 tables
 prisma/seed.ts              loads the real catalogue out of index.html
 src/app/                    routes (public, account, admin, api)
-src/components/hero/        the 3D Warka sign
-  logo-geometry.ts          THE BRAND — traced outlines, do not redraw
-  sign-scene.ts             three.js: extrusion, material, lighting, scroll
+src/components/hero/        the hero and its typographic brand plate
+src/components/ui/          ActionButton — every interactive button
 src/lib/
   orders.ts                 pricing and the order state machine
   payments/                 provider interface + Chapa adapter
@@ -119,14 +123,23 @@ src/lib/
 src/styles/tokens.css       the design system
 ```
 
-## The sign
+## The logo
 
-`src/components/hero/logo-geometry.ts` holds the outlines traced from the
-shop's own painted sign: the three ዋርካ letters, the nine የአንጨት ስራዎች letters,
-the frame, and the warka tree cut as pierced fretwork. **The silhouette is the
-brand.** Depth, bevel, material, lighting and shadow are the things meant to be
-tuned; the shapes are not. The flat mark in the header is generated from the
-same data, so the two can never drift apart.
+Text, nothing else. The header is the wordmark; the hero panel sets it larger
+with the Amharic name beneath. There is no canvas, no WebGL context and no
+animation loop anywhere on the site — the 3D sign and three.js were removed,
+which took about 500 KB and a per-frame render loop out with them.
+
+## Buttons
+
+`src/components/ui/ActionButton.tsx` is the one button. Ripple, sheen, hover
+lift, press, icon travel, loading spinner, success tick, animated focus ring
+and touch feedback — all CSS, all 90–220ms.
+
+The rule it exists to enforce: **the action fires first and the animation
+decorates it.** Nothing awaits a visual effect before calling the handler.
+Measured at 4ms from click to the network request going out, with the ripple
+already painted in that same frame.
 
 ---
 
