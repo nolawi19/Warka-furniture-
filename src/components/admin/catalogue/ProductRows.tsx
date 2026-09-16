@@ -14,6 +14,7 @@ import { Table, cell } from '@/components/admin/ui/Table';
 import { EmptyState } from '@/components/admin/ui/EmptyState';
 import { formatMoney } from '@/lib/money';
 import styles from './ProductRows.module.css';
+import { useServerData } from '@/components/admin/ui/useServerData';
 
 export type ProductRow = {
   id: string;
@@ -32,7 +33,7 @@ export type ProductRow = {
 const STATUS_LABEL = { DRAFT: 'Draft', PUBLISHED: 'Live', ARCHIVED: 'Archived' } as const;
 
 export function ProductRows({ products }: { products: ProductRow[] }) {
-  const [rows, setRows] = useState(products);
+  const [rows, setRows] = useServerData(products);
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<'all' | ProductRow['status']>('all');
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);

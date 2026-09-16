@@ -12,6 +12,7 @@ import {
 import { Card } from '@/components/admin/ui/Card';
 import { DragHandle, SortableList } from '@/components/admin/ui/SortableList';
 import styles from './ProductImages.module.css';
+import { useServerData } from '@/components/admin/ui/useServerData';
 
 export type ProductImageRow = {
   id: string;
@@ -38,7 +39,7 @@ export function ProductImages({
   images: ProductImageRow[];
   library: LibraryImage[];
 }) {
-  const [images, setImages] = useState(initial);
+  const [images, setImages] = useServerData(initial);
   const [picking, setPicking] = useState(false);
   const [query, setQuery] = useState('');
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);

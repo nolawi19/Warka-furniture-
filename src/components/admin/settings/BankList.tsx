@@ -6,6 +6,7 @@ import { useMemo, useState, useTransition } from 'react';
 import { saveBankAction, setBankActiveAction, syncBanksAction } from '@/app/actions/admin-banks';
 import { Card } from '@/components/admin/ui/Card';
 import styles from '../store/Store.module.css';
+import { useServerData } from '@/components/admin/ui/useServerData';
 
 export type BankRow = {
   id: string;
@@ -24,7 +25,7 @@ const KIND_LABEL: Record<BankRow['kind'], string> = {
 };
 
 export function BankList({ banks: initial, gatewayReady }: { banks: BankRow[]; gatewayReady: boolean }) {
-  const [banks, setBanks] = useState(initial);
+  const [banks, setBanks] = useServerData(initial);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'supported' | 'shown'>('all');
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);

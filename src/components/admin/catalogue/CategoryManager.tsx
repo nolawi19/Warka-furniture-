@@ -12,6 +12,7 @@ import { Card } from '@/components/admin/ui/Card';
 import { EmptyState } from '@/components/admin/ui/EmptyState';
 import { DragHandle, SortableList } from '@/components/admin/ui/SortableList';
 import styles from './CategoryManager.module.css';
+import { useServerData } from '@/components/admin/ui/useServerData';
 
 export type CategoryRow = {
   id: string;
@@ -31,7 +32,7 @@ export type CategoryRow = {
 type Draft = Partial<CategoryRow> & { name: string };
 
 export function CategoryManager({ categories }: { categories: CategoryRow[] }) {
-  const [rows, setRows] = useState(categories);
+  const [rows, setRows] = useServerData(categories);
   const [editing, setEditing] = useState<Draft | null>(null);
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const [pending, startTransition] = useTransition();

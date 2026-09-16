@@ -12,6 +12,7 @@ import { Card } from '@/components/admin/ui/Card';
 import { EmptyState } from '@/components/admin/ui/EmptyState';
 import { DragHandle, SortableList } from '@/components/admin/ui/SortableList';
 import styles from './Store.module.css';
+import { useServerData } from '@/components/admin/ui/useServerData';
 
 export type Zone = {
   id: string;
@@ -27,7 +28,7 @@ type Draft = Omit<Zone, 'id'> & { id?: string };
 const BLANK: Draft = { name: '', feeBirr: 0, freeAboveBirr: null, etaDays: '', isActive: true };
 
 export function DeliveryZones({ zones: initial, currency }: { zones: Zone[]; currency: string }) {
-  const [zones, setZones] = useState(initial);
+  const [zones, setZones] = useServerData(initial);
   const [editing, setEditing] = useState<Draft | null>(null);
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const [pending, startTransition] = useTransition();

@@ -9,6 +9,7 @@ import { Table, cell } from '@/components/admin/ui/Table';
 import { EmptyState } from '@/components/admin/ui/EmptyState';
 import styles from './ProductRows.module.css';
 import local from './Inventory.module.css';
+import { useServerData } from '@/components/admin/ui/useServerData';
 
 export type StockRow = {
   id: string;
@@ -28,7 +29,7 @@ function state(r: StockRow): { tone: 'ok' | 'warn' | 'error'; label: string } {
 }
 
 export function InventoryTable({ rows: initial }: { rows: StockRow[] }) {
-  const [rows, setRows] = useState(initial);
+  const [rows, setRows] = useServerData(initial);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'low' | 'out'>('all');
   const [adjusting, setAdjusting] = useState<StockRow | null>(null);

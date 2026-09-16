@@ -6,6 +6,7 @@ import { useCallback, useRef, useState, useTransition } from 'react';
 import { deleteMediaAction, updateMediaAction } from '@/app/actions/admin-media';
 import { EmptyState } from '@/components/admin/ui/EmptyState';
 import styles from './MediaLibrary.module.css';
+import { useServerData } from '@/components/admin/ui/useServerData';
 
 export type MediaItem = {
   id: string;
@@ -33,7 +34,7 @@ export function MediaLibrary({
   /** In picker mode, choosing an image calls back instead of opening details. */
   onPick?: (item: MediaItem) => void;
 }) {
-  const [items, setItems] = useState(initial);
+  const [items, setItems] = useServerData(initial);
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<MediaItem | null>(null);
   const [dragOver, setDragOver] = useState(false);

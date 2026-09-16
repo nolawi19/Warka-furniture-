@@ -12,6 +12,7 @@ import { Card } from '@/components/admin/ui/Card';
 import { EmptyState } from '@/components/admin/ui/EmptyState';
 import { DragHandle, SortableList } from '@/components/admin/ui/SortableList';
 import styles from './Store.module.css';
+import { useServerData } from '@/components/admin/ui/useServerData';
 
 export type BannerRow = {
   id: string;
@@ -61,7 +62,7 @@ function toLocalInput(iso: string | null | undefined): string {
 }
 
 export function BannerManager({ banners: initial }: { banners: BannerRow[] }) {
-  const [banners, setBanners] = useState(initial);
+  const [banners, setBanners] = useServerData(initial);
   const [editing, setEditing] = useState<Draft | null>(null);
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
