@@ -90,7 +90,10 @@ export async function syncBanksFromChapa(): Promise<SyncResult> {
   for (const row of rows) {
     const name = typeof row.name === 'string' ? row.name.trim() : '';
     if (!name) continue;
-    const chapaId = row.id === undefined || row.id === null ? null : String(row.id);
+    // Chapa's ids are numbers or strings. Anything else is not an id, and
+    // storing "[object Object]" would quietly break the next sync's matching.
+    const chapaId =
+      typeof row.id === 'string' || typeof row.id === 'number' ? String(row.id) : null;
     const slug = typeof row.slug === 'string' && row.slug ? slugify(row.slug) : slugify(name);
     const swift = typeof row.swift === 'string' ? row.swift : null;
     const isWallet = row.is_mobilemoney === true || row.is_mobilemoney === 1;

@@ -41,7 +41,7 @@ export async function saveCategoryAction(input: unknown): Promise<CategoryAction
 
   // A category cannot be its own parent, and a two-level tree cannot become a
   // loop, so a parent that is itself a child is refused.
-  let parentId: string | null = data.parentId?.trim() || null;
+  const parentId: string | null = data.parentId?.trim() || null;
   if (parentId && parentId === data.id) {
     return { ok: false, message: 'A category cannot sit inside itself.' };
   }

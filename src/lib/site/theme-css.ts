@@ -16,7 +16,15 @@ import { fontStack, type ButtonPreset, type ButtonsSettings, type Palette, type 
 
 /** Nothing that could end a declaration, a rule, or the <style> element. */
 function css(value: string): string {
-  return value.replace(/[<>{};@\\]/g, '').replace(/\/\*|\*\//g, '').trim().slice(0, 200);
+  return value
+    // Anything that could end a declaration, a rule or the element itself.
+    // Quotes and ampersands go too: they are never needed in a colour or a
+    // length, and their absence is what lets the whole sheet be emitted as
+    // plain text that React will not escape.
+    .replace(/[<>&{};@'"\\]/g, '')
+    .replace(/\/\*|\*\//g, '')
+    .trim()
+    .slice(0, 200);
 }
 
 function num(value: number, min: number, max: number): number {
@@ -147,14 +155,18 @@ export function buildThemeCss(args: {
   if (typeScale) root.push(typeScale);
 
   for (const [name, preset] of Object.entries(buttons)) {
-    root.push(buttonBlock(name, preset as ButtonPreset));
+    root.push(buttonBlock(name, preset));
   }
 
   const dark = paletteBlock(theme.dark);
 
   return [
     `:root{\n${root.join('\n')}\n}`,
-    dark ? `:root[data-theme='dark']{\n${dark}\n}` : '',
+    // Unquoted on purpose: `dark` is a valid CSS identifier, and keeping the
+    // sheet free of quotes lets React hoist it as ordinary text without
+    // escaping anything. A single escaped quote here would silently kill the
+    // whole dark palette.
+    dark ? `:root[data-theme=dark]{\n${dark}\n}` : '',
     // Applied here rather than in tokens.css so that a shop keeping the
     // defaults ships no extra rules at all.
     `body{font-family:var(--font-body);font-weight:var(--weight-body);}`,

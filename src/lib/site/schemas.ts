@@ -509,10 +509,10 @@ export const SETTING_KEYS = Object.keys(SETTING_SCHEMAS) as SettingKey[];
 export function parseSetting<K extends SettingKey>(key: K, raw: unknown): SettingValue<K> {
   const schema = SETTING_SCHEMAS[key];
   const attempt = schema.safeParse(raw ?? {});
-  if (attempt.success) return attempt.data as SettingValue<K>;
-  return schema.parse({}) as SettingValue<K>;
+  if (attempt.success) return attempt.data;
+  return schema.parse({});
 }
 
 export function defaultSetting<K extends SettingKey>(key: K): SettingValue<K> {
-  return SETTING_SCHEMAS[key].parse({}) as SettingValue<K>;
+  return SETTING_SCHEMAS[key].parse({});
 }

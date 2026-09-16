@@ -131,7 +131,7 @@ export async function placeOrderAction(
       // deliveryLine1 is what every existing screen prints as "the address",
       // so it gets something a person can read: the driver's own directions
       // when there are any, and the coordinate otherwise.
-      line1: (input.notes || '').trim() || (hasPin ? `Pinned location ${lat!.toFixed(5)}, ${lng!.toFixed(5)}` : 'No address given'),
+      line1: (input.notes || '').trim() || (hasPin ? `Pinned location ${lat.toFixed(5)}, ${lng.toFixed(5)}` : 'No address given'),
       line2: null,
       city: store.city,
       subCity: null,

@@ -78,6 +78,6 @@ export async function POST(req: NextRequest) {
 }
 
 // Chapa only POSTs. Anything else is a probe.
-export async function GET() {
+export function GET() {
   return NextResponse.json({ error: 'method not allowed' }, { status: 405 });
 }

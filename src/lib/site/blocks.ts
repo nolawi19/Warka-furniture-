@@ -286,7 +286,7 @@ export function newBlock(type: BlockType): Block {
   return {
     id: `b-${Math.random().toString(36).slice(2, 10)}`,
     type,
-    props: BLOCK_PROPS[type].parse({}) as Record<string, unknown>,
+    props: BLOCK_PROPS[type].parse({}),
     style: defaultStyle(),
     animation: BlockAnimationSchema.parse({}),
   };
@@ -323,7 +323,7 @@ export function newBlockWithStarter(type: BlockType): Block {
   const starter = STARTER_PROPS[type];
   if (starter) {
     const merged = BLOCK_PROPS[type].safeParse({ ...(block.props as object), ...starter });
-    if (merged.success) block.props = merged.data as Record<string, unknown>;
+    if (merged.success) block.props = merged.data;
   }
   return block;
 }

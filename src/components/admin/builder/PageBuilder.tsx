@@ -1,9 +1,11 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { publishPageAction, savePageBlocksAction } from '@/app/actions/admin-pages';
 import { DragHandle, SortableList } from '@/components/admin/ui/SortableList';
+import { asText } from '@/lib/text';
 import {
   BLOCK_LIBRARY,
   newBlockWithStarter,
@@ -62,28 +64,30 @@ export function PageBuilder({
   const [message, setMessage] = useState('');
   const [publishing, setPublishing] = useState(false);
 
-  // Undo/redo. Snapshots of the whole document, which is cheap at this size
-  // and impossible to get subtly wrong.
-  const past = useRef<Block[][]>([]);
-  const future = useRef<Block[][]>([]);
+  // Undo/redo: snapshots of the whole document, which is cheap at this size and
+  // impossible to get subtly wrong. Held in state rather than refs, because the
+  // Undo and Redo buttons are disabled from their lengths — a ref does not
+  // re-render, so those buttons would show whatever was true at the last render
+  // for some other reason. It happened to be right, in the order things
+  // currently run; "happened to be right" is not a property worth keeping.
+  const [past, setPast] = useState<Block[][]>([]);
+  const [future, setFuture] = useState<Block[][]>([]);
   const touched = useRef(false);
   const timer = useRef<number | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const commit = useCallback((next: Block[]) => {
-    past.current = [...past.current.slice(-49), blocksRef.current];
-    future.current = [];
+    // The functional form reads the value React is about to render from, not
+    // the one this closure was built with, so a fast second edit cannot push a
+    // stale snapshot onto the stack.
+    setBlocks((previous) => {
+      setPast((p) => [...p.slice(-49), previous]);
+      return next;
+    });
+    setFuture([]);
     touched.current = true;
-    setBlocks(next);
     setSave('dirty');
   }, []);
-
-  // A ref alongside the state so commit() can read the previous value without
-  // depending on it and rebuilding every callback on every keystroke.
-  const blocksRef = useRef(blocks);
-  useEffect(() => {
-    blocksRef.current = blocks;
-  }, [blocks]);
 
   const persist = useCallback(
     async (next: Block[]) => {
@@ -162,19 +166,20 @@ export function PageBuilder({
   }, []);
 
   function undo() {
-    const previous = past.current.pop();
-    if (!previous) return;
-    future.current = [blocks, ...future.current.slice(0, 49)];
+    if (past.length === 0) return;
+    const previous = past[past.length - 1];
+    setPast((p) => p.slice(0, -1));
+    setFuture((f) => [blocks, ...f.slice(0, 49)]);
     touched.current = true;
     setBlocks(previous);
     setSave('dirty');
   }
 
   function redo() {
-    const [next, ...rest] = future.current;
-    if (!next) return;
-    future.current = rest;
-    past.current = [...past.current, blocks];
+    if (future.length === 0) return;
+    const [next, ...rest] = future;
+    setFuture(rest);
+    setPast((p) => [...p, blocks]);
     touched.current = true;
     setBlocks(next);
     setSave('dirty');
@@ -194,6 +199,9 @@ export function PageBuilder({
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+    // No dependency array on purpose: the handler closes over blocks, past and
+    // future, and must be rebound whenever any of them changes or Ctrl-Z would
+    // undo to whatever the document looked like when the page opened.
   });
 
   function add(type: BlockType) {
@@ -220,10 +228,15 @@ export function PageBuilder({
   function duplicate(id: string) {
     const index = blocks.findIndex((b) => b.id === id);
     if (index === -1) return;
+
+    // This runs from a click, not during render — the purity rule cannot tell
+    // the difference for a function declared in the component body.
+    /* eslint-disable react-hooks/purity */
     const copy: Block = {
       ...structuredClone(blocks[index]),
       id: `b-${Math.random().toString(36).slice(2, 10)}`,
     };
+    /* eslint-enable react-hooks/purity */
     commit([...blocks.slice(0, index + 1), copy, ...blocks.slice(index + 1)]);
     setSelectedId(copy.id);
   }
@@ -259,9 +272,9 @@ export function PageBuilder({
       {/* ------------------------------------------------------------ top */}
       <header className={styles.toolbar}>
         <div className={styles.toolbarLeft}>
-          <a href="/admin/pages" className={styles.back}>
+          <Link href="/admin/pages" className={styles.back}>
             ← Pages
-          </a>
+          </Link>
           <span className={styles.pageName}>{pageTitle}</span>
           <span className={styles.slug}>/{pageSlug}</span>
         </div>
@@ -275,10 +288,10 @@ export function PageBuilder({
         </div>
 
         <div className={styles.toolbarRight}>
-          <button type="button" onClick={undo} disabled={past.current.length === 0} title="Undo (Ctrl-Z)">
+          <button type="button" onClick={undo} disabled={past.length === 0} title="Undo (Ctrl-Z)">
             Undo
           </button>
-          <button type="button" onClick={redo} disabled={future.current.length === 0} title="Redo (Ctrl-Shift-Z)">
+          <button type="button" onClick={redo} disabled={future.length === 0} title="Redo (Ctrl-Shift-Z)">
             Redo
           </button>
           <a href={`/preview/${pageId}`} target="_blank" rel="noopener noreferrer" className={styles.ghost}>
@@ -434,17 +447,12 @@ export function PageBuilder({
 
 /** One line of whatever is actually in the block, for the outline. */
 function summarise(block: Block): string {
-  const p = block.props as Record<string, unknown>;
+  const p = block.props;
   const first =
-    (p.heading as string) ||
-    (p.text as string) ||
-    (p.label as string) ||
-    (p.title as string) ||
-    (p.alt as string) ||
-    '';
+    asText(p.heading) || asText(p.text) || asText(p.label) || asText(p.title) || asText(p.alt);
   if (first) return first.slice(0, 44);
   if (Array.isArray(p.items)) return `${p.items.length} item${p.items.length === 1 ? '' : 's'}`;
   if (Array.isArray(p.images)) return `${p.images.length} picture${p.images.length === 1 ? '' : 's'}`;
-  if (p.url) return String(p.url).slice(0, 44);
+  if (p.url) return asText(p.url).slice(0, 44);
   return '';
 }

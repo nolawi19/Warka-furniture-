@@ -109,7 +109,7 @@ export function ProductImages({
                       run(() => addProductImageAction({ productId, url: l.url, alt: l.alt }))
                     }
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    { }
                     <img src={l.url} alt="" loading="lazy" />
                     <span>{l.filename}</span>
                   </button>
@@ -129,7 +129,7 @@ export function ProductImages({
           {(image, args) => (
             <div className={styles.row} data-primary={image.isPrimary}>
               <DragHandle args={args} />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              { }
               <img src={image.url} alt={image.alt} className={styles.thumb} />
               <div className={styles.rowMain}>
                 <span className={styles.alt}>{image.alt || <em>no description</em>}</span>

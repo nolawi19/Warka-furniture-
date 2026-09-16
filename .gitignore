@@ -9,3 +9,7 @@ next-env.d.ts
 .env*.local
 /public/uploads/
 warka-furniture-complete.zip
+
+# Screenshots produced by the browser test harnesses, which run from the
+# project root. They are evidence for one run, not part of the project.
+/*.png

@@ -46,7 +46,7 @@ export const getPublishedSetting = <K extends SettingKey>(key: K): Promise<Setti
     },
     ['site-setting', key],
     { tags: [SETTINGS_TAG, `${SETTINGS_TAG}:${key}`] },
-  )() as Promise<SettingValue<K>>;
+  )();
 
 /** Everything at once, for the root layout — one query, not thirteen. */
 export const getPublishedSettings = unstable_cache(

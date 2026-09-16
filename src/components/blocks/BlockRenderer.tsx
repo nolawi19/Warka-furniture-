@@ -19,7 +19,7 @@ import styles from './Blocks.module.css';
  * shell, which is what makes width, spacing, colour, alignment and per-device
  * visibility work the same way on all of them.
  */
-export async function BlockRenderer({ blocks }: { blocks: Block[] }) {
+export function BlockRenderer({ blocks }: { blocks: Block[] }) {
   return (
     <>
       {blocks.map((block) => (
@@ -81,9 +81,7 @@ function BlockShell({ block, children }: { block: Block; children: React.ReactNo
   );
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any -- props are validated by
-   the block's own zod schema before they arrive here; narrowing each one again
-   would be the same check written twice. */
+ 
 async function BlockBody({ block }: { block: Block }) {
   const p = block.props as any;
 

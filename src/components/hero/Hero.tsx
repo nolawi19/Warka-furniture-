@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 import { ActionButton } from '@/components/ui/ActionButton';
 import styles from './Hero.module.css';
 

@@ -14,7 +14,7 @@ import { PrismaClient, type MovementReason } from '@prisma/client';
 // verifyPassword expects.
 import { hashPassword } from '../src/lib/password';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const legacy = require('./_legacy-catalogue.cjs') as {
   CATEGORIES: { key: string; name: string; blurb: string }[];
   LINES: { key: string; cat: string; name: string; rank: number }[];
@@ -104,6 +104,28 @@ const LINE_DESCRIPTION: Record<string, string> = {
 const MATERIALS =
   'Locally sourced hardwood frame, 18 mm melamine or marble-effect laminate board, high-density foam, buttoned upholstery fabric.';
 
+/**
+ * Delivery zones. Starting points the shop is expected to correct — every fee
+ * is a placeholder. Extracted so a run that skips the catalogue still gets
+ * them: a shop with no zones cannot take an order at all.
+ */
+async function seedDeliveryZones(): Promise<void> {
+  const zones = [
+    { slug: 'addis-ababa', name: 'Addis Ababa', feeSantim: 0, etaDays: '1–3 days', position: 0 },
+    { slug: 'oromia-nearby', name: 'Greater Addis / nearby Oromia', feeSantim: 0, etaDays: '3–5 days', position: 1 },
+    { slug: 'regional', name: 'Other Ethiopian cities', feeSantim: 0, etaDays: 'Quoted per order', position: 2 },
+  ];
+  for (const z of zones) {
+    await db.deliveryZone.upsert({
+      where: { slug: z.slug },
+      // Only the wording and the order. A fee the shop has set is theirs.
+      update: { name: z.name, etaDays: z.etaDays, position: z.position },
+      create: { ...z, isActive: true },
+    });
+  }
+  console.log(`  delivery zones: ${zones.length}`);
+}
+
 async function main() {
   console.log('Seeding Warka Furniture …');
 
@@ -162,6 +184,16 @@ async function main() {
         '           built-in default. Set it in .env and run this again before\n' +
         '           putting the shop anywhere but your own machine.',
     );
+  }
+
+  // A shop that has deliberately emptied the catalogue to enter its own
+  // products must not get the original nine back the next time it re-seeds to
+  // reset a password. scripts/clear-catalogue.ts prints the line to add.
+  if ((process.env.SEED_SKIP_CATALOGUE ?? '').trim().toLowerCase() === 'true') {
+    console.log('  catalogue: skipped (SEED_SKIP_CATALOGUE=true)');
+    await seedDeliveryZones();
+    console.log('Done.');
+    return;
   }
 
   // ---------------------------------------------------------------- categories
@@ -296,21 +328,7 @@ async function main() {
   }
   console.log(`  products: ${byLine.size}  variants: ${variantCount}  photographs: ${imageCount}`);
 
-  // ---------------------------------------------------------------- delivery
-  // Starting points the shop is expected to correct — the fees are placeholders.
-  const zones = [
-    { slug: 'addis-ababa', name: 'Addis Ababa', feeSantim: 0, etaDays: '1–3 days', position: 0 },
-    { slug: 'oromia-nearby', name: 'Greater Addis / nearby Oromia', feeSantim: 0, etaDays: '3–5 days', position: 1 },
-    { slug: 'regional', name: 'Other Ethiopian cities', feeSantim: 0, etaDays: 'Quoted per order', position: 2 },
-  ];
-  for (const z of zones) {
-    await db.deliveryZone.upsert({
-      where: { slug: z.slug },
-      update: { name: z.name, etaDays: z.etaDays, position: z.position },
-      create: { ...z, isActive: true },
-    });
-  }
-  console.log(`  delivery zones: ${zones.length}`);
+  await seedDeliveryZones();
 
   const reason: MovementReason = 'SEED';
   console.log(`  (stock movements recorded with reason ${reason} when the admin sets counts)`);

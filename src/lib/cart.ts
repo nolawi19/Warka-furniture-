@@ -134,7 +134,7 @@ export async function getCart(): Promise<CartView> {
       listPriceSantim: v.priceSantim,
       lineTotalSantim: price === null ? null : price * item.qty,
       inStock,
-      availableQty: Number.isFinite(available) ? (available as number) : null,
+      availableQty: Number.isFinite(available) ? (available) : null,
     });
   }
 

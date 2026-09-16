@@ -94,7 +94,11 @@ export async function registerAction(_prev: FormState, formData: FormData): Prom
   await createSession(user.id, await clientMeta());
   await mergeAnonCartInto(user.id);
 
-  const next = String(formData.get('next') ?? '/account');
+  // formData.get returns string | File | null. A File would stringify to
+  // "[object File]" and then be rejected by safeNext, which is the right
+  // outcome reached the wrong way — so it is checked rather than coerced.
+  const raw = formData.get('next');
+  const next = typeof raw === 'string' ? raw : '/account';
   redirect(safeNext(next));
 }
 
@@ -136,7 +140,11 @@ export async function loginAction(_prev: FormState, formData: FormData): Promise
   await createSession(user.id, await clientMeta());
   await mergeAnonCartInto(user.id);
 
-  const next = String(formData.get('next') ?? '/account');
+  // formData.get returns string | File | null. A File would stringify to
+  // "[object File]" and then be rejected by safeNext, which is the right
+  // outcome reached the wrong way — so it is checked rather than coerced.
+  const raw = formData.get('next');
+  const next = typeof raw === 'string' ? raw : '/account';
   redirect(safeNext(next));
 }
 

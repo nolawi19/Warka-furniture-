@@ -177,8 +177,7 @@ export function MediaLibrary({
             {shown.map((item) => (
               <li key={item.id}>
                 <button type="button" className={styles.tile} onClick={() => (onPick ? onPick(item) : setSelected(item))}>
-                  {/* eslint-disable-next-line @next/next/no-img-element -- the
-                      library shows whatever was uploaded, at unknown sizes. */}
+                  { }
                   <img src={item.url} alt={item.alt} loading="lazy" />
                   <span className={styles.tileName}>{item.filename}</span>
                   <span className={styles.tileMeta}>
@@ -203,7 +202,7 @@ export function MediaLibrary({
             aria-label={selected.filename}
             onMouseDown={(e) => e.stopPropagation()}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            { }
             <img src={selected.url} alt={selected.alt} className={styles.preview} />
             <div className={styles.details}>
               <h2 className={styles.panelTitle}>{selected.filename}</h2>

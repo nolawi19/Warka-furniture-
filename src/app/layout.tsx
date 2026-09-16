@@ -146,10 +146,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className={`${archivo.variable} ${instrument.variable} ${ethiopic.variable}`}
       suppressHydrationWarning
     >
-      <head>
-        <style id="warka-theme" dangerouslySetInnerHTML={{ __html: themeCss }} />
-      </head>
       <body>
+        {/* React hoists this into <head> itself and dedupes it by href.
+            Written this way rather than as a hand-rolled <head> element for
+            one concrete reason: a browser extension that injects its own
+            <style> at the top of <head> — and plenty do — shifts what React
+            finds where it expected ours, and hydration fails on every page of
+            the site at once. Letting React own the hoisting makes that a
+            non-event. buildThemeCss emits no character React would escape,
+            which is why this can be plain text. */}
+        <style href="warka-theme" precedence="high">
+          {themeCss}
+        </style>
         <ThemeScript fallback={theme.defaultTheme} />
         {inAdmin ? (
           // The admin brings its own shell. Wrapping a tool in the shop's

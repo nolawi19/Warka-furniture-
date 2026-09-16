@@ -1,7 +1,8 @@
 'use client';
 
-import { ANIMATIONS, type AnimationName } from '@/lib/site/schemas';
+import { ANIMATIONS } from '@/lib/site/schemas';
 import type { Block } from '@/lib/site/blocks';
+import { asText } from '@/lib/text';
 import styles from './Builder.module.css';
 
 /**
@@ -29,7 +30,7 @@ export function BlockProperties({
   categories: { slug: string; name: string }[];
   products: { slug: string; name: string }[];
 }) {
-  const p = block.props as Record<string, unknown>;
+  const p = block.props;
 
   const setProp = (key: string, value: unknown) =>
     onChange((b) => ({ ...b, props: { ...b.props, [key]: value } }));
@@ -43,7 +44,7 @@ export function BlockProperties({
       <span>{label}</span>
       <input
         className={styles.input}
-        value={String(p[key] ?? '')}
+        value={asText(p[key])}
         onChange={(e) => setProp(key, e.target.value)}
       />
       {hint && <small>{hint}</small>}
@@ -56,7 +57,7 @@ export function BlockProperties({
       <textarea
         className={styles.textarea}
         rows={rows}
-        value={String(p[key] ?? '')}
+        value={asText(p[key])}
         onChange={(e) => setProp(key, e.target.value)}
       />
       <small>A blank line starts a new paragraph.</small>
@@ -82,7 +83,7 @@ export function BlockProperties({
   const pick = (key: string, label: string, options: { value: string; label: string }[]) => (
     <label className={styles.field} key={key}>
       <span>{label}</span>
-      <select className={styles.input} value={String(p[key] ?? '')} onChange={(e) => setProp(key, e.target.value)}>
+      <select className={styles.input} value={asText(p[key])} onChange={(e) => setProp(key, e.target.value)}>
         {options.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}
@@ -104,7 +105,7 @@ export function BlockProperties({
       <span>{label}</span>
       <input
         className={styles.input}
-        value={String(p[key] ?? '')}
+        value={asText(p[key])}
         list="builder-media"
         placeholder="/uploads/…"
         onChange={(e) => setProp(key, e.target.value)}
@@ -115,10 +116,12 @@ export function BlockProperties({
           Upload
         </a>
       </small>
-      {String(p[key] ?? '') && (
-        // eslint-disable-next-line @next/next/no-img-element -- a thumbnail of
+      {asText(p[key]) && (
+         
         // whatever the admin typed, at an unknown size.
-        <img src={String(p[key])} alt="" className={styles.thumb} />
+         
+        // whatever address the admin typed, at a size nothing knows in advance.
+        <img src={asText(p[key])} alt="" className={styles.thumb} />
       )}
     </label>
   );
@@ -326,7 +329,7 @@ export function BlockProperties({
                 <span>Category</span>
                 <select
                   className={styles.input}
-                  value={String(p.categorySlug ?? '')}
+                  value={asText(p.categorySlug)}
                   onChange={(e) => setProp('categorySlug', e.target.value)}
                 >
                   <option value="">Choose one</option>
@@ -368,7 +371,7 @@ export function BlockProperties({
               <span>Product</span>
               <select
                 className={styles.input}
-                value={String(p.slug ?? '')}
+                value={asText(p.slug)}
                 onChange={(e) => setProp('slug', e.target.value)}
               >
                 <option value="">Choose one</option>
@@ -687,7 +690,7 @@ export function BlockProperties({
             <select
               className={styles.input}
               value={block.animation.name}
-              onChange={(e) => setAnim('name', e.target.value as AnimationName)}
+              onChange={(e) => setAnim('name', e.target.value)}
             >
               {ANIMATIONS.map((a) => (
                 <option key={a} value={a}>

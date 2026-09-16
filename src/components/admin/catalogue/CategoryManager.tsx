@@ -182,7 +182,7 @@ function Row({
     <div className={styles.row}>
       <DragHandle args={args} />
       {row.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element -- admin thumbnail
+         
         <img src={row.imageUrl} alt="" className={styles.thumb} />
       ) : (
         <span className={styles.thumbEmpty} aria-hidden="true" />

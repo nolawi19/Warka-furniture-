@@ -17,7 +17,13 @@ export default async function HomePage() {
   // that is the homepage. Otherwise the original one below stands — so the
   // site has a homepage from the first minute, and gains an editable one the
   // moment somebody wants it.
-  const built = await db.page.findFirst({ where: { slug: 'home', status: 'PUBLISHED' } });
+  // Optional by nature: "has someone built a homepage?" If the database
+  // cannot answer, that is not a reason to fail here — fall through to the
+  // original homepage below and let its own queries report the real problem.
+  const built = await db.page
+    .findFirst({ where: { slug: 'home', status: 'PUBLISHED' } })
+    .catch(() => null);
+
   if (built?.publishedBlocks) {
     const blocks = parseBlocks(built.publishedBlocks);
     if (blocks.length > 0) return <BlockRenderer blocks={blocks} />;

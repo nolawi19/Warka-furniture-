@@ -45,7 +45,7 @@ export function SiteHeader({
             this paints with the first frame and costs nothing. */}
         <Link href="/" className={styles.brand} aria-label={`${name}, home`}>
           {store?.logoMode === 'image' && store.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element -- the admin
+             
             // uploads any shape; next/image would need known dimensions.
             <img src={store.logoUrl} alt={name} className={styles.logoImage} />
           ) : (

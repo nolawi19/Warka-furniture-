@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import type { Place } from '@/app/api/geocode/route';
 
 // Leaflet's stylesheet, from the installed package. Static because a CSS module
 // specifier cannot be awaited; it only reaches a browser that loads checkout.
@@ -41,13 +43,18 @@ export function LocationPicker({
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
   const [locating, setLocating] = useState(false);
   const [message, setMessage] = useState('');
+  const [query, setQuery] = useState('');
+  const [places, setPlaces] = useState<Place[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchFailed, setSearchFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
     // Loaded only when the map is actually on screen, so the rest of checkout
-    // is not carrying a map library it may never use.
-    (async () => {
+    // is not carrying a map library it may never use. `void` because the
+    // effect cannot await it and every failure is already handled inside.
+    void (async () => {
       try {
         const L = (await import('leaflet')).default;
         if (cancelled || !containerRef.current || mapRef.current) return;
@@ -101,6 +108,48 @@ export function LocationPicker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /** Put the pin somewhere and take the map with it. */
+  const placePin = useCallback(
+    (lat: number, lng: number, zoom = 17) => {
+      onChange({ lat, lng });
+      markerRef.current?.setLatLng([lat, lng]).addTo(mapRef.current);
+      mapRef.current?.setView([lat, lng], zoom);
+    },
+    [onChange],
+  );
+
+  // Debounced, and an in-flight search is abandoned when a newer keystroke
+  // arrives — otherwise a slow reply for "bo" can land after "bole" and
+  // replace the right answers with stale ones.
+  useEffect(() => {
+    const term = query.trim();
+    if (term.length < 3) {
+      setPlaces([]);
+      setSearching(false);
+      return;
+    }
+    const controller = new AbortController();
+    setSearching(true);
+    const timer = window.setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/geocode?q=${encodeURIComponent(term)}`, {
+          signal: controller.signal,
+        });
+        const data = (await res.json()) as { places?: Place[]; error?: string };
+        setPlaces(data.places ?? []);
+        setSearchFailed(Boolean(data.error));
+      } catch {
+        // Aborted, or the network blinked. Leave the last good result up.
+      } finally {
+        setSearching(false);
+      }
+    }, 450);
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [query]);
+
   function useMyLocation() {
     if (!navigator.geolocation) {
       setMessage('This browser cannot find your location. Tap the map instead.');
@@ -110,11 +159,7 @@ export function LocationPicker({
     setMessage('');
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        onChange({ lat, lng });
-        markerRef.current?.setLatLng([lat, lng]).addTo(mapRef.current);
-        mapRef.current?.setView([lat, lng], 17);
+        placePin(pos.coords.latitude, pos.coords.longitude);
         setLocating(false);
       },
       () => {
@@ -127,6 +172,56 @@ export function LocationPicker({
 
   return (
     <div className={styles.picker}>
+      <div className={styles.search}>
+        <label htmlFor="place-search" className="sr-only">
+          Search for a place
+        </label>
+        <div className={styles.searchRow}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M16.5 16.5 21 21" />
+          </svg>
+          <input
+            id="place-search"
+            type="search"
+            className={styles.searchInput}
+            placeholder="Search — Bole, Kazanchis, Megenagna…"
+            value={query}
+            autoComplete="off"
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {searching && <span className={styles.spinner} aria-hidden="true" />}
+        </div>
+
+        {query.trim().length >= 3 && (
+          <ul className={styles.results}>
+            {places.length === 0 && !searching && (
+              <li className={styles.noResults}>
+                {searchFailed
+                  ? 'Place search is unavailable just now. Tap the map instead.'
+                  : `Nothing found for “${query.trim()}”. Try a nearby landmark, or tap the map.`}
+              </li>
+            )}
+            {places.map((place) => (
+              <li key={place.id}>
+                <button
+                  type="button"
+                  className={styles.result}
+                  onClick={() => {
+                    placePin(place.lat, place.lng);
+                    setQuery('');
+                    setPlaces([]);
+                  }}
+                >
+                  <span className={styles.resultName}>{place.name}</span>
+                  {place.detail && <span className={styles.resultDetail}>{place.detail}</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <div className={styles.controls}>
         <button type="button" className={styles.locate} onClick={useMyLocation} disabled={locating}>
           {locating ? 'Finding you…' : 'Use my location'}
@@ -173,9 +268,7 @@ export function LocationPicker({
             onChange={(e) => {
               const lat = e.target.valueAsNumber;
               if (!Number.isFinite(lat)) return;
-              const next = { lat, lng: value?.lng ?? DEFAULT_CENTRE[1] };
-              onChange(next);
-              markerRef.current?.setLatLng([next.lat, next.lng]).addTo(mapRef.current);
+              placePin(lat, value?.lng ?? DEFAULT_CENTRE[1], mapRef.current?.getZoom() ?? 16);
             }}
           />
         </label>
@@ -189,9 +282,7 @@ export function LocationPicker({
             onChange={(e) => {
               const lng = e.target.valueAsNumber;
               if (!Number.isFinite(lng)) return;
-              const next = { lat: value?.lat ?? DEFAULT_CENTRE[0], lng };
-              onChange(next);
-              markerRef.current?.setLatLng([next.lat, next.lng]).addTo(mapRef.current);
+              placePin(value?.lat ?? DEFAULT_CENTRE[0], lng, mapRef.current?.getZoom() ?? 16);
             }}
           />
         </label>

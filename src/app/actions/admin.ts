@@ -2,7 +2,6 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import type { OrderStatus } from '@prisma/client';
 
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
@@ -39,7 +38,7 @@ export async function updateOrderStatusAction(
 
   const result = await transitionOrder(
     orderId,
-    parsed.data as OrderStatus,
+    parsed.data,
     { id: staff.id, label: staff.name },
     note?.slice(0, 300),
   );
