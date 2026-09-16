@@ -55,7 +55,14 @@ const activeBanners = unstable_cache(
 );
 
 export async function getBanners(placement: BannerPlacement): Promise<LiveBanner[]> {
-  const rows = await activeBanners(placement);
+  let rows: Awaited<ReturnType<typeof activeBanners>>;
+  try {
+    rows = await activeBanners(placement);
+  } catch {
+    // No database, no banners. The root layout renders this, so a blip must
+    // cost the shop its announcement strip and nothing else.
+    return [];
+  }
   const now = Date.now();
   return rows
     .filter((b) => (!b.startsAt || b.startsAt.getTime() <= now) && (!b.endsAt || b.endsAt.getTime() >= now))

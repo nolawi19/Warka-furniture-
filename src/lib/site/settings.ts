@@ -31,11 +31,18 @@ export const SETTINGS_TAG = 'site-settings';
 export const getPublishedSetting = <K extends SettingKey>(key: K): Promise<SettingValue<K>> =>
   unstable_cache(
     async () => {
-      const row = await db.siteSetting.findUnique({ where: { key } });
-      // `published` null means "never published": fall back to the default
-      // rather than to the draft. A draft must not leak to the public site.
-      if (!row?.published) return defaultSetting(key);
-      return parseSetting(key, row.published);
+      try {
+        const row = await db.siteSetting.findUnique({ where: { key } });
+        // `published` null means "never published": fall back to the default
+        // rather than to the draft. A draft must not leak to the public site.
+        if (!row?.published) return defaultSetting(key);
+        return parseSetting(key, row.published);
+      } catch {
+        // The database is unreachable — during a build on a machine with no
+        // database, or a blip in production. The site's own defaults are a
+        // complete, valid configuration, so it renders rather than 500s.
+        return defaultSetting(key);
+      }
     },
     ['site-setting', key],
     { tags: [SETTINGS_TAG, `${SETTINGS_TAG}:${key}`] },
@@ -44,9 +51,18 @@ export const getPublishedSetting = <K extends SettingKey>(key: K): Promise<Setti
 /** Everything at once, for the root layout — one query, not thirteen. */
 export const getPublishedSettings = unstable_cache(
   async () => {
-    const rows = await db.siteSetting.findMany();
-    const byKey = new Map(rows.map((r) => [r.key, r.published]));
     const out = {} as { [K in SettingKey]: SettingValue<K> };
+
+    let byKey = new Map<string, unknown>();
+    try {
+      const rows = await db.siteSetting.findMany();
+      byKey = new Map(rows.map((r) => [r.key, r.published]));
+    } catch {
+      // Unreachable database. Every group falls back to its default below,
+      // which is the site exactly as it shipped — the root layout calls this,
+      // so throwing here would take down every page on the site at once.
+    }
+
     for (const key of SETTING_KEYS) {
       const raw = byKey.get(key);
       (out as Record<string, unknown>)[key] = raw ? parseSetting(key, raw) : defaultSetting(key);
