@@ -1,4 +1,3 @@
-warka-furniture-site.zip
 node_modules/
 .next/
 out/
@@ -8,7 +7,11 @@ next-env.d.ts
 .env.local
 .env*.local
 /public/uploads/
-warka-furniture-complete.zip
+
+# Zips of the source, built on request with `git archive`. They were listed by
+# name twice and the next one was untracked again, which is how this file
+# learns the same lesson three times.
+*.zip
 
 # Screenshots produced by the browser test harnesses, which run from the
 # project root. They are evidence for one run, not part of the project.
