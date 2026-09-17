@@ -57,3 +57,16 @@
   .grid { grid-template-columns: 1fr; gap: var(--space-6); }
   .base { flex-direction: column; align-items: flex-start; }
 }
+
+/* On a finger, a stack of 15px-tall links a few pixels apart is a stack of
+   mis-taps. Each one becomes a block with room around it — the rows end up
+   about the height the line-height was already reserving, so the footer looks
+   the same and stops being fiddly. Pointer devices are untouched. */
+@media (pointer: coarse) {
+  .col li { line-height: 1.45; }
+  .col a { display: block; padding-block: 8px; }
+  .address { line-height: 1.5; }
+  .address a { display: inline-block; padding-block: 6px; }
+  .legal { gap: var(--space-5); }
+  .legal a { display: inline-block; padding-block: 6px; }
+}

@@ -47,3 +47,8 @@
 .emptyHint { margin-top: var(--space-3); font-size: var(--text-sm); }
 .emptyCta { display: flex; gap: var(--space-3); justify-content: center; margin-top: var(--space-5); flex-wrap: wrap; }
 
+
+@media (pointer: coarse) {
+  /* Same reason as the footer: a 19px-tall crumb is hard to hit. */
+  .crumbs a { display: inline-block; padding-block: 6px; }
+}
