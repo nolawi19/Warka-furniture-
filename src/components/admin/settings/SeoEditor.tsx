@@ -84,6 +84,16 @@ export function SeoEditor({
                 onChange={(v) => set((p) => ({ ...p, ogImageUrl: v }))}
               />
             </FieldRow>
+            <FieldRow>
+              <TextField
+                label="Favicon"
+                value={value.faviconUrl}
+                placeholder="/uploads/favicon.png"
+                hint="The small icon on the browser tab. A square PNG of 180×180 or larger. Leave this blank to keep the one the site came with."
+                wide
+                onChange={(v) => set((p) => ({ ...p, faviconUrl: v }))}
+              />
+            </FieldRow>
           </Card>
 
           <Card title="Indexing" description="Whether search engines are allowed to list the shop at all.">

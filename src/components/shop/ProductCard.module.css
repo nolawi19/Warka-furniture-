@@ -13,7 +13,7 @@
 .card:focus-within {
   border-color: var(--line);
   box-shadow: var(--shadow-2);
-  transform: translateY(-2px);
+  transform: translateY(var(--card-hover-lift, -2px));
 }
 
 .link { display: flex; flex-direction: column; height: 100%; }
@@ -29,7 +29,7 @@
   object-fit: cover;
   transition: transform var(--dur-slow) var(--ease-out);
 }
-.card:hover .image { transform: scale(1.03); }
+.card:hover .image { transform: scale(var(--card-image-scale, 1.03)); }
 @media (prefers-reduced-motion: reduce) {
   .card:hover .image { transform: none; }
   .card:hover, .card:focus-within { transform: none; }

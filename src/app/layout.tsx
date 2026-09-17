@@ -72,6 +72,9 @@ export async function generateMetadata(): Promise<Metadata> {
       images: seo.ogImageUrl ? [{ url: seo.ogImageUrl }] : undefined,
     },
     twitter: { card: 'summary_large_image' },
+    // Left out entirely when the shop has not uploaded one, so Next falls back
+    // to the icon in /app, which is the icon the site shipped with.
+    icons: seo.faviconUrl ? { icon: seo.faviconUrl, shortcut: seo.faviconUrl, apple: seo.faviconUrl } : undefined,
     // One switch takes the whole site out of the index. It is in the admin
     // because "we are not ready to be found yet" is a normal thing to want.
     robots: seo.allowIndexing
@@ -102,7 +105,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     headers(),
   ]);
 
-  const { store, theme, typography, buttons, seo, social, header } = settings;
+  const { store, theme, typography, buttons, seo, social, header, animations } = settings;
   const nav = settings['nav.header'];
 
   // Closed to the public, open to whoever is running it. The check is here,
@@ -118,7 +121,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   // Emitted after tokens.css, so anything the admin has not set keeps the
   // stylesheet's own value. A shop on the defaults ships a handful of lines.
-  const themeCss = buildThemeCss({ theme, typography, buttons });
+  const themeCss = buildThemeCss({ theme, typography, buttons, animations });
 
   const organisation = {
     '@context': 'https://schema.org',

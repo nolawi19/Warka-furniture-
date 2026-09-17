@@ -153,6 +153,16 @@ export function AppearanceEditor({
                 mode={mode}
                 onChange={(v) => set((prev) => ({ ...prev, radiusLg: v }))}
               />
+              <SliderField
+                label="Shadows"
+                value={value.shadowStrength}
+                min={0}
+                max={2}
+                step={0.1}
+                suffix="×"
+                hint="How pronounced every shadow on the site is. 0 turns them off entirely."
+                onChange={(v) => set((prev) => ({ ...prev, shadowStrength: v }))}
+              />
             </FieldRow>
           </Card>
         </>

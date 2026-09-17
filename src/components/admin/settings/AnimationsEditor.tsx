@@ -1,7 +1,7 @@
 'use client';
 
 import { Card } from '@/components/admin/ui/Card';
-import { FieldRow, SliderField, ToggleField } from '@/components/admin/ui/Fields';
+import { FieldRow, SelectField, SliderField, ToggleField } from '@/components/admin/ui/Fields';
 import { SettingsEditor } from '@/components/admin/ui/SettingsEditor';
 import type { AnimationsSettings } from '@/lib/site/schemas';
 import styles from './Editors.module.css';
@@ -44,6 +44,18 @@ export function AnimationsEditor({
               suffix="ms"
               hint="Each block can override this in the Website Builder."
               onChange={(v) => set((p) => ({ ...p, defaultDuration: v }))}
+            />
+            <SelectField
+              label="Product cards under the cursor"
+              value={value.cardHover}
+              options={[
+                { value: 'both', label: 'Rise, and the photograph grows' },
+                { value: 'lift', label: 'Rise only' },
+                { value: 'zoom', label: 'The photograph grows only' },
+                { value: 'none', label: 'Nothing moves' },
+              ]}
+              hint="Only the shadow and the picture move — the card never changes size, so a grid of them cannot shuffle under the cursor."
+              onChange={(v) => set((p) => ({ ...p, cardHover: v }))}
             />
           </FieldRow>
           <p className={styles.inlineNote}>

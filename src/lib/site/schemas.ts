@@ -137,6 +137,13 @@ export const ThemeSchema = z.object({
   dark: PaletteSchema.partial().default({}),
   radius: Px.default(3),
   radiusLg: Px.default(6),
+  /**
+   * How pronounced every shadow on the site is. 1 is the stylesheet's own
+   * values; 0 turns shadows off entirely, which is a real design choice and
+   * not a bug. It multiplies rather than replaces, so light and dark keep
+   * their separate, correct shadows.
+   */
+  shadowStrength: z.number().min(0).max(2).default(1),
   spacingScale: z.number().min(0.6).max(2).default(1),
   containerWidth: Px.default(1360),
   narrowWidth: Px.default(780),
@@ -368,6 +375,8 @@ export const SeoSchema = z.object({
     'Warka Furniture builds buttoned beds, dressing tables, mirrors, chests of drawers and office pedestals to your measurement in Addis Ababa.',
   ),
   ogImageUrl: z.string().trim().max(500).default(''),
+  /** Blank means the icon in /public, which is what the site shipped with. */
+  faviconUrl: z.string().trim().max(500).default(''),
   keywords: z.array(Text(60)).max(20).default([]),
   allowIndexing: z.boolean().default(true),
   canonicalHost: z.string().trim().max(200).default(''),
@@ -444,6 +453,8 @@ export const AnimationsSchema = z.object({
   enabled: z.boolean().default(true),
   defaultDuration: z.number().int().min(60).max(1200).default(320),
   respectReducedMotion: z.boolean().default(true),
+  /** What a product card does under the cursor. */
+  cardHover: z.enum(['none', 'lift', 'zoom', 'both']).default('both'),
 });
 
 export type AnimationsSettings = z.infer<typeof AnimationsSchema>;

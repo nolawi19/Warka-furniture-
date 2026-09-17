@@ -12,7 +12,15 @@
  * settings row is written by an admin, but "an admin typed it" is not the same
  * as "it is safe to interpolate into a stylesheet".
  */
-import { fontStack, type ButtonPreset, type ButtonsSettings, type Palette, type ThemeSettings, type TypographySettings } from './schemas';
+import {
+  fontStack,
+  type AnimationsSettings,
+  type ButtonPreset,
+  type ButtonsSettings,
+  type Palette,
+  type ThemeSettings,
+  type TypographySettings,
+} from './schemas';
 
 /** Nothing that could end a declaration, a rule, or the <style> element. */
 function css(value: string): string {
@@ -96,6 +104,32 @@ function buttonBlock(name: string, preset: ButtonPreset): string {
   return lines.join('\n');
 }
 
+/**
+ * The shadow ladder, multiplied.
+ *
+ * Written as three variables built from one alpha rather than three literal
+ * shadows, so light and dark keep their own (very different) correct values
+ * and the admin moves one slider across both.
+ */
+function shadowBlock(strength: number): string {
+  if (Math.abs(strength - 1) < 0.001) return '';
+  const k = num(strength, 0, 2);
+  const a = (base: number) => Math.round(base * k * 1000) / 1000;
+  return [
+    `  --shadow-1: 0 1px 2px rgba(var(--shadow-rgb), ${a(0.05)});`,
+    `  --shadow-2: 0 1px 2px rgba(var(--shadow-rgb), ${a(0.05)}), 0 8px 24px -12px rgba(var(--shadow-rgb), ${a(0.16)});`,
+    `  --shadow-3: 0 2px 4px rgba(var(--shadow-rgb), ${a(0.05)}), 0 18px 48px -20px rgba(var(--shadow-rgb), ${a(0.24)});`,
+  ].join('\n');
+}
+
+/** What a product card does under the cursor. */
+const CARD_HOVER: Record<AnimationsSettings['cardHover'], { lift: string; scale: string }> = {
+  none: { lift: '0px', scale: '1' },
+  lift: { lift: '-2px', scale: '1' },
+  zoom: { lift: '0px', scale: '1.03' },
+  both: { lift: '-2px', scale: '1.03' },
+};
+
 /** The 4px spacing ladder, multiplied. 1 emits nothing. */
 function spacingBlock(scale: number): string {
   if (Math.abs(scale - 1) < 0.001) return '';
@@ -124,8 +158,9 @@ export function buildThemeCss(args: {
   theme: ThemeSettings;
   typography: TypographySettings;
   buttons: ButtonsSettings;
+  animations: AnimationsSettings;
 }): string {
-  const { theme, typography, buttons } = args;
+  const { theme, typography, buttons, animations } = args;
 
   const root: string[] = [];
 
@@ -140,6 +175,13 @@ export function buildThemeCss(args: {
 
   const spacing = spacingBlock(theme.spacingScale);
   if (spacing) root.push(spacing);
+
+  const shadows = shadowBlock(theme.shadowStrength);
+  if (shadows) root.push(shadows);
+
+  const cardHover = CARD_HOVER[animations.cardHover] ?? CARD_HOVER.both;
+  root.push(`  --card-hover-lift: ${cardHover.lift};`);
+  root.push(`  --card-image-scale: ${cardHover.scale};`);
 
   root.push(`  --font-heading: ${fontStack(typography.headingFont)};`);
   root.push(`  --font-body: ${fontStack(typography.bodyFont)};`);
