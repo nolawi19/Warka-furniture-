@@ -2,13 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 import { ADMIN_NAV, activeLink } from '@/lib/admin/nav';
 import { AdminIcon } from './AdminIcon';
+import { useCollapsedGroups } from './collapsed-groups';
 import styles from './AdminSidebar.module.css';
-
-const STORAGE_KEY = 'warka.admin.collapsedGroups';
 
 /**
  * The admin's left rail.
@@ -23,28 +21,7 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const current = activeLink(pathname);
   const currentGroup = ADMIN_NAV.find((g) => g.links.some((l) => l.href === current?.href));
 
-  const [collapsed, setCollapsed] = useState<string[]>([]);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setCollapsed(JSON.parse(raw) as string[]);
-    } catch {
-      // Blocked storage just means every group starts open.
-    }
-  }, []);
-
-  function toggle(id: string) {
-    setCollapsed((prev) => {
-      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        /* nothing to do */
-      }
-      return next;
-    });
-  }
+  const [collapsed, toggle] = useCollapsedGroups();
 
   return (
     <nav className={styles.nav} aria-label="Admin sections">
