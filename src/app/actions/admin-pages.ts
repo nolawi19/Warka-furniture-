@@ -17,7 +17,7 @@ export type PageActionState = { ok: boolean; message: string; id?: string; slug?
  */
 const RESERVED = new Set([
   'admin', 'api', 'account', 'cart', 'checkout', 'login', 'register', 'order',
-  'product', 'shop', 'collections', 'search', 'help', 'legal', 'contact',
+  'product', 'shop', 'search', 'help', 'legal', 'contact',
   'craft', 'visit', 'sitemap.xml', 'robots.txt', 'uploads', '_next',
 ]);
 

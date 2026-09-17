@@ -22,7 +22,6 @@ export default async function NavigationPage() {
   // is how a menu ends up pointing at a 404.
   const suggestions = [
     { label: 'Shop', href: '/shop' },
-    { label: 'Collections', href: '/collections' },
     { label: 'Our craft', href: '/craft' },
     { label: 'Visit', href: '/visit' },
     { label: 'Contact', href: '/contact' },

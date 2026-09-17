@@ -11,7 +11,6 @@ import styles from './MobileNav.module.css';
 
 const FALLBACK_LINKS = [
   { href: '/shop', label: 'Shop everything' },
-  { href: '/collections', label: 'Collections' },
   { href: '/craft', label: 'Our craft' },
   { href: '/visit', label: 'Visit the workshop' },
   { href: '/contact', label: 'Contact' },

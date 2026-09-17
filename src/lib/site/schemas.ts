@@ -247,22 +247,35 @@ export const NavItemSchema = z.object({
 
 export type NavItem = z.infer<typeof NavItemSchema>;
 
-export const NavSchema = z.object({
-  items: z.array(NavItemSchema).max(24).default([]),
-});
+/**
+ * Addresses the site used to have and no longer does.
+ *
+ * A menu is stored data: removing a route does not remove the link somebody
+ * saved to it, and a saved link to a deleted page is a 404 in the header of
+ * every page on the site. Stripping them here means it happens once, on the
+ * way out of the database, for the draft and the published copy alike.
+ *
+ * /collections was a menu item that redirected to /shop — a second name for
+ * the catalogue, which is the thing it confused people about.
+ */
+const RETIRED_HREFS = new Set(['/collections']);
+
+const isRetired = (href: string) => RETIRED_HREFS.has(href.replace(/\/+$/, '') || '/');
+
+export const NavSchema = z
+  .object({
+    items: z.array(NavItemSchema).max(24).default([]),
+  })
+  .transform((nav) => ({
+    items: nav.items
+      .filter((i) => !isRetired(i.href))
+      .map((i) => ({ ...i, children: i.children.filter((c) => !isRetired(c.href)) })),
+  }));
 
 export type NavSettings = z.infer<typeof NavSchema>;
 
 export const DEFAULT_HEADER_NAV: NavItem[] = [
   { id: 'shop', label: 'Shop', href: '/shop', isVisible: true, openInNewTab: false, children: [] },
-  {
-    id: 'collections',
-    label: 'Collections',
-    href: '/collections',
-    isVisible: true,
-    openInNewTab: false,
-    children: [],
-  },
   { id: 'craft', label: 'Our craft', href: '/craft', isVisible: true, openInNewTab: false, children: [] },
   { id: 'visit', label: 'Visit', href: '/visit', isVisible: true, openInNewTab: false, children: [] },
 ];
