@@ -32,10 +32,15 @@ import styles from './Blocks.module.css';
  * visibility work the same way on all of them.
  */
 export function BlockRenderer({ blocks }: { blocks: Block[] }) {
+  // /#categories has to mean the same thing whichever homepage is serving, so
+  // the first category block answers to it exactly as the original page's
+  // category band does. Only the first: an id is not allowed to repeat.
+  const firstCategoryBlock = blocks.find((b) => b.type === 'categoryGrid')?.id;
+
   return (
     <>
       {blocks.map((block) => (
-        <BlockShell key={block.id} block={block}>
+        <BlockShell key={block.id} block={block} anchor={block.id === firstCategoryBlock ? 'categories' : undefined}>
           <BlockBody block={block} />
         </BlockShell>
       ))}
@@ -43,7 +48,15 @@ export function BlockRenderer({ blocks }: { blocks: Block[] }) {
   );
 }
 
-function BlockShell({ block, children }: { block: Block; children: React.ReactNode }) {
+function BlockShell({
+  block,
+  children,
+  anchor,
+}: {
+  block: Block;
+  children: React.ReactNode;
+  anchor?: string;
+}) {
   const s = block.style;
 
   const inner: React.CSSProperties = {
@@ -73,6 +86,7 @@ function BlockShell({ block, children }: { block: Block; children: React.ReactNo
 
   return (
     <section
+      id={anchor}
       className={styles.block}
       style={outer}
       data-block-id={block.id}

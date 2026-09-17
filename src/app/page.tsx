@@ -45,7 +45,7 @@ export default async function HomePage() {
     <>
       <Hero />
 
-      <Section labelledBy="categories-heading">
+      <Section id="categories" labelledBy="categories-heading">
         <CategoryStrip
           categories={categories}
           headingId="categories-heading"

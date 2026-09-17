@@ -6,6 +6,7 @@ import { AdminDrawer } from '@/components/admin/shell/AdminDrawer';
 import { AdminSearch } from '@/components/admin/shell/AdminSearch';
 import { AdminSidebar } from '@/components/admin/shell/AdminSidebar';
 import { NotificationBell } from '@/components/admin/shell/NotificationBell';
+import { SiteLinks } from '@/components/admin/shell/SiteLinks';
 import { requireStaff } from '@/lib/admin-guard';
 import { getShop } from '@/lib/site/shop';
 import styles from './layout.module.css';
@@ -55,6 +56,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </Link>
           <div className={styles.topSpacer} />
           <AdminSearch />
+          <SiteLinks />
           <NotificationBell />
         </header>
 

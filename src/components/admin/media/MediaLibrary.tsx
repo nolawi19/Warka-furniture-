@@ -84,7 +84,7 @@ export function MediaLibrary({
         setUploading(false);
       }
     },
-    [router],
+    [router, setItems],
   );
 
   const shown = query.trim()

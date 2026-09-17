@@ -172,7 +172,14 @@
   color: var(--ink-3);
   border-radius: var(--radius-sm);
 }
-.iconBtn:hover { color: var(--ink); background: var(--bg-3); }
+.iconBtn:hover:not(:disabled) { color: var(--ink); background: var(--bg-3); }
+.iconBtn:disabled { opacity: 0.3; cursor: default; }
+
+/* The row's own toolbar: move, hide, duplicate, delete. Always present rather
+   than revealed on hover — a control you have to go looking for is a control
+   on a touch screen nobody finds. */
+.rowTools { display: flex; align-items: center; gap: 1px; flex: none; }
+.rowTools .iconBtn[aria-pressed='true'] { color: var(--ember-text); }
 
 /* -------------------------------------------------------------- canvas */
 

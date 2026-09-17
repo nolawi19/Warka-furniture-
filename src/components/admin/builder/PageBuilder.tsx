@@ -229,16 +229,38 @@ export function PageBuilder({
     const index = blocks.findIndex((b) => b.id === id);
     if (index === -1) return;
 
-    // This runs from a click, not during render — the purity rule cannot tell
-    // the difference for a function declared in the component body.
-    /* eslint-disable react-hooks/purity */
     const copy: Block = {
       ...structuredClone(blocks[index]),
       id: `b-${Math.random().toString(36).slice(2, 10)}`,
     };
-    /* eslint-enable react-hooks/purity */
     commit([...blocks.slice(0, index + 1), copy, ...blocks.slice(index + 1)]);
     setSelectedId(copy.id);
+  }
+
+  function move(id: string, direction: -1 | 1) {
+    const index = blocks.findIndex((b) => b.id === id);
+    const to = index + direction;
+    if (index === -1 || to < 0 || to >= blocks.length) return;
+    const next = [...blocks];
+    [next[index], next[to]] = [next[to], next[index]];
+    commit(next);
+  }
+
+  /**
+   * Hide is not delete. A hidden block keeps its content and its settings and
+   * simply stops rendering, on every device at once — which is what somebody
+   * means when they take a section off the page for a week.
+   */
+  function setHidden(id: string, hidden: boolean) {
+    patch(id, (b) => ({
+      ...b,
+      style: {
+        ...b.style,
+        showOnDesktop: !hidden,
+        showOnTablet: !hidden,
+        showOnMobile: !hidden,
+      },
+    }));
   }
 
   async function publish() {
@@ -364,32 +386,83 @@ export function PageBuilder({
                 getKey={(b) => b.id}
                 onReorder={(next) => commit(next)}
               >
-                {(block, args) => (
-                  <div
-                    className={styles.outlineRow}
-                    data-selected={block.id === selectedId}
-                    data-hidden={!block.style.showOnDesktop && !block.style.showOnTablet && !block.style.showOnMobile}
-                  >
-                    <DragHandle args={args} />
-                    <button
-                      type="button"
-                      className={styles.outlineName}
-                      onClick={() => {
-                        setSelectedId(block.id);
-                        setPanel('settings');
-                      }}
+                {(block, args) => {
+                  const hidden =
+                    !block.style.showOnDesktop && !block.style.showOnTablet && !block.style.showOnMobile;
+                  const index = blocks.findIndex((b) => b.id === block.id);
+
+                  return (
+                    <div
+                      className={styles.outlineRow}
+                      data-selected={block.id === selectedId}
+                      data-hidden={hidden}
                     >
-                      <span>{BLOCK_LIBRARY.find((l) => l.type === block.type)?.label ?? block.type}</span>
-                      <small>{summarise(block)}</small>
-                    </button>
-                    <button type="button" className={styles.iconBtn} title="Duplicate" onClick={() => duplicate(block.id)}>
-                      ⧉
-                    </button>
-                    <button type="button" className={styles.iconBtn} title="Delete" onClick={() => remove(block.id)}>
-                      ✕
-                    </button>
-                  </div>
-                )}
+                      <DragHandle args={args} />
+                      <button
+                        type="button"
+                        className={styles.outlineName}
+                        onClick={() => {
+                          setSelectedId(block.id);
+                          setPanel('settings');
+                        }}
+                      >
+                        <span>{BLOCK_LIBRARY.find((l) => l.type === block.type)?.label ?? block.type}</span>
+                        <small>{hidden ? 'Hidden' : summarise(block)}</small>
+                      </button>
+
+                      <div className={styles.rowTools}>
+                        <button
+                          type="button"
+                          className={styles.iconBtn}
+                          title="Move up"
+                          aria-label="Move up"
+                          disabled={index <= 0}
+                          onClick={() => move(block.id, -1)}
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.iconBtn}
+                          title="Move down"
+                          aria-label="Move down"
+                          disabled={index === blocks.length - 1}
+                          onClick={() => move(block.id, 1)}
+                        >
+                          ↓
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.iconBtn}
+                          title={hidden ? 'Show on the page' : 'Hide from the page'}
+                          aria-label={hidden ? 'Show on the page' : 'Hide from the page'}
+                          aria-pressed={hidden}
+                          onClick={() => setHidden(block.id, !hidden)}
+                        >
+                          {hidden ? '🙈' : '👁'}
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.iconBtn}
+                          title="Duplicate"
+                          aria-label="Duplicate"
+                          onClick={() => duplicate(block.id)}
+                        >
+                          ⧉
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.iconBtn}
+                          title="Delete"
+                          aria-label="Delete"
+                          onClick={() => remove(block.id)}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }}
               </SortableList>
             )}
           </section>
