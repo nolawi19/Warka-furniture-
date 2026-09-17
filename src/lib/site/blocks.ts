@@ -15,7 +15,9 @@
  */
 import { z } from 'zod';
 
+import { HERO_DEFAULTS } from '@/components/hero/hero-content';
 import { AnimationName } from './schemas';
+import { HOME_QUOTE, HOME_STEPS, HOME_VISIT } from './home-defaults';
 
 /* ------------------------------------------------------------------- style */
 
@@ -61,6 +63,9 @@ const Text = (max: number) => z.string().max(max).default('');
  * type instead.
  */
 export const BLOCK_PROPS = {
+  // Deliberately the same field names as HeroContent in components/hero/Hero.tsx.
+  // The block does not describe a hero: it *is* the hero's props, so the
+  // builder cannot preview a hero the site would render differently.
   hero: z.object({
     kicker: Text(80),
     heading: Text(200),
@@ -69,9 +74,15 @@ export const BLOCK_PROPS = {
     primaryHref: Text(300),
     secondaryLabel: Text(40),
     secondaryHref: Text(300),
+    facts: z.array(z.object({ value: Text(60), label: Text(80) })).max(4).default([]),
+    panel: z.enum(['plate', 'image', 'none']).default('plate'),
+    plateKicker: Text(80),
+    wordmarkMain: Text(40),
+    wordmarkSub: Text(40),
+    amharic: Text(80),
+    plateNote: Text(200),
     imageUrl: Text(500),
     imageAlt: Text(200),
-    layout: z.enum(['text-left', 'text-right', 'centred']).default('text-left'),
   }),
 
   heading: z.object({
@@ -114,7 +125,8 @@ export const BLOCK_PROPS = {
 
   productGrid: z.object({
     heading: Text(120),
-    source: z.enum(['featured', 'newest', 'category']).default('featured'),
+    kicker: Text(80),
+    source: z.enum(['featured', 'newest', 'photographed', 'category']).default('featured'),
     categorySlug: Text(80),
     limit: z.number().int().min(1).max(24).default(6),
     columnsDesktop: z.number().int().min(1).max(6).default(3),
@@ -126,11 +138,46 @@ export const BLOCK_PROPS = {
 
   categoryGrid: z.object({
     heading: Text(120),
+    kicker: Text(80),
     limit: z.number().int().min(1).max(12).default(6),
-    columnsDesktop: z.number().int().min(1).max(6).default(3),
-    columnsTablet: z.number().int().min(1).max(4).default(2),
-    columnsMobile: z.number().int().min(1).max(3).default(1),
+    linkLabel: Text(40),
+    linkHref: Text(300),
     showCounts: z.boolean().default(true),
+  }),
+
+  /** The numbered "how you buy it" panel. */
+  steps: z.object({
+    heading: Text(120),
+    kicker: Text(80),
+    note: Text(120),
+    items: z
+      .array(z.object({ n: Text(8), t: Text(120), d: Text(600) }))
+      .max(8)
+      .default([]),
+  }),
+
+  /** One line of type on its own. */
+  quote: z.object({
+    text: Text(400),
+    cite: Text(120),
+  }),
+
+  /** The shop's own details beside a photograph. */
+  storeInfo: z.object({
+    heading: Text(120),
+    kicker: Text(80),
+    body: Text(800),
+    imageUrl: Text(500),
+    imageAlt: Text(200),
+    showArea: z.boolean().default(true),
+    showHours: z.boolean().default(true),
+    showPhone: z.boolean().default(true),
+    showEmail: z.boolean().default(false),
+    showDelivery: z.boolean().default(true),
+    primaryLabel: Text(40),
+    primaryHref: Text(300),
+    secondaryLabel: Text(40),
+    secondaryHref: Text(300),
   }),
 
   featuredProduct: z.object({
@@ -217,11 +264,14 @@ export const BLOCK_LIBRARY: {
   { type: 'productGrid', label: 'Product grid', group: 'Shop', hint: 'Products from the catalogue' },
   { type: 'categoryGrid', label: 'Category grid', group: 'Shop', hint: 'The shop’s categories' },
   { type: 'featuredProduct', label: 'Featured product', group: 'Shop', hint: 'One product, in full' },
+  { type: 'storeInfo', label: 'Store information', group: 'Shop', hint: 'Address, hours and phone' },
 
   { type: 'columns', label: 'Columns', group: 'Layout', hint: 'Two or three side by side' },
   { type: 'spacer', label: 'Spacer', group: 'Layout', hint: 'Empty vertical space' },
   { type: 'divider', label: 'Divider', group: 'Layout', hint: 'A line between sections' },
 
+  { type: 'steps', label: 'Numbered steps', group: 'More', hint: 'How something works, in order' },
+  { type: 'quote', label: 'Quote', group: 'More', hint: 'One line of type on its own' },
   { type: 'testimonials', label: 'Testimonials', group: 'More', hint: 'What customers said' },
   { type: 'faq', label: 'Questions', group: 'More', hint: 'Questions and answers' },
   { type: 'newsletter', label: 'Newsletter', group: 'More', hint: 'Collect email addresses' },
@@ -294,20 +344,35 @@ export function newBlock(type: BlockType): Block {
 
 /** Starting content for a new block, so it is never a blank rectangle. */
 export const STARTER_PROPS: Partial<Record<BlockType, Record<string, unknown>>> = {
-  hero: {
-    kicker: 'Made in Addis Ababa',
-    heading: 'Furniture built to your measurement.',
-    body: 'Beds, dressing tables, mirrors and chests, in the board and the colour you pick.',
-    primaryLabel: 'Shop the catalogue',
-    primaryHref: '/shop',
-  },
+  // The hero starts as the hero the site already has, so dropping one in shows
+  // the real thing rather than a stand-in that has to be replaced.
+  hero: { ...HERO_DEFAULTS },
   heading: { text: 'A section title' },
   paragraph: {
     text: 'Write here. This paragraph is a placeholder — click it and put the shop’s own words in.',
   },
   button: { label: 'Shop the catalogue', href: '/shop' },
-  productGrid: { heading: 'From the showroom', source: 'featured', limit: 6 },
-  categoryGrid: { heading: 'Browse by room', limit: 6 },
+  productGrid: {
+    kicker: 'Photographed in the workshop',
+    heading: 'On the floor now',
+    source: 'photographed',
+    limit: 6,
+    linkLabel: 'Browse everything',
+    linkHref: '/shop',
+  },
+  categoryGrid: { heading: 'What we make', limit: 12, linkLabel: 'All pieces', linkHref: '/shop' },
+  steps: { heading: 'How you buy it', items: HOME_STEPS },
+  quote: { text: HOME_QUOTE },
+  storeInfo: {
+    heading: 'Visit the workshop',
+    body: HOME_VISIT.body,
+    imageUrl: HOME_VISIT.imageUrl,
+    imageAlt: HOME_VISIT.imageAlt,
+    primaryLabel: 'See the pieces',
+    primaryHref: '/shop',
+    secondaryLabel: 'Ask a question',
+    secondaryHref: '/contact',
+  },
   newsletter: { heading: 'News from the workshop' },
   contact: { heading: 'Come and see it' },
   faq: {

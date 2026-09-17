@@ -4,15 +4,17 @@ import { revalidatePath } from 'next/cache';
 
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
-import { newBlockWithStarter } from '@/lib/site/blocks';
+import { homepageBlocks } from '@/lib/site/home-blocks';
 
 export type HomeActionState = { ok: boolean; message: string; id?: string } | null;
 
 /**
- * Create the homepage as a draft, pre-filled with something like the page the
- * site already has — a hero, the categories, some products and a contact
- * block. It starts as a DRAFT, so the original homepage keeps serving
- * visitors until somebody looks at this one and presses Publish.
+ * Create the homepage as a draft, pre-filled with the page the site already
+ * has — the same hero, the same categories, the same products, the same steps,
+ * quote and shop details, rendered by the same components. It starts as a
+ * DRAFT, so the original homepage keeps serving visitors until somebody looks
+ * at this one and presses Publish; and when they do, nothing visibly changes,
+ * which is exactly what makes it safe to press.
  */
 export async function createHomepageAction(): Promise<HomeActionState> {
   const staff = await assertStaff();
@@ -21,12 +23,7 @@ export async function createHomepageAction(): Promise<HomeActionState> {
   const existing = await db.page.findUnique({ where: { slug: 'home' } });
   if (existing) return { ok: true, message: 'It already exists.', id: existing.id };
 
-  const blocks = [
-    newBlockWithStarter('hero'),
-    newBlockWithStarter('categoryGrid'),
-    newBlockWithStarter('productGrid'),
-    newBlockWithStarter('contact'),
-  ];
+  const blocks = homepageBlocks();
 
   const page = await db.page.create({
     data: {

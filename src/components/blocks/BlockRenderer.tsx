@@ -1,9 +1,21 @@
 import Image from 'next/image';
-import Link from 'next/link';
 
+import { Hero } from '@/components/hero/Hero';
+import type { HeroContent } from '@/components/hero/hero-content';
+import { CategoryStrip } from '@/components/sections/CategoryStrip';
+import { ProductStrip } from '@/components/sections/ProductStrip';
+import { Quote } from '@/components/sections/Quote';
+import { Steps, type Step } from '@/components/sections/Steps';
+import { StorePanel, type StoreDetail } from '@/components/sections/StorePanel';
 import { NewsletterForm } from '@/components/site/NewsletterForm';
-import { ProductCard } from '@/components/shop/ProductCard';
-import { getCategories, getFeaturedProducts, getProductBySlug, searchProducts } from '@/lib/catalogue';
+import { ActionButton } from '@/components/ui/ActionButton';
+import {
+  getCategories,
+  getFeaturedProducts,
+  getPhotographedProducts,
+  getProductBySlug,
+  searchProducts,
+} from '@/lib/catalogue';
 import { formatMoney } from '@/lib/money';
 import type { Block } from '@/lib/site/blocks';
 import { getShop } from '@/lib/site/shop';
@@ -86,35 +98,11 @@ async function BlockBody({ block }: { block: Block }) {
   const p = block.props as any;
 
   switch (block.type) {
+    // Not a rendering of a hero: the hero itself, with the block's props as
+    // its props. The builder cannot preview a hero the site would draw
+    // differently, because there is only one of them.
     case 'hero':
-      return (
-        <div className={styles.hero} data-layout={p.layout}>
-          <div className={styles.heroText}>
-            {p.kicker && <p className="micro micro--ember">{p.kicker}</p>}
-            {p.heading && <h1 className={styles.heroHeading}>{p.heading}</h1>}
-            {p.body && <p className={styles.heroBody}>{p.body}</p>}
-            {(p.primaryLabel || p.secondaryLabel) && (
-              <div className={styles.heroActions}>
-                {p.primaryLabel && (
-                  <Link href={p.primaryHref || '/shop'} className={styles.btnPrimary}>
-                    {p.primaryLabel}
-                  </Link>
-                )}
-                {p.secondaryLabel && (
-                  <Link href={p.secondaryHref || '/'} className={styles.btnGhost}>
-                    {p.secondaryLabel}
-                  </Link>
-                )}
-              </div>
-            )}
-          </div>
-          {p.imageUrl && (
-            <div className={styles.heroImage}>
-              <Image src={p.imageUrl} alt={p.imageAlt || ''} fill sizes="(max-width: 900px) 100vw, 50vw" className={styles.cover} />
-            </div>
-          )}
-        </div>
-      );
+      return <Hero {...(p as Partial<HeroContent>)} headingId={`hero-${block.id}`} wrap={false} />;
 
     case 'heading': {
       const Tag = (p.level || 'h2') as 'h1' | 'h2' | 'h3' | 'h4';
@@ -173,9 +161,9 @@ async function BlockBody({ block }: { block: Block }) {
             {p.heading && <h2 className={styles.heading}>{p.heading}</h2>}
             {p.body && <p className={styles.bodyText}>{p.body}</p>}
             {p.linkLabel && (
-              <Link href={p.linkHref || '/shop'} className={styles.btnGhost}>
+              <ActionButton as="link" href={p.linkHref || '/shop'} variant="ghost">
                 {p.linkLabel}
-              </Link>
+              </ActionButton>
             )}
           </div>
         </div>
@@ -206,72 +194,83 @@ async function BlockBody({ block }: { block: Block }) {
           ? (await searchProducts({ category: p.categorySlug, sort: 'featured' })).slice(0, p.limit)
           : p.source === 'newest'
             ? (await searchProducts({ sort: 'featured' })).slice(0, p.limit)
-            : await getFeaturedProducts(p.limit);
-
-      if (products.length === 0) return null;
+            : p.source === 'photographed'
+              ? await getPhotographedProducts(p.limit)
+              : await getFeaturedProducts(p.limit);
 
       return (
-        <>
-          {(p.heading || p.linkLabel) && (
-            <div className={styles.sectionHead}>
-              {p.heading && <h2 className={styles.heading}>{p.heading}</h2>}
-              {p.linkLabel && (
-                <Link href={p.linkHref || '/shop'} className={styles.sectionLink}>
-                  {p.linkLabel}
-                </Link>
-              )}
-            </div>
-          )}
-          <div
-            className={styles.productGrid}
-            style={
-              {
-                '--cols-d': p.columnsDesktop,
-                '--cols-t': p.columnsTablet,
-                '--cols-m': p.columnsMobile,
-              } as React.CSSProperties
-            }
-          >
-            {products.map((product) => (
-              <ProductCard key={product.slug} product={product} />
-            ))}
-          </div>
-        </>
+        <ProductStrip
+          products={products}
+          kicker={p.kicker}
+          heading={p.heading}
+          headingId={`h-${block.id}`}
+          linkLabel={p.linkLabel}
+          linkHref={p.linkHref || '/shop'}
+          columns={{
+            mobile: p.columnsMobile,
+            tablet: p.columnsTablet,
+            desktop: p.columnsDesktop,
+          }}
+        />
       );
     }
 
     case 'categoryGrid': {
       const categories = (await getCategories()).slice(0, p.limit);
-      if (categories.length === 0) return null;
       return (
-        <>
-          {p.heading && <h2 className={styles.heading}>{p.heading}</h2>}
-          <div
-            className={styles.categoryGrid}
-            style={
-              {
-                '--cols-d': p.columnsDesktop,
-                '--cols-t': p.columnsTablet,
-                '--cols-m': p.columnsMobile,
-              } as React.CSSProperties
-            }
-          >
-            {categories.map((c) => (
-              <Link key={c.slug} href={`/shop?category=${c.slug}`} className={styles.categoryCard}>
-                <span className={styles.categoryName}>
-                  {c.name}
-                  {c.nameAm && <span className="am">{c.nameAm}</span>}
-                </span>
-                {c.blurb && <span className={styles.categoryBlurb}>{c.blurb}</span>}
-                {p.showCounts && (
-                  <span className={styles.categoryCount}>
-                    {c.pieceCount} {c.pieceCount === 1 ? 'piece' : 'pieces'}
-                  </span>
-                )}
-              </Link>
-            ))}
-          </div>
-        </>
+        <CategoryStrip
+          categories={categories}
+          kicker={p.kicker}
+          heading={p.heading}
+          headingId={`h-${block.id}`}
+          linkLabel={p.linkLabel}
+          linkHref={p.linkHref || '/shop'}
+          showCounts={p.showCounts}
+        />
+      );
+    }
+
+    case 'steps': {
+      const items = ((p.items ?? []) as Step[]).filter((i) => i.t);
+      if (items.length === 0) return null;
+      return (
+        <Steps
+          steps={items}
+          kicker={p.kicker}
+          heading={p.heading}
+          headingId={`h-${block.id}`}
+          note={p.note}
+        />
+      );
+    }
+
+    case 'quote':
+      if (!p.text) return null;
+      return <Quote text={p.text} cite={p.cite} bare />;
+
+    case 'storeInfo': {
+      const shop = await getShop();
+      const details: StoreDetail[] = [];
+      if (p.showArea) details.push({ label: 'Shop', value: shop.area });
+      if (p.showHours) details.push({ label: 'Open', value: shop.openingHours });
+      if (p.showPhone) details.push({ label: 'Phone', value: shop.phone, href: `tel:${shop.phoneHref}` });
+      if (p.showEmail) details.push({ label: 'Email', value: shop.email, href: `mailto:${shop.email}` });
+      if (p.showDelivery) details.push({ label: 'Delivery', value: shop.deliveryNote });
+
+      return (
+        <StorePanel
+          heading={p.heading}
+          headingId={`h-${block.id}`}
+          kicker={p.kicker}
+          body={p.body}
+          imageUrl={p.imageUrl || undefined}
+          imageAlt={p.imageAlt}
+          details={details}
+          primaryLabel={p.primaryLabel}
+          primaryHref={p.primaryHref}
+          secondaryLabel={p.secondaryLabel}
+          secondaryHref={p.secondaryHref}
+        />
       );
     }
 
@@ -300,9 +299,9 @@ async function BlockBody({ block }: { block: Block }) {
             <p className={styles.featuredPrice}>
               {prices.length > 0 ? formatMoney(Math.min(...prices)) : 'Priced in the shop'}
             </p>
-            <Link href={`/product/${product.slug}`} className={styles.btnPrimary}>
+            <ActionButton as="link" href={`/product/${product.slug}`} variant="primary" icon="arrow">
               See this piece
-            </Link>
+            </ActionButton>
           </div>
         </div>
       );
@@ -379,13 +378,9 @@ async function BlockBody({ block }: { block: Block }) {
     case 'button':
       if (!p.label) return null;
       return (
-        <Link
-          href={p.href || '/shop'}
-          className={p.variant === 'primary' ? styles.btnPrimary : styles.btnGhost}
-          data-size={p.size}
-        >
+        <ActionButton as="link" href={p.href || '/shop'} variant={p.variant} size={p.size}>
           {p.label}
-        </Link>
+        </ActionButton>
       );
 
     case 'newsletter':

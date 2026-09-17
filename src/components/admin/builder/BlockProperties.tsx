@@ -226,13 +226,36 @@ export function BlockProperties({
             {text('primaryHref', 'Button link')}
             {text('secondaryLabel', 'Second button text')}
             {text('secondaryHref', 'Second button link')}
-            {imageField('imageUrl', 'Picture')}
-            {text('imageAlt', 'Picture description')}
-            {pick('layout', 'Arrangement', [
-              { value: 'text-left', label: 'Text left, picture right' },
-              { value: 'text-right', label: 'Picture left, text right' },
-              { value: 'centred', label: 'Centred, no picture' },
+            {listEditor(
+              'facts',
+              'Short facts under the buttons',
+              [
+                { key: 'value', label: 'The fact' },
+                { key: 'label', label: 'The note under it' },
+              ],
+              4,
+              { value: '', label: '' },
+            )}
+            {pick('panel', 'Beside the text', [
+              { value: 'plate', label: 'The Warka name plate' },
+              { value: 'image', label: 'A photograph' },
+              { value: 'none', label: 'Nothing — text across the width' },
             ])}
+            {p.panel === 'plate' && (
+              <>
+                {text('plateKicker', 'Line at the top of the plate')}
+                {text('wordmarkMain', 'Name')}
+                {text('wordmarkSub', 'Under the name')}
+                {text('amharic', 'In Amharic')}
+                {area('plateNote', 'Note at the foot of the plate', 2)}
+              </>
+            )}
+            {p.panel === 'image' && (
+              <>
+                {imageField('imageUrl', 'Picture')}
+                {text('imageAlt', 'Picture description')}
+              </>
+            )}
           </>
         );
       case 'heading':
@@ -318,9 +341,11 @@ export function BlockProperties({
       case 'productGrid':
         return (
           <>
+            {text('kicker', 'Small line above')}
             {text('heading', 'Heading')}
             {pick('source', 'Which products', [
               { value: 'featured', label: 'The ones marked featured' },
+              { value: 'photographed', label: 'The ones with a photograph' },
               { value: 'newest', label: 'Most recently added' },
               { value: 'category', label: 'From one category' },
             ])}
@@ -354,14 +379,64 @@ export function BlockProperties({
       case 'categoryGrid':
         return (
           <>
+            {text('kicker', 'Small line above')}
             {text('heading', 'Heading')}
             {num('limit', 'How many', 1, 12)}
+            {text('linkLabel', 'Link text')}
+            {text('linkHref', 'Link address')}
             {toggle('showCounts', 'Show how many pieces are in each')}
-            <div className={styles.deviceCols}>
-              {num('columnsDesktop', 'Columns on a computer', 1, 6)}
-              {num('columnsTablet', 'On a tablet', 1, 4)}
-              {num('columnsMobile', 'On a phone', 1, 3)}
-            </div>
+            <p className={styles.hint}>
+              The panel fits as many across as the space allows, the same way it does on the
+              homepage.
+            </p>
+          </>
+        );
+      case 'steps':
+        return (
+          <>
+            {text('kicker', 'Small line above')}
+            {text('heading', 'Heading')}
+            {text('note', 'Small note on the right')}
+            {listEditor(
+              'items',
+              'Steps',
+              [
+                { key: 'n', label: 'Number' },
+                { key: 't', label: 'Title' },
+                { key: 'd', label: 'Text', area: true },
+              ],
+              8,
+              { n: '', t: '', d: '' },
+            )}
+          </>
+        );
+      case 'quote':
+        return (
+          <>
+            {area('text', 'The line', 3)}
+            {text('cite', 'Who said it')}
+          </>
+        );
+      case 'storeInfo':
+        return (
+          <>
+            {text('kicker', 'Small line above')}
+            {text('heading', 'Heading')}
+            {area('body', 'Text', 4)}
+            {imageField('imageUrl', 'Picture')}
+            {text('imageAlt', 'Picture description')}
+            {toggle('showArea', 'Show where the shop is')}
+            {toggle('showHours', 'Show the opening hours')}
+            {toggle('showPhone', 'Show the phone number')}
+            {toggle('showEmail', 'Show the email address')}
+            {toggle('showDelivery', 'Show the delivery note')}
+            {text('primaryLabel', 'Button text')}
+            {text('primaryHref', 'Button link')}
+            {text('secondaryLabel', 'Second button text')}
+            {text('secondaryHref', 'Second button link')}
+            <p className={styles.hint}>
+              The details themselves come from Store settings, so they are only ever in one place.
+            </p>
           </>
         );
       case 'featuredProduct':

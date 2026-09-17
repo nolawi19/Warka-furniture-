@@ -1,5 +1,13 @@
+/* The homepage's own section furniture, lifted out of app/page.module.css so
+   that the Website Builder's blocks can render the SAME markup and the SAME
+   rules. When each side had its own copy, the builder previewed a design the
+   site did not have — which is the bug this file exists to make impossible. */
+
 .section { padding-block: clamp(48px, 6vw, 88px); }
-.section:first-of-type { padding-top: clamp(32px, 4vw, 56px); }
+.section[data-first='true'] { padding-top: clamp(32px, 4vw, 56px); }
+/* Inside the builder a block supplies its own vertical rhythm, so the section
+   contributes none of its own. */
+.section[data-flush='true'] { padding-block: 0; }
 
 .sectionHead {
   display: flex;
@@ -68,19 +76,21 @@
   color: var(--ink-2);
 }
 
-/* ------------------------------------------------------------ grid */
+/* ------------------------------------------------------------ product grid */
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: clamp(12px, 1.6vw, 22px);
+  grid-template-columns: repeat(var(--cols-m, 2), minmax(0, 1fr));
+  gap: 10px;
 }
-
+@media (min-width: 561px) {
+  .grid {
+    grid-template-columns: repeat(var(--cols-t, 2), minmax(0, 1fr));
+    gap: clamp(12px, 1.6vw, 22px);
+  }
+}
 @media (min-width: 1001px) {
-  .grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 560px) {
-  .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .grid { grid-template-columns: repeat(var(--cols-d, 3), minmax(0, 1fr)); }
 }
 
 /* ------------------------------------------------------------ steps */
@@ -128,8 +138,27 @@
   line-height: 1.1;
   text-wrap: balance;
 }
+.quoteCite {
+  display: block;
+  margin-top: var(--space-4);
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-size: var(--text-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
 
-/* ------------------------------------------------------------ visit */
+.empty {
+  padding: var(--space-7) var(--space-4);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--ink-3);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+}
+
+/* ------------------------------------------------------------ store panel */
 
 .visit {
   display: grid;
@@ -137,6 +166,7 @@
   gap: clamp(24px, 4vw, 56px);
   align-items: center;
 }
+.visit[data-media='none'] { grid-template-columns: minmax(0, 1fr); }
 
 .visitImage {
   width: 100%;
@@ -162,36 +192,6 @@
 .details dd a:hover { color: var(--ember-text); border-color: currentColor; }
 
 .visitCta { display: flex; gap: var(--space-3); flex-wrap: wrap; }
-
-.btnPrimary, .btnGhost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  padding: 12px 20px;
-  border-radius: var(--radius);
-  border: 1px solid transparent;
-  transition: filter var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out),
-              transform var(--dur-instant) var(--ease-out);
-}
-.btnPrimary {
-  background: var(--btn-primary-bg, var(--ember));
-  color: var(--btn-primary-text, var(--ember-ink));
-  border-radius: var(--btn-primary-radius, var(--radius));
-  font-weight: var(--btn-primary-weight, 500);
-  text-transform: var(--btn-primary-transform, none);
-  box-shadow: var(--btn-primary-shadow, none);
-}
-.btnPrimary:hover { filter: brightness(1.08); }
-.btnGhost {
-  border-color: var(--btn-ghost-border, var(--line));
-  color: var(--btn-ghost-text, var(--ink));
-  background: var(--btn-ghost-bg, transparent);
-  border-radius: var(--btn-ghost-radius, var(--radius));
-}
-.btnGhost:hover { background: var(--bg-3); }
-.btnPrimary:active, .btnGhost:active { transform: translateY(1px); }
 
 @media (max-width: 900px) {
   .visit { grid-template-columns: 1fr; }

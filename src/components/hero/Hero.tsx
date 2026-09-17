@@ -1,72 +1,108 @@
+import Image from 'next/image';
+
 import { ActionButton } from '@/components/ui/ActionButton';
+import { HERO_DEFAULTS, type HeroContent } from './hero-content';
 import styles from './Hero.module.css';
 
-/**
- * The hero.
- *
- * The 3D sign that used to sit in the right-hand panel is gone, along with
- * three.js and its render loop. What replaces it is the wordmark set as type:
- * it paints with the first frame, costs nothing to render, and carries the
- * same name.
- */
-export function Hero({ pieceCount }: { pieceCount: number }) {
-  return (
-    <section className={`wrap ${styles.hero}`} aria-labelledby="hero-heading">
-      <div className={styles.copy}>
-        <p className="micro micro--ember">Made in Addis Ababa since the shop opened</p>
+export { HERO_DEFAULTS };
+export type { HeroContent, HeroFact } from './hero-content';
 
-        <h1 id="hero-heading" className={`dsp ${styles.headline}`}>
-          Beds, dressing tables, drawers.
+/**
+ * The hero — one component, used by both the public homepage and the Website
+ * Builder's hero block.
+ *
+ * That is the whole point of it taking props rather than holding its own copy.
+ * When the builder and the site each had their own hero, the preview showed an
+ * accurate picture of a design the site did not have. There is now one hero: if
+ * it changes here, it changes in both places, because there is only one place.
+ *
+ * Every default below is the wording the site shipped with, so a shop that has
+ * never opened the builder sees exactly what it saw before.
+ */
+export function Hero({
+  headingId = 'hero-heading',
+  wrap = true,
+  ...props
+}: Partial<HeroContent> & {
+  headingId?: string;
+  /** False inside the builder's block shell, which supplies the gutter itself. */
+  wrap?: boolean;
+}) {
+  const c = { ...HERO_DEFAULTS, ...props };
+
+  return (
+    <section className={wrap ? `wrap ${styles.hero}` : styles.hero} aria-labelledby={headingId} data-panel={c.panel}>
+      <div className={styles.copy}>
+        {c.kicker && <p className="micro micro--ember">{c.kicker}</p>}
+
+        <h1 id={headingId} className={`dsp ${styles.headline}`}>
+          {c.heading}
         </h1>
 
-        <p className="lede">
-          Warka Furniture builds bedroom and office furniture to your measurement. Buttoned beds,
-          mirrors, chests and pedestals, in the board and the colour you pick.
-        </p>
+        {c.body && <p className="lede">{c.body}</p>}
 
-        <div className={styles.cta}>
-          <ActionButton as="link" href="/shop" variant="primary" size="lg" icon="arrow">
-            Shop the catalogue
-          </ActionButton>
-          <ActionButton as="link" href="/craft" variant="ghost" size="lg">
-            How we build
-          </ActionButton>
-        </div>
+        {(c.primaryLabel || c.secondaryLabel) && (
+          <div className={styles.cta}>
+            {c.primaryLabel && (
+              <ActionButton as="link" href={c.primaryHref || '/shop'} variant="primary" size="lg" icon="arrow">
+                {c.primaryLabel}
+              </ActionButton>
+            )}
+            {c.secondaryLabel && (
+              <ActionButton as="link" href={c.secondaryHref || '/craft'} variant="ghost" size="lg">
+                {c.secondaryLabel}
+              </ActionButton>
+            )}
+          </div>
+        )}
 
-        <dl className={styles.facts}>
-          <div>
-            <dt>{pieceCount}</dt>
-            <dd>pieces to choose from</dd>
-          </div>
-          <div>
-            <dt>Made to size</dt>
-            <dd>not a fixed catalogue</dd>
-          </div>
-          <div>
-            <dt>Addis delivery</dt>
-            <dd>set up on arrival</dd>
-          </div>
-        </dl>
+        {c.facts.length > 0 && (
+          <dl className={styles.facts}>
+            {c.facts.map((fact, i) => (
+              <div key={`${fact.value}-${i}`}>
+                <dt>{fact.value}</dt>
+                <dd>{fact.label}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
       </div>
 
-      <div className={styles.stageColumn}>
-        <div className={styles.plate}>
-          <p className={styles.plateKicker}>Est. Kebena, Addis Ababa</p>
+      {c.panel === 'plate' && (
+        <div className={styles.stageColumn}>
+          <div className={styles.plate}>
+            {c.plateKicker && <p className={styles.plateKicker}>{c.plateKicker}</p>}
 
-          <p className={styles.wordmark}>
-            <span className={styles.wordmarkMain}>WARKA</span>
-            <span className={styles.wordmarkSub}>Furniture</span>
-          </p>
+            <p className={styles.wordmark}>
+              <span className={styles.wordmarkMain}>{c.wordmarkMain}</span>
+              {c.wordmarkSub && <span className={styles.wordmarkSub}>{c.wordmarkSub}</span>}
+            </p>
 
-          <p className={`am ${styles.amharic}`} lang="am">
-            ዋርካ የአንጨት ስራዎች
-          </p>
+            {c.amharic && (
+              <p className={`am ${styles.amharic}`} lang="am">
+                {c.amharic}
+              </p>
+            )}
 
-          <p className={styles.plateNote}>
-            The warka is the sycamore fig — the tree a village meets under.
-          </p>
+            {c.plateNote && <p className={styles.plateNote}>{c.plateNote}</p>}
+          </div>
         </div>
-      </div>
+      )}
+
+      {c.panel === 'image' && c.imageUrl && (
+        <div className={styles.stageColumn}>
+          <div className={styles.photo}>
+            <Image
+              src={c.imageUrl}
+              alt={c.imageAlt}
+              fill
+              sizes="(max-width: 900px) 100vw, 50vw"
+              priority
+              className={styles.photoImg}
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
