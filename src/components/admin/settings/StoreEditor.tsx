@@ -27,7 +27,7 @@ export function StoreEditor({
         return (
           <>
             {placeholderContact && (
-              <p className={styles.inlineNote} style={{ color: 'var(--warn)' }}>
+              <p className={`${styles.inlineNote} t-warn`}>
                 The phone number and email below are still the placeholders the site shipped with.
                 A customer who tries to ring the shop today reaches nobody.
               </p>
@@ -163,7 +163,7 @@ export function StoreEditor({
                 />
               </FieldRow>
               {value.maintenanceMode && (
-                <p className={styles.inlineNote} style={{ color: 'var(--warn)' }}>
+                <p className={`${styles.inlineNote} t-warn`}>
                   Once this is published, customers cannot browse or buy anything. You will still
                   be able to reach the admin, and so will anyone else signed in as staff.
                 </p>

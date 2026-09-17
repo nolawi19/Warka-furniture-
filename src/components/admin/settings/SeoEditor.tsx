@@ -119,7 +119,7 @@ export function SeoEditor({
               />
             </FieldRow>
             {!value.allowIndexing && (
-              <p className={styles.inlineNote} style={{ color: 'var(--warn)' }}>
+              <p className={`${styles.inlineNote} t-warn`}>
                 The website is currently hidden from search engines. Nobody will find the shop by
                 searching for it until this is switched back on and published.
               </p>

@@ -30,6 +30,12 @@ const WEIGHTS = [
 function Preview({ preset, label }: { preset: ButtonPreset; label: string }) {
   return (
     <span
+      // The colours here ARE the setting being previewed, so they have to be
+      // inline. A colour-changing browser extension rewrites inline styles and
+      // leaves its own attributes behind; suppressing the warning on this one
+      // element is cheaper than the alternative, and the preview is for the
+      // admin's eye rather than for hydration to agree about.
+      suppressHydrationWarning
       style={{
         display: 'inline-flex',
         alignItems: 'center',

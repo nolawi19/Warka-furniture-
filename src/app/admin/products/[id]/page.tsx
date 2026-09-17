@@ -33,7 +33,7 @@ export default async function EditProduct({ params }: { params: Promise<{ id: st
   return (
     <>
       <header className={styles.head}>
-        <Link href="/admin/products" style={{ fontSize: 12, color: 'var(--ink-2)' }}>
+        <Link href="/admin/products" className="t-xs t-muted">
           ← All products
         </Link>
         <h1 className={styles.title} style={{ marginTop: 8 }}>{product.name}</h1>

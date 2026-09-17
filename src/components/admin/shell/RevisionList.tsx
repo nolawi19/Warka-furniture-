@@ -55,7 +55,7 @@ export function RevisionList({ revisions }: { revisions: RevisionRow[] }) {
 
   return (
     <div className={styles.wrap}>
-      {message && <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ok)' }}>{message}</p>}
+      {message && <p className="t-sm t-ok">{message}</p>}
 
       <Table
         head={

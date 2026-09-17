@@ -34,7 +34,7 @@ export function CustomerControls({
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-      {message && <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-2)' }}>{message}</span>}
+      {message && <span className="t-xs t-muted">{message}</span>}
       <button
         type="button"
         className={isActive ? styles.dangerButton : styles.primary}

@@ -233,3 +233,43 @@ ul, ol {
 @media (pointer: coarse) {
   .admin-input { padding-block: 11px; }
 }
+
+/* =========================================================================
+   Admin text utilities
+   =========================================================================
+
+   These exist to get colour out of `style={{ color: … }}`.
+
+   Two reasons, and the second is the one that bites. A colour written inline
+   is a colour outside the design system, so changing a token does not change
+   it. And an inline style is exactly what a colour-changing browser extension
+   rewrites: Dark Reader replaces the declaration and stamps its own
+   data-darkreader-inline-color attribute on the element, which the server did
+   not render — so React finds attributes it did not write and hydration fails,
+   on whichever page happens to use one. A class has no inline style to rewrite. */
+
+.t-ink { color: var(--ink); }
+.t-muted { color: var(--ink-2); }
+.t-faint { color: var(--ink-3); }
+.t-ok { color: var(--ok); }
+.t-warn { color: var(--warn); }
+.t-danger { color: var(--danger); }
+
+.t-xs { font-size: var(--text-xs); }
+.t-sm { font-size: var(--text-sm); }
+.t-micro { font-size: var(--text-micro); }
+
+.t-block { display: block; }
+
+/* A small state pill: "configured" / "not configured" and the like. */
+.t-pill {
+  flex: none;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-3);
+  color: var(--ink-3);
+}
+.t-pill--ok { background: var(--ok-soft); color: var(--ok); }

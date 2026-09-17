@@ -88,6 +88,12 @@ function BlockShell({
     <section
       id={anchor}
       className={styles.block}
+      // A block's background and text colour are whatever the admin chose, so
+      // they can only be inline. That makes this element a target for
+      // extensions that rewrite colours and stamp their own attributes on what
+      // they touch — which the server never rendered, and which would
+      // otherwise fail hydration for the whole page.
+      suppressHydrationWarning
       style={outer}
       data-block-id={block.id}
       data-hide-desktop={!s.showOnDesktop}

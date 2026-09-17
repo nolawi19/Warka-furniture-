@@ -82,7 +82,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
       <div style={{ marginTop: 'var(--space-4)', display: 'grid', gap: 'var(--space-4)' }}>
         <Card title="Orders" padded={false}>
           {user.orders.length === 0 ? (
-            <p style={{ padding: 'var(--space-4)', color: 'var(--ink-2)', fontSize: 'var(--text-sm)' }}>
+            <p className="t-sm t-muted" style={{ padding: 'var(--space-4)' }}>
               This customer has not ordered anything yet.
             </p>
           ) : (
@@ -121,8 +121,8 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
           <Card title="Addresses">
             <ul style={{ display: 'grid', gap: 'var(--space-3)' }}>
               {user.addresses.map((a) => (
-                <li key={a.id} style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-2)' }}>
-                  {a.label && <strong style={{ color: 'var(--ink)' }}>{a.label}: </strong>}
+                <li key={a.id} className="t-sm t-muted">
+                  {a.label && <strong className="t-ink">{a.label}: </strong>}
                   {[a.line1, a.line2, a.subCity, a.city].filter(Boolean).join(', ')}
                   {a.phone && ` · ${a.phone}`}
                 </li>

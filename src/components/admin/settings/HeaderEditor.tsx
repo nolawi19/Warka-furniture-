@@ -64,7 +64,7 @@ export function HeaderEditor({
           </Card>
 
           {!value.showCart && (
-            <p className={styles.inlineNote} style={{ color: 'var(--warn)' }}>
+            <p className={`${styles.inlineNote} t-warn`}>
               With the basket hidden, a customer can still reach /cart and check out — they just
               have no button to get there. Hide it only if you mean to stop taking orders.
             </p>

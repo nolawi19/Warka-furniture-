@@ -251,7 +251,7 @@ export function DiscountManager({
 
               {editing.scope === 'CATEGORIES' && (
                 <fieldset className={styles.dialogWide} style={{ display: 'grid', gap: 6 }}>
-                  <legend style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-2)', fontWeight: 500 }}>
+                  <legend className="t-xs t-muted" style={{ fontWeight: 500 }}>
                     Categories
                   </legend>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
@@ -278,7 +278,7 @@ export function DiscountManager({
 
               {editing.scope === 'PRODUCTS' && (
                 <fieldset className={styles.dialogWide} style={{ display: 'grid', gap: 6 }}>
-                  <legend style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-2)', fontWeight: 500 }}>
+                  <legend className="t-xs t-muted" style={{ fontWeight: 500 }}>
                     Products
                   </legend>
                   <div style={{ display: 'grid', gap: 5, maxHeight: 200, overflowY: 'auto' }}>

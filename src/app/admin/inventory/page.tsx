@@ -80,7 +80,7 @@ export default async function AdminInventory() {
           padded={false}
         >
           {movements.length === 0 ? (
-            <p style={{ padding: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--ink-2)' }}>
+            <p className="t-sm t-muted" style={{ padding: 'var(--space-4)' }}>
               No stock has moved yet.
             </p>
           ) : (
@@ -103,7 +103,7 @@ export default async function AdminInventory() {
                       {m.variant.label} · {m.variant.sku}
                     </span>
                   </td>
-                  <td className={cell.num} style={{ color: m.delta < 0 ? 'var(--danger)' : 'var(--ok)' }}>
+                  <td className={`${cell.num} ${m.delta < 0 ? 't-danger' : 't-ok'}`}>
                     {m.delta > 0 ? `+${m.delta}` : m.delta}
                   </td>
                   <td className={cell.dim}>

@@ -841,7 +841,7 @@ export function BlockProperties({
             Show on a phone
           </label>
           {!s.showOnDesktop && !s.showOnTablet && !s.showOnMobile && (
-            <p className={styles.hint} style={{ color: 'var(--warn)' }}>
+            <p className={`${styles.hint} t-warn`}>
               Hidden everywhere — nobody will see this block. Delete it instead if you are done
               with it.
             </p>

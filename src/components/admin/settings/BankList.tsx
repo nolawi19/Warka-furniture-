@@ -162,13 +162,13 @@ export function BankList({ banks: initial, gatewayReady }: { banks: BankRow[]; g
         </div>
       )}
 
-      <p style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', marginBottom: 8 }}>
+      <p className="t-xs t-faint" style={{ marginBottom: 8 }}>
         Showing {shown.length} of {banks.length}.
       </p>
 
       <div style={{ display: 'grid', gap: 4, maxHeight: 520, overflowY: 'auto' }}>
         {shown.length === 0 ? (
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-2)', padding: 'var(--space-4)' }}>
+          <p className="t-sm t-muted" style={{ padding: 'var(--space-4)' }}>
             Nothing matches “{query.trim()}”.
           </p>
         ) : (
@@ -177,11 +177,11 @@ export function BankList({ banks: initial, gatewayReady }: { banks: BankRow[]; g
               <label style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
                 <input type="checkbox" checked={b.isActive} onChange={(e) => toggle(b, e.target.checked)} />
                 <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: 'block', fontSize: 'var(--text-sm)', color: 'var(--ink)' }}>
+                  <span className="t-block t-sm t-ink">
                     {b.name}
-                    {b.shortName && <span style={{ color: 'var(--ink-3)' }}> · {b.shortName}</span>}
+                    {b.shortName && <span className="t-faint"> · {b.shortName}</span>}
                   </span>
-                  <span style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
+                  <span className="t-block t-xs t-faint">
                     {KIND_LABEL[b.kind]}
                     {b.chapaId && ` · gateway id ${b.chapaId}`}
                   </span>

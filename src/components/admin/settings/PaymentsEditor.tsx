@@ -74,26 +74,15 @@ export function PaymentsEditor({
                           onChange={(e) => toggle(m.id, e.target.checked)}
                         />
                         <span style={{ flex: 1, minWidth: 0 }}>
-                          <span style={{ display: 'block', fontSize: 'var(--text-sm)', color: 'var(--ink)' }}>
+                          <span className="t-block t-sm t-ink">
                             {m.label}
                           </span>
-                          <span style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
+                          <span className="t-block t-xs t-faint">
                             {m.hint} · settles through {m.providerId}
                           </span>
                         </span>
                       </label>
-                      <span
-                        style={{
-                          flex: 'none',
-                          fontSize: 10,
-                          letterSpacing: '0.1em',
-                          textTransform: 'uppercase',
-                          padding: '3px 8px',
-                          borderRadius: 'var(--radius-pill)',
-                          background: m.configured ? 'var(--ok-soft)' : 'var(--bg-3)',
-                          color: m.configured ? 'var(--ok)' : 'var(--ink-3)',
-                        }}
-                      >
+                      <span className={m.configured ? 't-pill t-pill--ok' : 't-pill'}>
                         {m.configured ? 'ready' : 'no credentials'}
                       </span>
                     </div>
