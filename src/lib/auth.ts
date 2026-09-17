@@ -1,8 +1,8 @@
 import 'server-only';
 
 import { cookies } from 'next/headers';
-import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
-import type { Role, User } from '@prisma/client';
+import { createHash, randomBytes } from 'node:crypto';
+import type { User } from '@prisma/client';
 
 import { db } from './db';
 import { hashPassword, verifyPassword } from './password';
@@ -25,13 +25,6 @@ export { hashPassword, verifyPassword };
 // A leaked database backup therefore does not hand anyone a live session.
 function hashToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
-}
-
-export function safeEqual(a: string, b: string): boolean {
-  const ab = Buffer.from(a);
-  const bb = Buffer.from(b);
-  if (ab.length !== bb.length) return false;
-  return timingSafeEqual(ab, bb);
 }
 
 export async function createSession(
@@ -99,10 +92,6 @@ export async function currentUser(): Promise<SessionUser | null> {
 
 export function isStaff(user: SessionUser | null): boolean {
   return user?.role === 'ADMIN' || user?.role === 'STAFF';
-}
-
-export function hasRole(user: SessionUser | null, ...roles: Role[]): boolean {
-  return !!user && roles.includes(user.role);
 }
 
 // ------------------------------------------------------------ login attempts

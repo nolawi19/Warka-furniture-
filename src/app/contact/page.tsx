@@ -52,9 +52,9 @@ export default async function ContactPage() {
           {!SHOP.contactIsReal && (
             <p className={styles.note}>
               <strong>Note for the shop:</strong> the phone number and email above are still the
-              placeholders from the original site. Replace them in{' '}
-              <code>src/lib/shop-details.ts</code> and they update here, in the footer, on every
-              order page and in the structured data Google reads.
+              placeholders the site shipped with. Put the real ones into Store settings in the
+              admin and they change here, in the footer, on every order page and in the structured
+              data Google reads.
             </p>
           )}
         </div>

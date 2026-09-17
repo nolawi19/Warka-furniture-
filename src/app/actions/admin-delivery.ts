@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
+import { toSantim } from '@/lib/money';
 import { slugify } from '@/lib/slug';
 
 export type DeliveryActionState = { ok: boolean; message: string } | null;
@@ -32,11 +33,11 @@ export async function saveDeliveryZoneAction(input: unknown): Promise<DeliveryAc
 
   const fields = {
     name: d.name,
-    feeSantim: Math.round(d.feeBirr * 100),
+    feeSantim: toSantim(d.feeBirr),
     freeAboveSantim:
       d.freeAboveBirr === null || d.freeAboveBirr === undefined
         ? null
-        : Math.round(d.freeAboveBirr * 100),
+        : toSantim(d.freeAboveBirr),
     etaDays: d.etaDays?.trim() || null,
     isActive: d.isActive ?? true,
   };

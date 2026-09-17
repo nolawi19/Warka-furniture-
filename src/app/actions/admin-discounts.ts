@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
+import { toSantim } from '@/lib/money';
 
 export type DiscountActionState = { ok: boolean; message: string } | null;
 
@@ -72,8 +73,8 @@ export async function saveDiscountAction(input: unknown): Promise<DiscountAction
     kind: d.kind,
     // Percent stays a whole number; a fixed amount becomes santim, so no float
     // ever reaches a total.
-    value: d.kind === 'PERCENT' ? Math.round(d.value) : Math.round(d.value * 100),
-    minOrderSantim: Math.round((d.minOrderBirr ?? 0) * 100),
+    value: d.kind === 'PERCENT' ? Math.round(d.value) : toSantim(d.value),
+    minOrderSantim: toSantim(d.minOrderBirr ?? 0),
     maxRedemptions: d.maxRedemptions ?? null,
     startsAt,
     endsAt,

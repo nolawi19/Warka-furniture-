@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
+import { toSantim } from '@/lib/money';
 import { transitionOrder } from '@/lib/orders';
 import { slugify } from '@/lib/slug';
 
@@ -227,7 +228,7 @@ function birrToSantim(value: string | undefined): number | null {
   if (!value || !value.trim()) return null;
   const n = Number(value.replace(/,/g, ''));
   if (!Number.isFinite(n) || n < 0) return null;
-  return Math.round(n * 100);
+  return toSantim(n);
 }
 
 export async function saveVariantAction(

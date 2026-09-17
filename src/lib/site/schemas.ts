@@ -6,8 +6,8 @@
  *
  *  1. An empty database renders exactly the site that was hardcoded before
  *     this existed. The defaults below are copied from src/styles/tokens.css
- *     and src/lib/shop-details.ts, value for value. Nothing looks different
- *     until somebody deliberately changes it.
+ *     and from the shop constants the site used to carry in its source, value
+ *     for value. Nothing looks different until somebody deliberately changes it.
  *
  *  2. A stored payload that is missing a field, or has a field from an older
  *     version of the schema, still parses. `.catch()` on the outer object

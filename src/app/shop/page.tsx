@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { ProductCard } from '@/components/shop/ProductCard';
+import { ActionButton } from '@/components/ui/ActionButton';
 import { ShopControls } from '@/components/shop/ShopControls';
 import { getCategories, searchProducts, type ShopQuery } from '@/lib/catalogue';
 import styles from './page.module.css';
@@ -100,12 +101,12 @@ export default async function ShopPage({ searchParams }: { searchParams: SearchP
             listed, it is still worth asking.
           </p>
           <div className={styles.emptyCta}>
-            <Link href="/shop" className={styles.btnGhost}>
+            <ActionButton as="link" href="/shop" variant="ghost">
               Clear the filters
-            </Link>
-            <Link href="/contact" className={styles.btnPrimary}>
+            </ActionButton>
+            <ActionButton as="link" href="/contact" variant="primary" icon="arrow">
               Ask the workshop
-            </Link>
+            </ActionButton>
           </div>
         </div>
       ) : (

@@ -10,6 +10,7 @@ import type {
   VerifiedPayment,
   WebhookCheck,
 } from './provider';
+import { toSantim } from '@/lib/money';
 
 /**
  * Chapa — https://chapa.co
@@ -189,7 +190,7 @@ export const chapaProvider: PaymentProvider = {
       const amountSantim =
         amount === undefined || amount === null
           ? null
-          : Math.round(Number(amount) * 100);
+          : toSantim(Number(amount));
 
       return {
         status,
