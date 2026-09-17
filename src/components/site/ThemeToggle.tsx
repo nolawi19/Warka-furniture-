@@ -1,30 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useTheme } from './use-theme';
 import styles from './ThemeToggle.module.css';
 
-type Theme = 'light' | 'dark';
-
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>('light');
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const current = (document.documentElement.getAttribute('data-theme') as Theme) ?? 'light';
-    setTheme(current);
-    setReady(true);
-  }, []);
+  const [theme, setTheme, ready] = useTheme();
 
   function toggle() {
-    const next: Theme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    document.documentElement.setAttribute('data-theme', next);
-    try {
-      localStorage.setItem('warka.theme', next);
-    } catch {
-      /* private window: the choice just will not persist */
-    }
-    window.dispatchEvent(new CustomEvent('warka:themechange', { detail: next }));
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   }
 
   return (

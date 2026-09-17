@@ -1,29 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
+import { useTheme } from './use-theme';
 import styles from './ThemeChoice.module.css';
-
-type Theme = 'light' | 'dark';
 
 /** The labelled version of the theme toggle, for the mobile drawer. */
 export function ThemeChoice() {
-  const [theme, setTheme] = useState<Theme>('light');
-
-  useEffect(() => {
-    setTheme((document.documentElement.getAttribute('data-theme') as Theme) ?? 'light');
-  }, []);
-
-  function choose(next: Theme) {
-    setTheme(next);
-    document.documentElement.setAttribute('data-theme', next);
-    try {
-      localStorage.setItem('warka.theme', next);
-    } catch {
-      /* private window */
-    }
-    window.dispatchEvent(new CustomEvent('warka:themechange', { detail: next }));
-  }
+  const [theme, choose] = useTheme();
 
   return (
     <div className={styles.wrap}>
