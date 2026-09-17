@@ -34,19 +34,38 @@ export function CategoryStrip({
   headingId?: string;
   showCounts?: boolean;
 }) {
+  // "All {count} pieces" is the label the homepage has always used, so the
+  // token has to survive into the block — otherwise a built homepage says
+  // something slightly different from the one it replaced.
+  const total = categories.reduce((n, c) => n + c.pieceCount, 0);
+  const label = linkLabel?.replace(/\{count\}/g, String(total));
+
+  // The heading is rendered whether or not there is anything under it: the
+  // section around this one points its aria-labelledby at that heading's id,
+  // and a label that refers to an element which is not there is worse than a
+  // section with nothing in it.
+  const head = (
+    <SectionHead
+      kicker={kicker}
+      heading={heading}
+      headingId={headingId}
+      linkLabel={categories.length > 0 ? label : undefined}
+      linkHref={linkHref}
+    />
+  );
+
   if (categories.length === 0) {
-    return <p className={styles.empty}>No categories are published yet.</p>;
+    return (
+      <>
+        {head}
+        <p className={styles.empty}>No categories are published yet.</p>
+      </>
+    );
   }
 
   return (
     <>
-      <SectionHead
-        kicker={kicker}
-        heading={heading}
-        headingId={headingId}
-        linkLabel={linkLabel}
-        linkHref={linkHref}
-      />
+      {head}
       <ul className={styles.categories}>
         {categories.map((c) => (
           <li key={c.slug}>

@@ -17,7 +17,7 @@ import {
   searchProducts,
 } from '@/lib/catalogue';
 import { formatMoney } from '@/lib/money';
-import type { Block } from '@/lib/site/blocks';
+import { blockBox, type Block } from '@/lib/site/blocks';
 import { getShop } from '@/lib/site/shop';
 import { Reveal } from './Reveal';
 import styles from './Blocks.module.css';
@@ -59,27 +59,35 @@ function BlockShell({
 }) {
   const s = block.style;
 
+  // Every length comes from blockBox, which turns bounded numbers and closed
+  // lists into CSS. Nothing the admin types reaches a stylesheet unexamined.
+  const box = blockBox(s);
+
   const inner: React.CSSProperties = {
-    maxWidth:
-      s.width === 'full'
-        ? 'none'
-        : s.width === 'narrow'
-          ? 'var(--wrap-narrow)'
-          : s.width === 'custom'
-            ? `${s.customWidth}px`
-            : 'var(--wrap)',
+    maxWidth: box.maxWidth,
     marginInline: s.align === 'left' ? '0 auto' : s.align === 'right' ? 'auto 0' : 'auto',
     textAlign: s.align,
+    width: '100%',
   };
 
   const outer: React.CSSProperties = {
-    paddingTop: s.paddingTop,
-    paddingBottom: s.paddingBottom,
+    paddingTop: box.paddingTop,
+    paddingBottom: box.paddingBottom,
     paddingInline: s.paddingX || undefined,
-    minHeight: s.minHeight || undefined,
+    minHeight: box.minHeight,
     background: s.background || undefined,
     color: s.textColor || undefined,
     borderRadius: s.radius || undefined,
+    // Only when the block is deliberately taller than its content is there
+    // anything to align, so the flex box only appears then.
+    ...(box.minHeight
+      ? {
+          display: 'flex',
+          flexDirection: 'column' as const,
+          justifyContent:
+            s.verticalAlign === 'middle' ? 'center' : s.verticalAlign === 'bottom' ? 'flex-end' : 'flex-start',
+        }
+      : {}),
   };
 
   const body = <div style={inner}>{children}</div>;
@@ -231,6 +239,11 @@ async function BlockBody({ block }: { block: Block }) {
             tablet: p.columnsTablet,
             desktop: p.columnsDesktop,
           }}
+          emptyLabel={
+            p.source === 'photographed'
+              ? 'Nothing is photographed yet. The catalogue is still the place to look.'
+              : undefined
+          }
         />
       );
     }
@@ -266,7 +279,7 @@ async function BlockBody({ block }: { block: Block }) {
 
     case 'quote':
       if (!p.text) return null;
-      return <Quote text={p.text} cite={p.cite} bare />;
+      return <Quote text={p.text} cite={p.cite} />;
 
     case 'storeInfo': {
       const shop = await getShop();

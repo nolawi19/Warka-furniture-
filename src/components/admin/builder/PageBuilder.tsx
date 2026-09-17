@@ -237,15 +237,6 @@ export function PageBuilder({
     setSelectedId(copy.id);
   }
 
-  function move(id: string, direction: -1 | 1) {
-    const index = blocks.findIndex((b) => b.id === id);
-    const to = index + direction;
-    if (index === -1 || to < 0 || to >= blocks.length) return;
-    const next = [...blocks];
-    [next[index], next[to]] = [next[to], next[index]];
-    commit(next);
-  }
-
   /**
    * Hide is not delete. A hidden block keeps its content and its settings and
    * simply stops rendering, on every device at once — which is what somebody
@@ -389,8 +380,6 @@ export function PageBuilder({
                 {(block, args) => {
                   const hidden =
                     !block.style.showOnDesktop && !block.style.showOnTablet && !block.style.showOnMobile;
-                  const index = blocks.findIndex((b) => b.id === block.id);
-
                   return (
                     <div
                       className={styles.outlineRow}
@@ -410,27 +399,11 @@ export function PageBuilder({
                         <small>{hidden ? 'Hidden' : summarise(block)}</small>
                       </button>
 
+                      {/* Move up and down live on the drag handle, which is
+                          where SortableList already puts them for keyboard
+                          users. A second pair here would be two buttons doing
+                          one job. */}
                       <div className={styles.rowTools}>
-                        <button
-                          type="button"
-                          className={styles.iconBtn}
-                          title="Move up"
-                          aria-label="Move up"
-                          disabled={index <= 0}
-                          onClick={() => move(block.id, -1)}
-                        >
-                          ↑
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.iconBtn}
-                          title="Move down"
-                          aria-label="Move down"
-                          disabled={index === blocks.length - 1}
-                          onClick={() => move(block.id, 1)}
-                        >
-                          ↓
-                        </button>
                         <button
                           type="button"
                           className={styles.iconBtn}

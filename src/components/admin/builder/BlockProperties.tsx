@@ -600,9 +600,10 @@ export function BlockProperties({
             <span>Width</span>
             <select className={styles.input} value={s.width} onChange={(e) => setStyle('width', e.target.value)}>
               <option value="narrow">Narrow — good for reading</option>
-              <option value="wide">Wide — the usual page width</option>
-              <option value="full">Edge to edge</option>
+              <option value="wide">Container — the usual page width</option>
+              <option value="full">Full width — edge to edge</option>
               <option value="custom">An exact width</option>
+              <option value="percent">A share of the width</option>
             </select>
           </label>
           {s.width === 'custom' && (
@@ -620,6 +621,77 @@ export function BlockProperties({
               />
             </label>
           )}
+          {s.width === 'percent' && (
+            <label className={styles.field}>
+              <span>
+                Share of the width <em>{s.percentWidth}%</em>
+              </span>
+              <input
+                type="range"
+                min={10}
+                max={100}
+                step={5}
+                value={s.percentWidth}
+                onChange={(e) => setStyle('percentWidth', e.target.valueAsNumber)}
+              />
+            </label>
+          )}
+          {mode === 'advanced' && s.width !== 'full' && (
+            <label className={styles.field}>
+              <span>
+                Never wider than <em>px, 0 = no limit</em>
+              </span>
+              <input
+                className={styles.input}
+                type="number"
+                min={0}
+                max={2400}
+                value={s.maxWidth}
+                onChange={(e) => setStyle('maxWidth', Math.max(0, e.target.valueAsNumber || 0))}
+              />
+            </label>
+          )}
+
+          <label className={styles.field}>
+            <span>Height</span>
+            <select className={styles.input} value={s.height} onChange={(e) => setStyle('height', e.target.value)}>
+              <option value="auto">As tall as it needs</option>
+              <option value="small">Small</option>
+              <option value="medium">Medium</option>
+              <option value="large">Large</option>
+              <option value="screen">A full screen</option>
+              <option value="custom">An exact height</option>
+            </select>
+          </label>
+          {s.height === 'custom' && (
+            <label className={styles.field}>
+              <span>
+                At least <em>px</em>
+              </span>
+              <input
+                className={styles.input}
+                type="number"
+                min={0}
+                max={1200}
+                value={s.minHeight}
+                onChange={(e) => setStyle('minHeight', Math.max(0, e.target.valueAsNumber || 0))}
+              />
+            </label>
+          )}
+          {s.height !== 'auto' && (
+            <label className={styles.field}>
+              <span>Content sits</span>
+              <select
+                className={styles.input}
+                value={s.verticalAlign}
+                onChange={(e) => setStyle('verticalAlign', e.target.value)}
+              >
+                <option value="top">At the top</option>
+                <option value="middle">In the middle</option>
+                <option value="bottom">At the bottom</option>
+              </select>
+            </label>
+          )}
           <label className={styles.field}>
             <span>Alignment</span>
             <select className={styles.input} value={s.align} onChange={(e) => setStyle('align', e.target.value)}>
@@ -628,27 +700,32 @@ export function BlockProperties({
               <option value="right">Right</option>
             </select>
           </label>
-          {mode === 'advanced' && (
-            <label className={styles.field}>
-              <span>
-                Smallest height <em>px, 0 = as tall as it needs</em>
-              </span>
-              <input
-                className={styles.input}
-                type="number"
-                min={0}
-                max={1200}
-                value={s.minHeight}
-                onChange={(e) => setStyle('minHeight', e.target.valueAsNumber || 0)}
-              />
-            </label>
-          )}
         </div>
       </details>
 
       <details className={styles.group}>
         <summary>Spacing</summary>
         <div className={styles.groupBody}>
+          <label className={styles.field}>
+            <span>Space around it</span>
+            <select
+              className={styles.input}
+              value={s.spacing}
+              onChange={(e) => setStyle('spacing', e.target.value)}
+            >
+              <option value="none">None</option>
+              <option value="tight">Tight</option>
+              <option value="normal">Normal — like the rest of the site</option>
+              <option value="loose">Loose</option>
+              <option value="custom">Exact numbers</option>
+            </select>
+            {s.spacing !== 'custom' && (
+              <small>These are the site’s own section spacings, and shrink on a phone by themselves.</small>
+            )}
+          </label>
+
+          {s.spacing === 'custom' && (
+            <>
           <label className={styles.field}>
             <span>
               Space above <em>{s.paddingTop}px</em>
@@ -675,6 +752,9 @@ export function BlockProperties({
               onChange={(e) => setStyle('paddingBottom', e.target.valueAsNumber)}
             />
           </label>
+            </>
+          )}
+
           {mode === 'advanced' && (
             <label className={styles.field}>
               <span>

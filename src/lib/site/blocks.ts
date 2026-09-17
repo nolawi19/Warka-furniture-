@@ -22,15 +22,50 @@ import { HOME_QUOTE, HOME_STEPS, HOME_VISIT } from './home-defaults';
 /* ------------------------------------------------------------------- style */
 
 export const BlockStyleSchema = z.object({
-  /** How wide the block's content is allowed to be. */
-  width: z.enum(['narrow', 'wide', 'full', 'custom']).default('wide'),
+  /**
+   * How wide the block's content is allowed to be.
+   *
+   * A closed list, not a CSS string. Every value here turns into a length this
+   * file computes — so a block can be any width the shop wants without any
+   * path existing by which a stored setting becomes arbitrary CSS.
+   *
+   *   narrow   a reading measure
+   *   wide     the page's container
+   *   full     edge to edge
+   *   custom   an exact pixel width, clamped to 200–2400
+   *   percent  a share of the container, clamped to 10–100
+   */
+  width: z.enum(['narrow', 'wide', 'full', 'custom', 'percent']).default('wide'),
   customWidth: z.number().int().min(200).max(2400).default(1000),
+  percentWidth: z.number().int().min(10).max(100).default(100),
+  /** A ceiling on top of the above, so a percentage cannot run away. 0 = none. */
+  maxWidth: z.number().int().min(0).max(2400).default(0),
 
+  /**
+   * How tall. 'auto' means as tall as its content, which is almost always
+   * right; 'screen' is one viewport; the named sizes are the spacing scale.
+   */
+  height: z.enum(['auto', 'small', 'medium', 'large', 'screen', 'custom']).default('auto'),
   /** 0 means "as tall as its content", which is almost always right. */
   minHeight: z.number().int().min(0).max(1200).default(0),
+  /** Where the content sits when the block is taller than the content is. */
+  verticalAlign: z.enum(['top', 'middle', 'bottom']).default('top'),
 
   align: z.enum(['left', 'center', 'right']).default('left'),
 
+  /**
+   * Vertical rhythm.
+   *
+   * The named settings are the site's own section spacing — the same clamp()
+   * every hand-written section on the site uses, so a block set to "normal"
+   * breathes exactly like the homepage it sits next to, at every width. That
+   * is what a shared design system means here: not a number that happens to
+   * match on a laptop, but the same rule.
+   *
+   * 'custom' keeps the two pixel sliders, and is the default so that pages
+   * built before this existed keep the spacing they were given.
+   */
+  spacing: z.enum(['none', 'tight', 'normal', 'loose', 'custom']).default('custom'),
   paddingTop: z.number().int().min(0).max(240).default(48),
   paddingBottom: z.number().int().min(0).max(240).default(48),
   paddingX: z.number().int().min(0).max(160).default(0),
@@ -328,6 +363,65 @@ export function parseBlocks(raw: unknown): Block[] {
   return out;
 }
 
+/** The site's section rhythm, as the stylesheets themselves write it. */
+const SPACING: Record<Exclude<BlockStyle['spacing'], 'custom'>, string> = {
+  none: '0px',
+  tight: 'clamp(24px, 3vw, 44px)',
+  normal: 'clamp(48px, 6vw, 88px)',
+  loose: 'clamp(72px, 9vw, 132px)',
+};
+
+/** The named heights, in CSS the browser can compute. */
+const HEIGHTS: Record<BlockStyle['height'], string | undefined> = {
+  auto: undefined,
+  small: '220px',
+  medium: '380px',
+  large: '560px',
+  screen: '100svh',
+  custom: undefined, // minHeight supplies it
+};
+
+/**
+ * The block's own box, as lengths.
+ *
+ * Everything the builder can set about size passes through here, and nothing
+ * else does. The inputs are numbers with bounds and strings from closed lists,
+ * so the output is always a length — there is no branch in which a stored
+ * value reaches CSS unexamined.
+ */
+export function blockBox(s: BlockStyle): {
+  maxWidth?: string;
+  minHeight?: string;
+  paddingTop: string;
+  paddingBottom: string;
+} {
+  const width =
+    s.width === 'full'
+      ? 'none'
+      : s.width === 'narrow'
+        ? 'var(--wrap-narrow)'
+        : s.width === 'custom'
+          ? `${s.customWidth}px`
+          : s.width === 'percent'
+            ? `${s.percentWidth}%`
+            : 'var(--wrap)';
+
+  const capped =
+    s.maxWidth > 0 && width !== 'none' ? `min(${width}, ${s.maxWidth}px)` : s.maxWidth > 0 ? `${s.maxWidth}px` : width;
+
+  const named = HEIGHTS[s.height];
+  const minHeight = s.height === 'custom' ? (s.minHeight > 0 ? `${s.minHeight}px` : undefined) : named;
+
+  const padding = s.spacing === 'custom' ? null : SPACING[s.spacing];
+
+  return {
+    maxWidth: capped,
+    minHeight,
+    paddingTop: padding ?? `${s.paddingTop}px`,
+    paddingBottom: padding ?? `${s.paddingBottom}px`,
+  };
+}
+
 export function defaultStyle(): BlockStyle {
   return BlockStyleSchema.parse({});
 }
@@ -360,7 +454,7 @@ export const STARTER_PROPS: Partial<Record<BlockType, Record<string, unknown>>> 
     linkLabel: 'Browse everything',
     linkHref: '/shop',
   },
-  categoryGrid: { heading: 'What we make', limit: 12, linkLabel: 'All pieces', linkHref: '/shop' },
+  categoryGrid: { heading: 'What we make', limit: 12, linkLabel: 'All {count} pieces', linkHref: '/shop' },
   steps: { heading: 'How you buy it', items: HOME_STEPS },
   quote: { text: HOME_QUOTE },
   storeInfo: {

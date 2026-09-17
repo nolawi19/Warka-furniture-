@@ -1,30 +1,18 @@
 import styles from './Sections.module.css';
 
-/** A line of type on its own, full-bleed. */
-export function Quote({
-  text,
-  cite,
-  label = 'Quote',
-  bare = false,
-}: {
-  text: string;
-  cite?: string;
-  label?: string;
-  /** True inside the builder's block shell, which supplies the band itself. */
-  bare?: boolean;
-}) {
-  const quote = (
-    <blockquote className={styles.quoteText}>
-      {text}
-      {cite && <cite className={styles.quoteCite}>{cite}</cite>}
-    </blockquote>
-  );
-
-  if (bare) return quote;
-
+/**
+ * A line of type on its own.
+ *
+ * It brings its own vertical band — the homepage's quote always has — so a
+ * block holding one sets its spacing to none and lets this decide.
+ */
+export function Quote({ text, cite, label = 'Quote' }: { text: string; cite?: string; label?: string }) {
   return (
     <section className={styles.quote} aria-label={label}>
-      {quote}
+      <blockquote className={styles.quoteText}>
+        {text}
+        {cite && <cite className={styles.quoteCite}>{cite}</cite>}
+      </blockquote>
     </section>
   );
 }

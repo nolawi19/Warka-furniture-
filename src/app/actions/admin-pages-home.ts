@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
 import { homepageBlocks } from '@/lib/site/home-blocks';
+import { getShop } from '@/lib/site/shop';
 
 export type HomeActionState = { ok: boolean; message: string; id?: string } | null;
 
@@ -23,7 +24,8 @@ export async function createHomepageAction(): Promise<HomeActionState> {
   const existing = await db.page.findUnique({ where: { slug: 'home' } });
   if (existing) return { ok: true, message: 'It already exists.', id: existing.id };
 
-  const blocks = homepageBlocks();
+  const shop = await getShop();
+  const blocks = homepageBlocks(shop.area);
 
   const page = await db.page.create({
     data: {
