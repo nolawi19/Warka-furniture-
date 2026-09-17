@@ -3,6 +3,7 @@
 import { Card } from '@/components/admin/ui/Card';
 import { FieldRow, SelectField, TextAreaField, TextField, ToggleField } from '@/components/admin/ui/Fields';
 import { SettingsEditor } from '@/components/admin/ui/SettingsEditor';
+import { LocationPicker } from '@/components/forms/LocationPicker';
 import type { StoreSettings } from '@/lib/site/schemas';
 import styles from './Editors.module.css';
 
@@ -117,6 +118,32 @@ export function StoreEditor({
                 />
               </FieldRow>
             </Card>
+
+          <Card
+            title="Where the shop is"
+            description="Drop a pin on the shop. Addis has very little street addressing, so this is the one thing somebody can open in their own phone — and it is what the Map block on the website shows."
+          >
+            <LocationPicker
+              value={
+                value.latitude === 0 && value.longitude === 0
+                  ? null
+                  : { lat: value.latitude, lng: value.longitude }
+              }
+              onChange={(pos) =>
+                set((p) => ({
+                  ...p,
+                  latitude: pos?.lat ?? 0,
+                  longitude: pos?.lng ?? 0,
+                }))
+              }
+            />
+            {value.latitude === 0 && value.longitude === 0 && (
+              <p className={styles.inlineNote}>
+                Not set yet. Until it is, the Map block shows nothing rather than a map of
+                somewhere else.
+              </p>
+            )}
+          </Card>
 
             <Card title="Money and place">
               <FieldRow>

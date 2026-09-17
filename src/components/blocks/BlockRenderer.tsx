@@ -1,11 +1,16 @@
 import Image from 'next/image';
 
+import type { ProductCardData } from '@/components/shop/ProductCard';
 import { Hero } from '@/components/hero/Hero';
 import type { HeroContent } from '@/components/hero/hero-content';
 import { CategoryStrip } from '@/components/sections/CategoryStrip';
+import { Cta } from '@/components/sections/Cta';
+import { ProductCarousel } from '@/components/sections/ProductCarousel';
 import { ProductStrip } from '@/components/sections/ProductStrip';
 import { Quote } from '@/components/sections/Quote';
+import { SectionHead } from '@/components/sections/SectionHead';
 import { Steps, type Step } from '@/components/sections/Steps';
+import { StoreMap } from '@/components/sections/StoreMap';
 import { StorePanel, type StoreDetail } from '@/components/sections/StorePanel';
 import { NewsletterForm } from '@/components/site/NewsletterForm';
 import { ActionButton } from '@/components/ui/ActionButton';
@@ -215,16 +220,7 @@ async function BlockBody({ block }: { block: Block }) {
       );
 
     case 'productGrid': {
-      // searchProducts has no limit of its own — it returns the whole matching
-      // set — so the block takes the first N rather than asking for N.
-      const products =
-        p.source === 'category' && p.categorySlug
-          ? (await searchProducts({ category: p.categorySlug, sort: 'featured' })).slice(0, p.limit)
-          : p.source === 'newest'
-            ? (await searchProducts({ sort: 'featured' })).slice(0, p.limit)
-            : p.source === 'photographed'
-              ? await getPhotographedProducts(p.limit)
-              : await getFeaturedProducts(p.limit);
+      const products = await productsFor(p);
 
       return (
         <ProductStrip
@@ -245,6 +241,74 @@ async function BlockBody({ block }: { block: Block }) {
               : undefined
           }
         />
+      );
+    }
+
+    case 'productCarousel': {
+      const products = await productsFor(p);
+
+      return (
+        <ProductCarousel
+          products={products}
+          kicker={p.kicker}
+          heading={p.heading}
+          headingId={`h-${block.id}`}
+          linkLabel={p.linkLabel}
+          linkHref={p.linkHref || '/shop'}
+          visibleDesktop={p.visibleDesktop}
+          visibleMobile={p.visibleMobile}
+          emptyLabel={
+            p.source === 'photographed'
+              ? 'Nothing is photographed yet. The catalogue is still the place to look.'
+              : undefined
+          }
+        />
+      );
+    }
+
+    case 'cta':
+      return (
+        <Cta
+          kicker={p.kicker}
+          heading={p.heading}
+          headingId={`h-${block.id}`}
+          body={p.body}
+          primaryLabel={p.primaryLabel}
+          primaryHref={p.primaryHref}
+          secondaryLabel={p.secondaryLabel}
+          secondaryHref={p.secondaryHref}
+        />
+      );
+
+    case 'map': {
+      const shop = await getShop();
+      // 0,0 is the schema's "not set". A map of the Gulf of Guinea is worse
+      // than no map, so the block renders nothing until somebody sets it.
+      //
+      // Finite is checked as well as zero, and not out of caution: settings are
+      // read through unstable_cache, and a cache entry written before these two
+      // fields existed comes back without them. `undefined === 0` is false, so
+      // a zero-only test put a map of nowhere on the page until the cache
+      // turned over. A field that is new is a field that can be missing.
+      const pinned =
+        Number.isFinite(shop.latitude) &&
+        Number.isFinite(shop.longitude) &&
+        !(shop.latitude === 0 && shop.longitude === 0);
+      if (!pinned) return null;
+      return (
+        <>
+          {(p.heading || p.kicker) && (
+            <SectionHead kicker={p.kicker} heading={p.heading ?? ''} headingId={`h-${block.id}`} />
+          )}
+          <StoreMap
+            lat={shop.latitude}
+            lng={shop.longitude}
+            label={shop.name}
+            zoom={p.zoom}
+            height={p.height}
+          />
+          {p.showAddress && <p className={styles.bodyText}>{shop.area}</p>}
+        </>
       );
     }
 
@@ -485,4 +549,26 @@ async function BlockBody({ block }: { block: Block }) {
     default:
       return null;
   }
+}
+
+/**
+ * Which products a block is asking for.
+ *
+ * The grid and the carousel offer the same four choices, so they read them in
+ * the same place — otherwise "newest" would quietly come to mean two things.
+ *
+ * searchProducts has no limit of its own (it returns the whole matching set),
+ * so the caller takes the first N rather than asking for N.
+ */
+async function productsFor(p: {
+  source: string;
+  categorySlug?: string;
+  limit: number;
+}): Promise<ProductCardData[]> {
+  if (p.source === 'category' && p.categorySlug) {
+    return (await searchProducts({ category: p.categorySlug, sort: 'featured' })).slice(0, p.limit);
+  }
+  if (p.source === 'newest') return (await searchProducts({ sort: 'featured' })).slice(0, p.limit);
+  if (p.source === 'photographed') return getPhotographedProducts(p.limit);
+  return getFeaturedProducts(p.limit);
 }

@@ -62,6 +62,13 @@ export const StoreSchema = z.object({
   openingHours: Text(120).default('Tuesday to Saturday, 9 to 6'),
   deliveryNote: Text(200).default('Delivered anywhere in Addis and set up on arrival.'),
 
+  /**
+   * Where the shop is, for the map on the website. 0,0 means "not set", which
+   * is why the map block renders nothing rather than the Gulf of Guinea.
+   */
+  latitude: z.number().min(-90).max(90).default(0),
+  longitude: z.number().min(-180).max(180).default(0),
+
   currency: Text(8).default('ETB'),
   currencyLabel: Text(40).default('Ethiopian Birr'),
   timezone: Text(60).default('Africa/Addis_Ababa'),

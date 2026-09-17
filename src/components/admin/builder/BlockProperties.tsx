@@ -126,6 +126,40 @@ export function BlockProperties({
     </label>
   );
 
+  /** The "which products" question, asked identically by the grid and the carousel. */
+  const productSource = (min = 1, max = 24) => (
+    <>
+      {text('kicker', 'Small line above')}
+      {text('heading', 'Heading')}
+      {pick('source', 'Which products', [
+        { value: 'featured', label: 'The ones marked featured' },
+        { value: 'photographed', label: 'The ones with a photograph' },
+        { value: 'newest', label: 'Most recently added' },
+        { value: 'category', label: 'From one category' },
+      ])}
+      {p.source === 'category' && (
+        <label className={styles.field}>
+          <span>Category</span>
+          <select
+            className={styles.input}
+            value={asText(p.categorySlug)}
+            onChange={(e) => setProp('categorySlug', e.target.value)}
+          >
+            <option value="">Choose one</option>
+            {categories.map((c) => (
+              <option key={c.slug} value={c.slug}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      {num('limit', 'How many', min, max)}
+      {text('linkLabel', 'Link text')}
+      {text('linkHref', 'Link address')}
+    </>
+  );
+
   /** Editing a list of sub-items — columns, gallery, FAQ, testimonials. */
   function listEditor(
     key: string,
@@ -341,39 +375,52 @@ export function BlockProperties({
       case 'productGrid':
         return (
           <>
-            {text('kicker', 'Small line above')}
-            {text('heading', 'Heading')}
-            {pick('source', 'Which products', [
-              { value: 'featured', label: 'The ones marked featured' },
-              { value: 'photographed', label: 'The ones with a photograph' },
-              { value: 'newest', label: 'Most recently added' },
-              { value: 'category', label: 'From one category' },
-            ])}
-            {p.source === 'category' && (
-              <label className={styles.field}>
-                <span>Category</span>
-                <select
-                  className={styles.input}
-                  value={asText(p.categorySlug)}
-                  onChange={(e) => setProp('categorySlug', e.target.value)}
-                >
-                  <option value="">Choose one</option>
-                  {categories.map((c) => (
-                    <option key={c.slug} value={c.slug}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
-            {num('limit', 'How many', 1, 24)}
-            {text('linkLabel', 'Link text')}
-            {text('linkHref', 'Link address')}
+            {productSource()}
             <div className={styles.deviceCols}>
               {num('columnsDesktop', 'Columns on a computer', 1, 6)}
               {num('columnsTablet', 'On a tablet', 1, 4)}
               {num('columnsMobile', 'On a phone', 1, 3)}
             </div>
+          </>
+        );
+      case 'productCarousel':
+        return (
+          <>
+            {productSource(2, 24)}
+            <div className={styles.deviceCols}>
+              {num('visibleDesktop', 'Visible on a computer', 2, 6)}
+              {num('visibleMobile', 'On a phone', 1, 3)}
+            </div>
+            <p className={styles.hint}>
+              A fraction on a phone — 1.4, say — leaves the next card half showing, which is how
+              somebody knows there is more to scroll to.
+            </p>
+          </>
+        );
+      case 'cta':
+        return (
+          <>
+            {text('kicker', 'Small line above')}
+            {text('heading', 'Heading')}
+            {area('body', 'Text', 3)}
+            {text('primaryLabel', 'Button text')}
+            {text('primaryHref', 'Button link')}
+            {text('secondaryLabel', 'Second button text')}
+            {text('secondaryHref', 'Second button link')}
+          </>
+        );
+      case 'map':
+        return (
+          <>
+            {text('kicker', 'Small line above')}
+            {text('heading', 'Heading')}
+            {num('zoom', 'How close in', 3, 19)}
+            {num('height', 'Height', 160, 720, 'px')}
+            {toggle('showAddress', 'Print the address under it')}
+            <p className={styles.hint}>
+              The pin is the shop’s own position, set once in Store settings, so it is only ever in
+              one place. Until it is set, this block shows nothing at all.
+            </p>
           </>
         );
       case 'categoryGrid':

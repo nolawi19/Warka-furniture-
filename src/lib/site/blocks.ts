@@ -191,6 +191,40 @@ export const BLOCK_PROPS = {
       .default([]),
   }),
 
+  /** Products side by side, scrolled rather than wrapped. */
+  productCarousel: z.object({
+    heading: Text(120),
+    kicker: Text(80),
+    source: z.enum(['featured', 'newest', 'photographed', 'category']).default('featured'),
+    categorySlug: Text(80),
+    limit: z.number().int().min(2).max(24).default(8),
+    /** How many are visible at once on a wide screen. */
+    visibleDesktop: z.number().int().min(2).max(6).default(4),
+    visibleMobile: z.number().min(1).max(3).default(1.4),
+    linkLabel: Text(40),
+    linkHref: Text(300),
+  }),
+
+  /** One thing to do, said once. */
+  cta: z.object({
+    kicker: Text(80),
+    heading: Text(200),
+    body: Text(600),
+    primaryLabel: Text(40),
+    primaryHref: Text(300),
+    secondaryLabel: Text(40),
+    secondaryHref: Text(300),
+  }),
+
+  /** Where the shop is, from Store settings. */
+  map: z.object({
+    heading: Text(120),
+    kicker: Text(80),
+    zoom: z.number().int().min(3).max(19).default(16),
+    height: z.number().int().min(160).max(720).default(320),
+    showAddress: z.boolean().default(true),
+  }),
+
   /** One line of type on its own. */
   quote: z.object({
     text: Text(400),
@@ -299,12 +333,15 @@ export const BLOCK_LIBRARY: {
   { type: 'productGrid', label: 'Product grid', group: 'Shop', hint: 'Products from the catalogue' },
   { type: 'categoryGrid', label: 'Category grid', group: 'Shop', hint: 'The shop’s categories' },
   { type: 'featuredProduct', label: 'Featured product', group: 'Shop', hint: 'One product, in full' },
+  { type: 'productCarousel', label: 'Product carousel', group: 'Shop', hint: 'Products side by side, scrolled' },
   { type: 'storeInfo', label: 'Store information', group: 'Shop', hint: 'Address, hours and phone' },
+  { type: 'map', label: 'Map', group: 'Shop', hint: 'Where the shop is' },
 
   { type: 'columns', label: 'Columns', group: 'Layout', hint: 'Two or three side by side' },
   { type: 'spacer', label: 'Spacer', group: 'Layout', hint: 'Empty vertical space' },
   { type: 'divider', label: 'Divider', group: 'Layout', hint: 'A line between sections' },
 
+  { type: 'cta', label: 'Call to action', group: 'Text', hint: 'One thing to do, said once' },
   { type: 'steps', label: 'Numbered steps', group: 'More', hint: 'How something works, in order' },
   { type: 'quote', label: 'Quote', group: 'More', hint: 'One line of type on its own' },
   { type: 'testimonials', label: 'Testimonials', group: 'More', hint: 'What customers said' },
@@ -455,6 +492,22 @@ export const STARTER_PROPS: Partial<Record<BlockType, Record<string, unknown>>> 
     linkHref: '/shop',
   },
   categoryGrid: { heading: 'What we make', limit: 12, linkLabel: 'All {count} pieces', linkHref: '/shop' },
+  productCarousel: {
+    heading: 'From the workshop',
+    source: 'photographed',
+    limit: 8,
+    linkLabel: 'Browse everything',
+    linkHref: '/shop',
+  },
+  cta: {
+    heading: 'Come and see a piece before you order.',
+    body: 'There is usually a bed and a dressing table finished and standing on the floor.',
+    primaryLabel: 'Shop the catalogue',
+    primaryHref: '/shop',
+    secondaryLabel: 'Ask a question',
+    secondaryHref: '/contact',
+  },
+  map: { heading: 'Where we are' },
   steps: { heading: 'How you buy it', items: HOME_STEPS },
   quote: { text: HOME_QUOTE },
   storeInfo: {

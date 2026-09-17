@@ -200,3 +200,52 @@
 @media (max-width: 420px) {
   .details > div { grid-template-columns: 1fr; gap: 2px; }
 }
+
+/* ------------------------------------------------------------- carousel */
+
+/* A scroll container with snap points and nothing else. Every input method
+   the browser already supports — finger, trackpad, wheel, arrow keys — works
+   without a line of JavaScript, and there is no state to get out of step. */
+.carousel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc(
+    (100% - (var(--visible-m, 1.4) - 1) * clamp(12px, 1.6vw, 22px)) / var(--visible-m, 1.4)
+  );
+  gap: clamp(12px, 1.6vw, 22px);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  padding-bottom: var(--space-3);
+  /* Room for the card's hover lift and shadow, which would otherwise be
+     clipped by the scroll container. */
+  padding-top: 4px;
+  scrollbar-width: thin;
+}
+.carousel > li { scroll-snap-align: start; min-width: 0; }
+.carousel:focus-visible { outline: 2px solid var(--ember); outline-offset: 4px; }
+
+@media (min-width: 761px) {
+  .carousel {
+    grid-auto-columns: calc(
+      (100% - (var(--visible-d, 4) - 1) * clamp(12px, 1.6vw, 22px)) / var(--visible-d, 4)
+    );
+  }
+}
+
+/* ------------------------------------------------------------------ cta */
+
+.cta {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+  max-width: 62ch;
+}
+.ctaHeading {
+  font-size: var(--text-h2);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+.ctaBody { font-size: var(--text-lg); color: var(--ink-2); text-wrap: pretty; }
+.ctaButtons { display: flex; gap: var(--space-3); flex-wrap: wrap; }
