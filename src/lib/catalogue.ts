@@ -2,7 +2,7 @@ import 'server-only';
 
 import type { Prisma } from '@prisma/client';
 
-import { db } from './db';
+import { db, type Row } from './db';
 import { effectivePriceSantim } from './money';
 import type { ProductCardData } from '@/components/shop/ProductCard';
 
@@ -25,7 +25,9 @@ const CARD_SELECT = {
   },
 } satisfies Prisma.ProductSelect;
 
-type CardRow = Prisma.ProductGetPayload<{ select: typeof CARD_SELECT }>;
+// Row<>, not Prisma.ProductGetPayload<>: the payload types describe the
+// unextended client and still call every price a bigint.
+type CardRow = Row<typeof db.product, { select: typeof CARD_SELECT }>;
 
 function toCard(p: CardRow): ProductCardData {
   const prices = p.variants.map(effectivePriceSantim).filter((n): n is number => n !== null);

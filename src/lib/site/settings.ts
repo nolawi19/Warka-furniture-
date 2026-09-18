@@ -24,6 +24,19 @@ import {
 export const SETTINGS_TAG = 'site-settings';
 
 /**
+ * One settings row by key.
+ *
+ * Takes a plain string rather than the `SettingKey` union on purpose: the
+ * callers below are generic in K, and Prisma's argument type will not accept
+ * an unresolved type parameter inside a `where`. The key is the table's
+ * primary key and a string in the database, so nothing is lost by saying so.
+ */
+function settingRow(key: string) {
+  return db.siteSetting.findUnique({ where: { key } });
+}
+
+
+/**
  * The public read. Cached across requests and invalidated by tag the moment
  * anything is published, so a visitor never waits for a revalidation window
  * to see a change the shop has just made.
@@ -32,7 +45,7 @@ export const getPublishedSetting = <K extends SettingKey>(key: K): Promise<Setti
   unstable_cache(
     async () => {
       try {
-        const row = await db.siteSetting.findUnique({ where: { key } });
+        const row = await settingRow(key);
         // `published` null means "never published": fall back to the default
         // rather than to the draft. A draft must not leak to the public site.
         if (!row?.published) return defaultSetting(key);
@@ -75,7 +88,7 @@ export const getPublishedSettings = unstable_cache(
 
 /** The admin read: the draft, falling back to published, then to the default. */
 export async function getDraftSetting<K extends SettingKey>(key: K): Promise<SettingValue<K>> {
-  const row = await db.siteSetting.findUnique({ where: { key } });
+  const row = await settingRow(key);
   if (!row) return defaultSetting(key);
   const source = row.draft && Object.keys(row.draft as object).length > 0 ? row.draft : row.published;
   return parseSetting(key, source);
@@ -90,7 +103,7 @@ export type SettingState = {
 };
 
 export async function getSettingState(key: SettingKey): Promise<SettingState> {
-  const row = await db.siteSetting.findUnique({ where: { key } });
+  const row = await settingRow(key);
   if (!row) {
     return { hasDraft: false, hasPublished: false, isDirty: false, updatedAt: null, updatedByLabel: null };
   }
@@ -160,7 +173,7 @@ export async function publishSetting(
   actor: Actor,
   summary?: string,
 ): Promise<{ ok: true } | { ok: false; message: string }> {
-  const row = await db.siteSetting.findUnique({ where: { key } });
+  const row = await settingRow(key);
   if (!row) return { ok: false, message: 'There is nothing to publish yet.' };
 
   const draft = parseSetting(key, row.draft);
@@ -195,7 +208,7 @@ export async function publishSetting(
 
 /** Throw the draft away and go back to what is live. */
 export async function discardDraftSetting(key: SettingKey): Promise<void> {
-  const row = await db.siteSetting.findUnique({ where: { key } });
+  const row = await settingRow(key);
   if (!row) return;
   await db.siteSetting.update({
     where: { key },

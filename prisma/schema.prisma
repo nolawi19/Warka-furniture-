@@ -194,8 +194,8 @@ model ProductVariant {
 
   // Null price means "ask in the shop" — a real state for made-to-measure
   // furniture, not a missing value.
-  priceSantim     Int?
-  salePriceSantim Int?
+  priceSantim     BigInt?
+  salePriceSantim BigInt?
 
   stock             Int     @default(0)
   trackStock        Boolean @default(true)
@@ -205,7 +205,7 @@ model ProductVariant {
   lowStockThreshold Int     @default(3)
   // What it costs the shop to build. Never shown to a customer; it exists so
   // the admin can see margin.
-  costSantim        Int?
+  costSantim        BigInt?
 
   widthCm  Int?
   depthCm  Int?
@@ -324,11 +324,11 @@ model Order {
 
   // Every figure below is computed on the server from current prices. Nothing
   // the browser sends is trusted.
-  subtotalSantim Int
-  shippingSantim Int    @default(0)
-  discountSantim Int    @default(0)
-  taxSantim      Int    @default(0)
-  totalSantim    Int
+  subtotalSantim BigInt
+  shippingSantim BigInt    @default(0)
+  discountSantim BigInt    @default(0)
+  taxSantim      BigInt    @default(0)
+  totalSantim    BigInt
   currency       String @default("ETB")
 
   couponId String?
@@ -387,9 +387,9 @@ model OrderItem {
   sku          String
   imageUrl     String?
 
-  unitPriceSantim Int
+  unitPriceSantim BigInt
   qty             Int
-  lineTotalSantim Int
+  lineTotalSantim BigInt
 
   @@index([orderId])
 }
@@ -433,9 +433,9 @@ model Payment {
 
   status PaymentStatus @default(PENDING)
 
-  amountSantim   Int
+  amountSantim   BigInt
   currency       String @default("ETB")
-  refundedSantim Int    @default(0)
+  refundedSantim BigInt    @default(0)
 
   // The reference we hand the provider, and what it hands back.
   providerRef   String? @unique
@@ -531,10 +531,11 @@ model Coupon {
   categoryIds String[]      @default([])
 
   kind  DiscountKind
-  // Percent (1-100) or santim off, read according to kind.
-  value Int
+  // Percent (1-100) or santim off, read according to kind. BigInt for the
+  // santim half — a percentage is nowhere near either limit.
+  value BigInt
 
-  minOrderSantim Int       @default(0)
+  minOrderSantim BigInt       @default(0)
   maxRedemptions Int?
   redemptions    Int       @default(0)
   startsAt       DateTime?
@@ -592,9 +593,9 @@ model DeliveryZone {
   id              String   @id @default(cuid())
   name            String
   slug            String   @unique
-  feeSantim       Int      @default(0)
+  feeSantim       BigInt      @default(0)
   // Free above this order value; null means never free.
-  freeAboveSantim Int?
+  freeAboveSantim BigInt?
   etaDays         String?
   isActive        Boolean  @default(true)
   position        Int      @default(0)

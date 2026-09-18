@@ -10,7 +10,7 @@ import type {
   VerifiedPayment,
   WebhookCheck,
 } from './provider';
-import { toSantim } from '@/lib/money';
+import { MAX_SANTIM, toSantim } from '@/lib/money';
 
 /**
  * Chapa — https://chapa.co
@@ -186,15 +186,18 @@ export const chapaProvider: PaymentProvider = {
               ? 'CANCELLED'
               : 'FAILED';
 
+      // The gateway's own figure, which is somebody else's number arriving
+      // over the wire. Finite is not enough: a nonsensical amount must not be
+      // recorded against an order, so it is dropped and the order keeps the
+      // amount the shop calculated.
       const amount = json.data?.amount;
+      const raw = amount === undefined || amount === null ? null : toSantim(Number(amount));
       const amountSantim =
-        amount === undefined || amount === null
-          ? null
-          : toSantim(Number(amount));
+        raw !== null && Number.isFinite(raw) && raw >= 0 && raw <= MAX_SANTIM ? raw : null;
 
       return {
         status,
-        amountSantim: Number.isFinite(amountSantim) ? amountSantim : null,
+        amountSantim,
         currency: json.data?.currency ?? null,
         providerTxnId: json.data?.reference ?? null,
         raw: json,

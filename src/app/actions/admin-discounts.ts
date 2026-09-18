@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
-import { toSantim } from '@/lib/money';
+import { MAX_BIRR, toSantim } from '@/lib/money';
 
 export type DiscountActionState = { ok: boolean; message: string } | null;
 
@@ -21,7 +21,13 @@ const DiscountSchema = z
       .regex(/^[A-Za-z0-9_-]+$/, 'Letters, numbers, - and _ only — a customer has to type this.'),
     kind: z.enum(['PERCENT', 'FIXED']),
     /** Percent 1-100, or an amount in Birr. Converted below. */
-    value: z.number().min(0.01, 'A discount of nothing is not a discount.'),
+    value: z
+      .number()
+      .min(0.01, 'A discount of nothing is not a discount.')
+      // The PERCENT half is capped at 100 by the refine below; this is the
+      // FIXED half, which had no ceiling at all and is the same shape of bug
+      // as the variant price that overflowed.
+      .max(MAX_BIRR, `A fixed discount cannot be more than ${MAX_BIRR.toLocaleString('en-US')} Birr.`),
     minOrderBirr: z.number().min(0).max(10_000_000).optional(),
     maxRedemptions: z.number().int().min(1).max(1_000_000).nullable().optional(),
     startsAt: z.string().trim().max(40).optional(),

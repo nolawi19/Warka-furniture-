@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
-import { toSantim } from '@/lib/money';
+import { parseBirr } from '@/lib/money';
 import { transitionOrder } from '@/lib/orders';
 import { slugify } from '@/lib/slug';
 
@@ -224,12 +224,7 @@ const VariantSchema = z.object({
   trackStock: z.coerce.boolean(),
 });
 
-function birrToSantim(value: string | undefined): number | null {
-  if (!value || !value.trim()) return null;
-  const n = Number(value.replace(/,/g, ''));
-  if (!Number.isFinite(n) || n < 0) return null;
-  return toSantim(n);
-}
+
 
 export async function saveVariantAction(
   variantId: string,
@@ -257,9 +252,21 @@ export async function saveVariantAction(
   });
   if (!before) return { ok: false, message: 'No such variant.' };
 
-  const priceSantim = birrToSantim(parsed.data.price);
-  const salePriceSantim = birrToSantim(parsed.data.salePrice);
+  // Every price the admin types comes through parseBirr, which says no to a
+  // number that is not a price rather than handing it to the database and
+  // letting Postgres object in hexadecimal.
+  const price = parseBirr(parsed.data.price);
+  if (!price.ok) return { ok: false, message: `Price: ${price.reason}` };
 
+  const salePrice = parseBirr(parsed.data.salePrice);
+  if (!salePrice.ok) return { ok: false, message: `Sale price: ${salePrice.reason}` };
+
+  const priceSantim = price.santim;
+  const salePriceSantim = salePrice.santim;
+
+  if (salePriceSantim !== null && priceSantim === null) {
+    return { ok: false, message: 'A sale price needs a normal price to be lower than.' };
+  }
   if (salePriceSantim !== null && priceSantim !== null && salePriceSantim >= priceSantim) {
     return { ok: false, message: 'A sale price has to be lower than the normal price.' };
   }

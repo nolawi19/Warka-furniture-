@@ -1,8 +1,8 @@
 import 'server-only';
 
-import type { OrderStatus, Prisma } from '@prisma/client';
+import type { OrderStatus } from '@prisma/client';
 
-import { db } from './db';
+import { db, type TxClient } from './db';
 import { effectivePriceSantim } from './money';
 import { orderReference } from './slug';
 
@@ -421,7 +421,7 @@ export async function transitionOrder(
   to: OrderStatus,
   actor: { id?: string | null; label: string },
   note?: string,
-  tx?: Prisma.TransactionClient,
+  tx?: TxClient,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const client = tx ?? db;
 
