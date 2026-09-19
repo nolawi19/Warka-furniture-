@@ -49,7 +49,15 @@ export function CartLines({ lines }: { lines: CartLine[] }) {
       <ul className={styles.list}>
         {lines.map((line) => (
           <li key={line.variantId} className={styles.line} data-busy={busyId === line.variantId}>
-            <Link href={`/product/${line.productSlug}`} className={styles.thumb}>
+            {/* The photograph goes to the same page as the name beside it.
+                Hidden from the accessibility tree rather than given a label,
+                so a screen reader announces the piece once, not twice. */}
+            <Link
+              href={`/product/${line.productSlug}`}
+              className={styles.thumb}
+              aria-hidden="true"
+              tabIndex={-1}
+            >
               {line.imageUrl ? (
                 <Image src={line.imageUrl} alt="" width={112} height={84} />
               ) : (

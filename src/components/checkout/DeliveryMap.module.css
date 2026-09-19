@@ -121,12 +121,27 @@
   box-shadow: var(--shadow-2);
   background: var(--bg-2);
 }
-.mapBox :global(.maplibregl-ctrl-group button) { width: 34px; height: 34px; }
-.mapBox :global(.maplibregl-ctrl-attrib) {
-  font-size: 10.5px;
-  background: color-mix(in srgb, var(--bg-2) 86%, transparent);
+.mapBox :global(.maplibregl-ctrl-group button) { width: 36px; height: 36px; }
+
+/* On a touch screen the zoom and full-screen buttons are the map's only
+   controls, so they get a full thumb-sized target. */
+@media (pointer: coarse) {
+  .mapBox :global(.maplibregl-ctrl-group button) { width: 44px; height: 44px; }
 }
-.mapBox :global(.maplibregl-ctrl-attrib a) { color: var(--ink-2); }
+
+/* OpenStreetMap's licence requires this credit to stay readable. It was
+   translucent, which meant a dark tile showed through and took the contrast
+   with it — so it is opaque, and the type is a little larger. */
+.mapBox :global(.maplibregl-ctrl-attrib) {
+  font-size: 11px;
+  background: var(--bg-2);
+  color: var(--ink-2);
+}
+.mapBox :global(.maplibregl-ctrl-attrib a) {
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 
 .overlay {
   position: absolute;

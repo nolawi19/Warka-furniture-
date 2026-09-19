@@ -30,7 +30,13 @@
   /* -- ink ------------------------------------------------------------ */
   --ink: #14110e;         /* 17.9:1 on bg */
   --ink-2: #57514a;       /*  7.4:1 on bg — secondary text */
-  --ink-3: #8b8279;       /*  3.6:1 on bg — icons and rules only, never body text */
+  /* Muted text: counts, hints, footer links, "optional". This was #8b8279
+     and 3.6:1, documented as "icons and rules only, never body text" — a rule
+     the site then broke in a dozen places, because muted text is exactly what
+     a muted colour gets used for. Darkened until it clears 4.5:1 on every
+     light surface, sunken ones included, so it is safe wherever it lands.
+     4.67:1 on --bg-3, 5.1:1 on --bg, 5.4:1 on white. */
+  --ink-3: #706962;
   --ink-inverse: #faf9f7;
 
   /* -- lines ---------------------------------------------------------- */
@@ -161,7 +167,10 @@
 
   --ink: #f5f2ec;         /* 16.9:1 on bg */
   --ink-2: #b5ada2;       /*  8.5:1 on bg */
-  --ink-3: #847c72;       /*  4.6:1 on bg */
+  /* 4.6:1 on --bg looked fine, but only 3.8:1 on --bg-3 and 4.3:1 on
+     --stage, which is where half the muted text actually sits. Lightened
+     until the worst dark surface clears 4.5. */
+  --ink-3: #938a80;       /*  4.7:1 on --bg-3, 5.2:1 on --stage, 5.6:1 on --bg */
   --ink-inverse: #14110e;
 
   --line: rgba(245, 242, 236, 0.13);
