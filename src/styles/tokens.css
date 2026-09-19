@@ -47,6 +47,10 @@
   --on-photo: #faf9f7;
   --on-photo-2: rgba(250, 249, 247, 0.82);
 
+  /* The mobile buy bar's height. A page that ends above it pads by this much
+     so the last thing on the page is never sitting under it. */
+  --buybar-h: 68px;
+
   /* A .band flips its surface — dark in the light theme, light in the dark
      one. Text inherits --ink-inverse and is fine, but an accent or a muted
      grey does not flip with it, and ends up at 2:1 on a surface it was never

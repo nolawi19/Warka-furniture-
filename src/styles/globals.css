@@ -317,3 +317,12 @@ ul, ol {
   color: var(--ink-3);
 }
 .t-pill--ok { background: var(--ok-soft); color: var(--ok); }
+
+/* A page carrying the mobile buy bar ends above it, footer included. The bar
+   is fixed over the viewport, so this clearance cannot live on one page's
+   own container. Set by BuyBar while it is mounted. */
+@media (max-width: 900px) {
+  body[data-buybar] {
+    padding-bottom: calc(var(--buybar-h) + env(safe-area-inset-bottom, 0px));
+  }
+}

@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useMemo, useState, useTransition } from 'react';
+import { useRouter } from "next/navigation";
+import { useMemo, useRef, useState, useTransition } from "react";
 
-import { addToCartAction } from '@/app/actions/cart';
-import { ActionButton } from '@/components/ui/ActionButton';
-import { Icon } from '@/components/ui/Icon';
-import { SaveButton } from './SaveButton';
-import { formatMoney } from '@/lib/money';
-import styles from './ProductBuy.module.css';
+import { addToCartAction } from "@/app/actions/cart";
+import { ActionButton } from "@/components/ui/ActionButton";
+import { Icon } from "@/components/ui/Icon";
+import { BuyBar } from "./BuyBar";
+import { SaveButton } from "./SaveButton";
+import { formatMoney } from "@/lib/money";
+import styles from "./ProductBuy.module.css";
 
 export type BuyVariant = {
   id: string;
@@ -23,11 +24,23 @@ export type BuyVariant = {
   imageUrl: string | null;
   widthCm: number | null;
   heightCm: number | null;
+  depthCm: number | null;
 };
 
-type Feedback = { tone: 'ok' | 'error'; text: string } | null;
+type Feedback = { tone: "ok" | "error"; text: string } | null;
 
-const AXIS_ORDER = ['size', 'width', 'height', 'shape', 'drawers', 'board', 'colour', 'base', 'mirror', 'castors'];
+const AXIS_ORDER = [
+  "size",
+  "width",
+  "height",
+  "shape",
+  "drawers",
+  "board",
+  "colour",
+  "base",
+  "mirror",
+  "castors",
+];
 function axisRank(axis: string): number {
   const i = AXIS_ORDER.indexOf(axis.toLowerCase());
   return i === -1 ? AXIS_ORDER.length : i;
@@ -35,7 +48,8 @@ function axisRank(axis: string): number {
 
 function priceOf(v: BuyVariant): number | null {
   if (v.priceSantim === null) return null;
-  if (v.salePriceSantim !== null && v.salePriceSantim < v.priceSantim) return v.salePriceSantim;
+  if (v.salePriceSantim !== null && v.salePriceSantim < v.priceSantim)
+    return v.salePriceSantim;
   return v.priceSantim;
 }
 
@@ -67,11 +81,13 @@ export function ProductBuy({
         map.set(key, list);
       }
     }
-    return [...map.entries()]
-      .filter(([, values]) => values.length > 1)
-      // Size before finish before everything else: it is the decision people
-      // make first, and JSON key order is not a design decision.
-      .sort((a, b) => axisRank(a[0]) - axisRank(b[0]));
+    return (
+      [...map.entries()]
+        .filter(([, values]) => values.length > 1)
+        // Size before finish before everything else: it is the decision people
+        // make first, and JSON key order is not a design decision.
+        .sort((a, b) => axisRank(a[0]) - axisRank(b[0]))
+    );
   }, [variants]);
 
   // Open on something the shop can actually sell today: priced and
@@ -102,15 +118,23 @@ export function ProductBuy({
     const next = { ...selection, [axis]: value };
     // If that exact combination is not built, fall to the nearest one that is,
     // rather than showing a picker in a state with no product behind it.
-    const exists = variants.some((v) => axes.every(([k]) => v.options[k] === next[k]));
+    const exists = variants.some((v) =>
+      axes.every(([k]) => v.options[k] === next[k]),
+    );
     const resolved = exists
       ? next
       : (variants.find((v) => v.options[axis] === value)?.options ?? next);
     setSelection(resolved);
     setFeedback(null);
-    const v = variants.find((x) => axes.every(([k]) => x.options[k] === resolved[k]));
+    const v = variants.find((x) =>
+      axes.every(([k]) => x.options[k] === resolved[k]),
+    );
     onImageChange?.(v?.imageUrl ?? null);
   }
+
+  // What the mobile buy bar watches. When this scrolls out of sight the bar
+  // takes over; when it comes back the bar stands down.
+  const actionRef = useRef<HTMLDivElement>(null);
 
   function add() {
     if (!current) return;
@@ -121,12 +145,15 @@ export function ProductBuy({
     startTransition(async () => {
       const result = await addToCartAction(current.id, qty);
       if (result.ok) {
-        setFeedback({ tone: 'ok', text: 'Added to your basket.' });
+        setFeedback({ tone: "ok", text: "Added to your basket." });
         setAdded(true);
         window.setTimeout(() => setAdded(false), 1400);
         router.refresh();
       } else {
-        setFeedback({ tone: 'error', text: result.message ?? 'That did not work.' });
+        setFeedback({
+          tone: "error",
+          text: result.message ?? "That did not work.",
+        });
       }
     });
   }
@@ -139,7 +166,11 @@ export function ProductBuy({
     current.priceSantim !== null &&
     current.salePriceSantim < current.priceSantim;
   const inStock = available(current);
-  const lowStock = current.trackStock && !current.allowBackorder && current.stock > 0 && current.stock <= 3;
+  const lowStock =
+    current.trackStock &&
+    !current.allowBackorder &&
+    current.stock > 0 &&
+    current.stock <= 3;
 
   return (
     <div className={styles.buy}>
@@ -148,8 +179,8 @@ export function ProductBuy({
           <>
             <p className={styles.ask}>Priced in the shop</p>
             <p className={styles.askNote}>
-              This line is quoted to your measurement. Add it to your basket and we will confirm
-              the price before anything is charged.
+              This line is quoted to your measurement. Add it to your basket and
+              we will confirm the price before anything is charged.
             </p>
           </>
         ) : (
@@ -159,7 +190,8 @@ export function ProductBuy({
               <span className={styles.was}>
                 <s>{formatMoney(current.priceSantim)}</s>
                 <span className={styles.saveTag}>
-                  Save {formatMoney(current.priceSantim! - current.salePriceSantim!)}
+                  Save{" "}
+                  {formatMoney(current.priceSantim! - current.salePriceSantim!)}
                 </span>
               </span>
             )}
@@ -173,9 +205,9 @@ export function ProductBuy({
           ? lowStock
             ? `Only ${current.stock} left in the showroom`
             : current.trackStock
-              ? 'Ready to take away'
-              : 'Made to order · about 2 weeks'
-          : 'Out of stock'}
+              ? "Ready to take away"
+              : "Made to order · about 2 weeks"
+          : "Out of stock"}
       </p>
 
       {axes.map(([axis, values]) => (
@@ -186,7 +218,9 @@ export function ProductBuy({
               const exists = variants.some(
                 (v) =>
                   v.options[axis] === value &&
-                  axes.every(([k]) => k === axis || v.options[k] === selection[k]),
+                  axes.every(
+                    ([k]) => k === axis || v.options[k] === selection[k],
+                  ),
               );
               const sellable = variants.some(
                 (v) => v.options[axis] === value && available(v),
@@ -200,7 +234,7 @@ export function ProductBuy({
                   data-unavailable={!sellable}
                   title={
                     !exists
-                      ? 'Not built in this combination — picking it will adjust the others'
+                      ? "Not built in this combination — picking it will adjust the others"
                       : undefined
                   }
                   onClick={() => choose(axis, value)}
@@ -213,7 +247,7 @@ export function ProductBuy({
         </fieldset>
       ))}
 
-      <div className={styles.actions}>
+      <div className={styles.actions} ref={actionRef}>
         <div className={styles.qty}>
           <button
             type="button"
@@ -247,7 +281,7 @@ export function ProductBuy({
           success={added}
           disabled={!inStock}
         >
-          {inStock ? 'Add to basket' : 'Out of stock'}
+          {inStock ? "Add to basket" : "Out of stock"}
         </ActionButton>
 
         <SaveButton
@@ -274,8 +308,51 @@ export function ProductBuy({
 
       {/* Announced, and placed where the person is already looking. */}
       <p className={styles.feedback} role="status" data-tone={feedback?.tone}>
-        {feedback?.text ?? ''}
+        {feedback?.text ?? ""}
       </p>
+
+      {/* "Will it fit" — the one question a furniture shopper cannot answer from
+          a photograph. The numbers come from the variant; a dimension the shop
+          has not filled in is simply absent, and a piece with none of the three
+          shows no block at all. Nothing here is estimated. */}
+      {(current.widthCm || current.depthCm || current.heightCm) && (
+        <section className={styles.fit} aria-labelledby="fit-heading">
+          <h3 id="fit-heading" className={styles.fitHead}>
+            <Icon name="ruler" size={15} />
+            Will it fit
+          </h3>
+          <dl className={styles.fitGrid}>
+            {current.widthCm && (
+              <div>
+                <dt>Width</dt>
+                <dd>
+                  <span className="nums">{current.widthCm}</span> cm
+                </dd>
+              </div>
+            )}
+            {current.depthCm && (
+              <div>
+                <dt>Depth</dt>
+                <dd>
+                  <span className="nums">{current.depthCm}</span> cm
+                </dd>
+              </div>
+            )}
+            {current.heightCm && (
+              <div>
+                <dt>Height</dt>
+                <dd>
+                  <span className="nums">{current.heightCm}</span> cm
+                </dd>
+              </div>
+            )}
+          </dl>
+          <p className={styles.fitNote}>
+            Measured for this finish. Every piece is built to the size you bring
+            in, so these are a starting point rather than a limit.
+          </p>
+        </section>
+      )}
 
       <dl className={styles.spec}>
         <div>
@@ -286,15 +363,42 @@ export function ProductBuy({
           <dt>Code</dt>
           <dd className={styles.sku}>{current.sku}</dd>
         </div>
-        {current.widthCm && (
-          <div>
-            <dt>Width</dt>
-            <dd>{current.widthCm} cm</dd>
-          </div>
-        )}
       </dl>
 
-      <span className="sr-only">Selected: {productName}, {current.label}</span>
+      <span className="sr-only">
+        Selected: {productName}, {current.label}
+      </span>
+
+      {/* Below 900px the buy column cannot be sticky, so the action is gone a
+          couple of seconds into a scroll. The bar hands it back. It renders the
+          SAME handler and the same pending/added state — there is one
+          add-to-cart path in this component, not two. */}
+      <BuyBar
+        watch={actionRef}
+        price={price === null ? null : formatMoney(price)}
+        was={
+          current.salePriceSantim !== null &&
+          current.priceSantim !== null &&
+          current.salePriceSantim < current.priceSantim
+            ? formatMoney(current.priceSantim)
+            : null
+        }
+        label={current.label}
+      >
+        <ActionButton
+          as="button"
+          variant="primary"
+          size="lg"
+          icon="cart"
+          fullWidth
+          onClick={add}
+          loading={pending}
+          success={added}
+          disabled={!inStock}
+        >
+          {inStock ? "Add" : "Out of stock"}
+        </ActionButton>
+      </BuyBar>
     </div>
   );
 }

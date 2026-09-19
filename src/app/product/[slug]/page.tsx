@@ -97,6 +97,7 @@ export default async function ProductPage({ params }: { params: Params }) {
     imageUrl: v.images[0]?.url ?? null,
     widthCm: v.widthCm,
     heightCm: v.heightCm,
+    depthCm: v.depthCm,
   }));
 
   const gallery = product.images.length

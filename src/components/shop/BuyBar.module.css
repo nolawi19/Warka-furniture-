@@ -1,0 +1,78 @@
+/* =========================================================================
+   Mobile buy bar
+   =========================================================================
+   Only exists below the width where the buy column stops being sticky, so
+   the two are never on screen together.
+   ========================================================================= */
+
+.bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 60;
+  display: none;
+  background: color-mix(in srgb, var(--bg-2) 94%, transparent);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line-2);
+  /* Animated with transform only. Animating height or bottom would move the
+     page behind it and cost us the 0.000 layout-shift score. */
+  transform: translateY(100%);
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
+  opacity: 0;
+  /* Clear of the home indicator on a phone with a gesture bar. */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (max-width: 900px) {
+  .bar { display: block; }
+}
+
+.bar[data-shown] { transform: none; opacity: 1; }
+
+/* Exit faster than enter: leaving should not hold the screen. */
+.bar:not([data-shown]) { transition-duration: var(--dur-fast); }
+
+@media (prefers-reduced-motion: reduce) {
+  .bar { transition: opacity var(--dur-fast) var(--ease-out); transform: none; }
+  .bar:not([data-shown]) { opacity: 0; pointer-events: none; }
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: var(--buybar-h);
+  padding: 10px clamp(16px, 4vw, 24px);
+}
+
+.meta { min-width: 0; flex: 1; display: grid; gap: 1px; }
+
+.price {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.was { font-size: var(--text-xs); color: var(--ink-3); font-weight: 400; }
+.quote { font-size: var(--text-sm); font-weight: 400; color: var(--ink-2); }
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.label svg { color: var(--ember-text); flex: none; }
+
+/* The action keeps a sensible width on a narrow phone without crushing the
+   price beside it. */
+.action { flex: none; min-width: 148px; max-width: 58vw; }
