@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import type { SessionUser } from '@/lib/auth';
+import { isStaff, type SessionUser } from '@/lib/auth';
 import type { HeaderSettings, NavItem, StoreSettings } from '@/lib/site/schemas';
 import { DEFAULT_HEADER_NAV } from '@/lib/site/schemas';
 import { Icon } from '@/components/ui/Icon';
@@ -100,6 +100,15 @@ export function SiteHeader({
             >
               <Icon name={savedCount > 0 ? 'heart-filled' : 'heart'} />
               {savedCount > 0 && <span className={styles.dot} aria-hidden="true" />}
+            </Link>
+          )}
+
+          {/* Only for staff, and only once they are signed in. The gate is
+              requireStaff() on every admin page and action — this is the
+              shortcut, not the security. A customer never sees it. */}
+          {isStaff(user) && (
+            <Link href="/admin" className={styles.iconLink} aria-label="Admin dashboard">
+              <Icon name="grid" />
             </Link>
           )}
 
