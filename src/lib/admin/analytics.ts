@@ -68,7 +68,15 @@ export async function topProducts(limit = 8): Promise<Ranked[]> {
     id: r.sku,
     label: r.productName,
     sub: r.sku,
-    value: r._sum.lineTotalSantim ?? 0,
+    // Number(), because an aggregate is not a field read. The money columns
+    // are int8 and db.ts converts them to numbers on the way out — but that
+    // conversion is a Prisma result extension, and extensions run on SELECTed
+    // fields, not on _sum/_avg/_min/_max. Those come back as raw BigInt while
+    // TypeScript, which the extension DOES retype, still calls them numbers.
+    // So the checker stays quiet and the page throws "Cannot mix BigInt and
+    // other types" the first time a shop has any revenue at all.
+    value: Number(r._sum.lineTotalSantim ?? 0),
+    // qty is a plain Int, so it needs nothing.
     count: r._sum.qty ?? 0,
   }));
 }
@@ -164,10 +172,13 @@ export async function headlineNumbers(): Promise<Headline> {
   ]);
 
   return {
-    revenueAllTime: allTime._sum.totalSantim ?? 0,
-    revenueToday: todayAgg._sum.totalSantim ?? 0,
-    revenueWeek: weekAgg._sum.totalSantim ?? 0,
-    revenueMonth: monthAgg._sum.totalSantim ?? 0,
+    // Number() for the same reason as topProducts: _sum bypasses the result
+    // extension and hands back BigInt. Leaving these raw also breaks the
+    // zero-guards on the dashboard, because 0n === 0 is false.
+    revenueAllTime: Number(allTime._sum.totalSantim ?? 0),
+    revenueToday: Number(todayAgg._sum.totalSantim ?? 0),
+    revenueWeek: Number(weekAgg._sum.totalSantim ?? 0),
+    revenueMonth: Number(monthAgg._sum.totalSantim ?? 0),
     ordersTotal,
     ordersPending,
     ordersProcessing,
