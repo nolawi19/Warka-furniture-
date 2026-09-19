@@ -14,7 +14,14 @@ const nextConfig: NextConfig = {
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
       { key: 'X-Frame-Options', value: 'DENY' },
-      { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' },
+      // geolocation=(self): the checkout map offers "Use my location", and
+      // an empty allowlist blocks it before the browser ever asks the person.
+      // Only our own origin; an embedded third party still gets nothing.
+      // The other three stay closed — nothing on this site uses them.
+      {
+        key: 'Permissions-Policy',
+        value: 'camera=(), microphone=(), geolocation=(self), payment=()',
+      },
     ];
     // The builder embeds /preview/<id> in an iframe. X-Frame-Options: DENY
     // would refuse that even from our own origin, so preview — and only

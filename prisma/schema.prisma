@@ -597,6 +597,16 @@ model DeliveryZone {
   // Free above this order value; null means never free.
   freeAboveSantim BigInt?
   etaDays         String?
+
+  // Where the zone is, so the delivery map can tell a customer which one
+  // their pin falls in. All three are optional and start null: a zone with no
+  // centre behaves exactly as it did before, chosen from the list by hand.
+  // A circle rather than a polygon on purpose — a shopkeeper can set "3 km
+  // around Kebena" from the admin without drawing anything, and Addis
+  // delivery pricing is banded by distance rather than by boundary.
+  centreLat       Float?
+  centreLng       Float?
+  radiusKm        Float?
   isActive        Boolean  @default(true)
   position        Int      @default(0)
   createdAt       DateTime @default(now())

@@ -4,8 +4,11 @@ import { notFound } from 'next/navigation';
 
 import { ProductBuy } from '@/components/shop/ProductBuy';
 import { ProductGallery } from '@/components/shop/ProductGallery';
-import { ProductCard } from '@/components/shop/ProductCard';
+import { ProductStrip } from '@/components/sections/ProductStrip';
+import { SectionHead } from '@/components/sections/SectionHead';
+import { Icon } from '@/components/ui/Icon';
 import { getProductBySlug, getRelatedProducts } from '@/lib/catalogue';
+import { savedVariantIds } from '@/lib/wishlist';
 import { effectivePriceSantim } from '@/lib/money';
 import { getShop } from '@/lib/site/shop';
 import styles from './page.module.css';
@@ -44,7 +47,10 @@ export default async function ProductPage({ params }: { params: Params }) {
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const related = await getRelatedProducts(product.id, product.categoryId, 4);
+  const [related, saved] = await Promise.all([
+    getRelatedProducts(product.id, product.categoryId, 4),
+    savedVariantIds(),
+  ]);
 
   const prices = product.variants.map(effectivePriceSantim).filter((n): n is number => n !== null);
   const from = prices.length ? Math.min(...prices) : null;
@@ -98,81 +104,76 @@ export default async function ProductPage({ params }: { params: Params }) {
     : [];
 
   return (
-    <div className="wrap">
+    <div className={`wrap ${styles.page}`}>
       <nav aria-label="Breadcrumb" className={styles.crumbs}>
         <Link href="/">Home</Link>
-        <span aria-hidden="true">/</span>
+        <Icon name="chevron-right" size={14} />
         <Link href="/shop">Shop</Link>
-        <span aria-hidden="true">/</span>
+        <Icon name="chevron-right" size={14} />
         <Link href={`/shop?category=${product.category.slug}`}>{product.category.name}</Link>
-        <span aria-hidden="true">/</span>
+        <Icon name="chevron-right" size={14} />
         <span aria-current="page">{product.name}</span>
       </nav>
 
       <div className={styles.layout}>
         <ProductGallery images={gallery} productName={product.name} />
 
-        <div className={styles.detail}>
-          <p className="micro">{product.category.name}</p>
-          <h1 className={styles.title}>{product.name}</h1>
+        <div className={styles.buyColumn}>
+          <header className={styles.head}>
+            <p className={styles.category}>{product.category.name}</p>
+            <h1 className={styles.title}>{product.name}</h1>
+            {product.shortDescription && <p className={styles.short}>{product.shortDescription}</p>}
+          </header>
 
-          {product.description && <p className="lede">{product.description}</p>}
-
-          <ProductBuy variants={variants} productName={product.name} />
-
-          <div className={styles.trust}>
-            {[
-              { t: 'Made to your size', d: 'Tell us the measurement when you order.' },
-              { t: 'Delivered in Addis', d: SHOP.deliveryNote },
-              { t: 'Seen before you buy', d: `Visit the workshop in ${SHOP.area}.` },
-            ].map((item) => (
-              <div key={item.t} className={styles.trustItem}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M20 6.5 9.5 17 4 11.5" />
-                </svg>
-                <div>
-                  <strong>{item.t}</strong>
-                  <span>{item.d}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <details className={styles.panel}>
-            <summary>Materials and care</summary>
-            <div className={styles.panelBody}>
-              {product.materials && <p>{product.materials}</p>}
-              {product.careNotes && <p>{product.careNotes}</p>}
-            </div>
-          </details>
-
-          <details className={styles.panel}>
-            <summary>Delivery and returns</summary>
-            <div className={styles.panelBody}>
-              <p>
-                Delivered anywhere in Addis Ababa and set up in the room. You choose the day when
-                you place the order. Outside Addis, we quote per order.
-              </p>
-              <p>
-                Because every piece is cut to your measurement, made-to-order work cannot be
-                returned unless it arrives damaged or is not what was agreed. Tell us within 48
-                hours of delivery and we will put it right.
-              </p>
-            </div>
-          </details>
+          <ProductBuy variants={variants} productName={product.name} savedIds={[...saved]} />
         </div>
       </div>
 
+      <section className={styles.story} aria-label="About this piece">
+        <div className={styles.storyBlock}>
+          <h2 className={styles.storyTitle}>About this piece</h2>
+          <div className={styles.prose}>
+            {product.description
+              ? product.description.split(/\n{2,}/).filter(Boolean).map((para, i) => <p key={i}>{para}</p>)
+              : <p>Built to order in the Kebena workshop. Come and see one standing on the floor.</p>}
+            {product.materials && <p>{product.materials}</p>}
+            {product.careNotes && <p>{product.careNotes}</p>}
+          </div>
+        </div>
+
+        <div className={styles.storyBlock}>
+          <h2 className={styles.storyTitle}>Details</h2>
+          <dl className={styles.specList}>
+            <div>
+              <dt>Category</dt>
+              <dd>{product.category.name}</dd>
+            </div>
+            <div>
+              <dt>Finishes</dt>
+              <dd>{product.variants.length} to choose from</dd>
+            </div>
+            {product.brand && (
+              <div>
+                <dt>Made by</dt>
+                <dd>{product.brand}</dd>
+              </div>
+            )}
+            <div>
+              <dt>Delivery</dt>
+              <dd>{SHOP.deliveryNote}</dd>
+            </div>
+            <div>
+              <dt>Seen first</dt>
+              <dd>Visit the workshop in {SHOP.area}.</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
       {related.length > 0 && (
         <section className={styles.related} aria-labelledby="related-heading">
-          <h2 id="related-heading" className={`dsp ${styles.relatedTitle}`}>
-            You may also like
-          </h2>
-          <div className={styles.relatedGrid}>
-            {related.map((p) => (
-              <ProductCard key={p.slug} product={p} sizes="(max-width: 640px) 50vw, 300px" />
-            ))}
-          </div>
+          <SectionHead heading="You may also like" headingId="related-heading" linkLabel="All pieces" linkHref="/shop" />
+          <ProductStrip products={related} savedIds={saved} columns={{ mobile: 2, tablet: 3, desktop: 4 }} />
         </section>
       )}
 

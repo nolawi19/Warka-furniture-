@@ -4,7 +4,7 @@ import { useActionState, useEffect, useRef, useState } from 'react';
 
 import { placeOrderAction, type CheckoutState } from '@/app/actions/checkout';
 import { BankPicker, type BankOption } from '@/components/forms/BankPicker';
-import { LocationPicker, type Position } from '@/components/forms/LocationPicker';
+import { DeliveryMap, type DeliveryChoice } from '@/components/checkout/DeliveryMap';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { formatMoney } from '@/lib/money';
 import styles from './CheckoutForm.module.css';
@@ -16,7 +16,9 @@ type Method = {
   hint: string;
   kind: 'wallet' | 'bank' | 'card';
 };
-type Zone = { slug: string; name: string; feeSantim: number; etaDays: string | null };
+import type { MapZone } from '@/lib/delivery-zones';
+
+type Zone = MapZone;
 
 export function CheckoutForm({
   methods,
@@ -25,6 +27,8 @@ export function CheckoutForm({
   zones,
   banks,
   defaults,
+  shopCentre,
+  subtotalSantim,
 }: {
   methods: Method[];
   paymentsLive: boolean;
@@ -32,13 +36,16 @@ export function CheckoutForm({
   zones: Zone[];
   banks: BankOption[];
   defaults: { name: string; email: string; phone: string };
+  /** The workshop, for the distance read-out. Null until it is pinned. */
+  shopCentre: { lat: number; lng: number } | null;
+  subtotalSantim: number;
 }) {
   const [state, formAction, pending] = useActionState<CheckoutState, FormData>(placeOrderAction, {
     ok: false,
   });
   const [method, setMethod] = useState(methods[0]?.id ?? '');
   const [zone, setZone] = useState(zones[0]?.slug ?? '');
-  const [position, setPosition] = useState<Position>(null);
+  const [place, setPlace] = useState<DeliveryChoice>({ pin: null, address: null, zoneSlug: null });
   const summaryRef = useRef<HTMLDivElement>(null);
 
   const errorEntries = Object.entries(state.errors ?? {});
@@ -47,6 +54,13 @@ export function CheckoutForm({
   useEffect(() => {
     if (hasErrors) summaryRef.current?.focus();
   }, [hasErrors, state]);
+
+  // The map picks the zone when the pin lands inside a mapped one. The list
+  // below stays, because not every zone has a centre and because somebody
+  // should always be able to say where they are by hand.
+  useEffect(() => {
+    if (place.zoneSlug && place.zoneSlug !== zone) setZone(place.zoneSlug);
+  }, [place.zoneSlug, zone]);
 
   const selectedZone = zones.find((z) => z.slug === zone);
 
@@ -86,8 +100,22 @@ export function CheckoutForm({
           <span className={styles.stepNum}>2</span> Where it goes
         </h2>
 
+        {/* A pin, not a street address. Most of Addis has no house numbers,
+            and a driver navigates by landmark and by phone — so the useful
+            thing to collect is the spot itself. */}
+        <DeliveryMap
+          value={place}
+          zones={zones}
+          shopCentre={shopCentre}
+          subtotalSantim={subtotalSantim}
+          onChange={setPlace}
+        />
+
         <fieldset className={styles.zones}>
-          <legend className="sr-only">Delivery area</legend>
+          <legend className={styles.zonesLegend}>
+            Delivery area
+            <span>Chosen by the pin when it lands in one — change it here if you need to.</span>
+          </legend>
           {zones.map((z) => (
             <label key={z.slug} className={styles.zone} data-checked={zone === z.slug}>
               <input
@@ -107,11 +135,6 @@ export function CheckoutForm({
             </label>
           ))}
         </fieldset>
-
-        {/* A pin, not a street address. Most of Addis has no house numbers,
-            and a driver navigates by landmark and by phone — so the useful
-            thing to collect is the spot itself. */}
-        <LocationPicker value={position} onChange={setPosition} />
 
         <div className={styles.grid}>
           <Field

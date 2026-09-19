@@ -24,13 +24,29 @@ export type Place = {
   lng: number;
 };
 
+/**
+ * Where the geocoder lives.
+ *
+ * Defaults to OpenStreetMap's public Nominatim, which is free, needs no key,
+ * and asks for at most one request a second — the picker debounces and the
+ * results are cached for an hour, so a shop's checkout traffic stays well
+ * inside that.
+ *
+ * GEOCODER_URL points it somewhere else: a self-hosted Nominatim, or a paid
+ * one, for a shop whose traffic outgrows the public instance. Server-side
+ * only and deliberately not NEXT_PUBLIC — the browser never talks to the
+ * geocoder directly, which is what keeps the customer's IP address out of a
+ * third party's logs.
+ */
+const GEOCODER = (process.env.GEOCODER_URL ?? 'https://nominatim.openstreetmap.org').replace(/\/+$/, '');
+
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000';
 
 export async function GET(request: Request) {
   const q = (new URL(request.url).searchParams.get('q') ?? '').trim();
   if (q.length < 3) return NextResponse.json({ places: [] });
 
-  const url = new URL('https://nominatim.openstreetmap.org/search');
+  const url = new URL(`${GEOCODER}/search`);
   url.searchParams.set('q', q);
   url.searchParams.set('format', 'jsonv2');
   url.searchParams.set('addressdetails', '1');

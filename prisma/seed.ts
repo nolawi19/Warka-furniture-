@@ -110,16 +110,64 @@ const MATERIALS =
  * them: a shop with no zones cannot take an order at all.
  */
 async function seedDeliveryZones(): Promise<void> {
+  // Centres and radii so the checkout map can recognise a pin. These describe
+  // where the places ARE — Addis is at 9.01N 38.76E whoever is selling — and
+  // they carry no opinion about what delivery should cost. The fees stay at
+  // zero, which is the shop's decision to make in Admin → Delivery.
   const zones = [
-    { slug: 'addis-ababa', name: 'Addis Ababa', feeSantim: 0, etaDays: '1–3 days', position: 0 },
-    { slug: 'oromia-nearby', name: 'Greater Addis / nearby Oromia', feeSantim: 0, etaDays: '3–5 days', position: 1 },
-    { slug: 'regional', name: 'Other Ethiopian cities', feeSantim: 0, etaDays: 'Quoted per order', position: 2 },
+    {
+      slug: 'addis-ababa',
+      name: 'Addis Ababa',
+      feeSantim: 0,
+      etaDays: '1–3 days',
+      position: 0,
+      centreLat: 9.0108,
+      centreLng: 38.7613,
+      radiusKm: 18,
+    },
+    {
+      slug: 'oromia-nearby',
+      name: 'Greater Addis / nearby Oromia',
+      feeSantim: 0,
+      etaDays: '3–5 days',
+      position: 1,
+      centreLat: 9.0108,
+      centreLng: 38.7613,
+      radiusKm: 60,
+    },
+    {
+      slug: 'regional',
+      name: 'Other Ethiopian cities',
+      feeSantim: 0,
+      etaDays: 'Quoted per order',
+      position: 2,
+      centreLat: null,
+      centreLng: null,
+      radiusKm: null,
+    },
   ];
+
   for (const z of zones) {
+    const existing = await db.deliveryZone.findUnique({
+      where: { slug: z.slug },
+      select: { centreLat: true, centreLng: true, radiusKm: true },
+    });
+
+    // A shop that has drawn its own circle keeps it. The seed only fills a
+    // zone that has never been placed on the map.
+    const unplaced = !existing || existing.centreLat === null || existing.radiusKm === null;
+
     await db.deliveryZone.upsert({
       where: { slug: z.slug },
       // Only the wording and the order. A fee the shop has set is theirs.
-      update: { name: z.name, etaDays: z.etaDays, position: z.position },
+      update: {
+        name: z.name,
+        etaDays: z.etaDays,
+        position: z.position,
+        ...(unplaced
+          ? { centreLat: z.centreLat, centreLng: z.centreLng, radiusKm: z.radiusKm }
+          : {}),
+      },
       create: { ...z, isActive: true },
     });
   }

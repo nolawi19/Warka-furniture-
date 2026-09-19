@@ -14,6 +14,21 @@ import { getProvider } from '@/lib/payments/engine';
 import { enabledMethods } from '@/lib/site/payment-methods';
 import { transitionOrder } from '@/lib/orders';
 
+/**
+ * A coordinate the map may not have filled in.
+ *
+ * The empty string has to become undefined BEFORE any coercion. z.coerce
+ * .number() reads '' as 0, and 0,0 is a real place — open water in the Gulf of
+ * Guinea. Written the obvious way, an order from somebody who never touched
+ * the map is stored as if they had pinned it there, and the driver is sent a
+ * coordinate nobody chose.
+ */
+const coordinate = (limit: number) =>
+  z.preprocess(
+    (v) => (v === '' || v === null ? undefined : v),
+    z.coerce.number().min(-limit).max(limit).optional(),
+  );
+
 const CheckoutSchema = z.object({
   name: z.string().trim().min(2, 'Tell us who the order is for.').max(80),
   email: z.string().trim().toLowerCase().email('Enter a valid email address.').max(160),
@@ -21,8 +36,12 @@ const CheckoutSchema = z.object({
   // Where it goes is a pin on a map now, not a street address: most of Addis
   // Ababa has no house numbers, and a coordinate is the precise thing a
   // customer can actually give.
-  lat: z.coerce.number().min(-90).max(90).optional().or(z.literal('')),
-  lng: z.coerce.number().min(-180).max(180).optional().or(z.literal('')),
+  lat: coordinate(90),
+  lng: coordinate(180),
+  // What the map's reverse geocode made of the pin — a neighbourhood and a
+  // road, usually. Never invented here: if the lookup found nothing this is
+  // empty and the coordinate is printed instead.
+  address: z.string().trim().max(200).optional().or(z.literal('')),
   notes: z.string().trim().max(500).optional().or(z.literal('')),
   zone: z.string().trim().max(60).optional().or(z.literal('')),
   // Optional: a zero-total order, or a shop whose payment account is not yet
@@ -131,7 +150,10 @@ export async function placeOrderAction(
       // deliveryLine1 is what every existing screen prints as "the address",
       // so it gets something a person can read: the driver's own directions
       // when there are any, and the coordinate otherwise.
-      line1: (input.notes || '').trim() || (hasPin ? `Pinned location ${lat.toFixed(5)}, ${lng.toFixed(5)}` : 'No address given'),
+      line1:
+        (input.address || '').trim() ||
+        (input.notes || '').trim() ||
+        (hasPin ? `Pinned location ${lat.toFixed(5)}, ${lng.toFixed(5)}` : 'No address given'),
       line2: null,
       city: store.city,
       subCity: null,

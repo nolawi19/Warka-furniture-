@@ -5,6 +5,8 @@ import { useMemo, useState, useTransition } from 'react';
 
 import { addToCartAction } from '@/app/actions/cart';
 import { ActionButton } from '@/components/ui/ActionButton';
+import { Icon } from '@/components/ui/Icon';
+import { SaveButton } from './SaveButton';
 import { formatMoney } from '@/lib/money';
 import styles from './ProductBuy.module.css';
 
@@ -45,10 +47,13 @@ function available(v: BuyVariant): boolean {
 export function ProductBuy({
   productName,
   variants,
+  savedIds,
   onImageChange,
 }: {
   productName: string;
   variants: BuyVariant[];
+  /** Variant ids this visitor has saved, so the heart starts filled. */
+  savedIds?: string[];
   onImageChange?: (url: string | null) => void;
 }) {
   // Derive the option axes from the variants themselves rather than hard-coding
@@ -244,7 +249,28 @@ export function ProductBuy({
         >
           {inStock ? 'Add to basket' : 'Out of stock'}
         </ActionButton>
+
+        <SaveButton
+          variantId={current.id}
+          saved={savedIds?.includes(current.id) ?? false}
+          label={`${productName}, ${current.label}`}
+        />
       </div>
+
+      <ul className={styles.assurances}>
+        <li>
+          <Icon name="ruler" size={16} />
+          Built to your measurement
+        </li>
+        <li>
+          <Icon name="truck" size={16} />
+          Delivered in Addis and set up
+        </li>
+        <li>
+          <Icon name="shield" size={16} />
+          Seen and checked before it leaves
+        </li>
+      </ul>
 
       {/* Announced, and placed where the person is already looking. */}
       <p className={styles.feedback} role="status" data-tone={feedback?.tone}>

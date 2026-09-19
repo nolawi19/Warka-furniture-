@@ -10,6 +10,7 @@ import { allMethods } from '@/lib/payments/engine';
 import { enabledMethods } from '@/lib/site/payment-methods';
 import { seedBanks } from '@/lib/payments/bank-sync';
 import { formatMoney } from '@/lib/money';
+import { getShop } from '@/lib/site/shop';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
@@ -25,8 +26,9 @@ export default async function CheckoutPage() {
 
   await seedBanks();
 
-  const [user, zones, banks] = await Promise.all([
+  const [user, store, zones, banks] = await Promise.all([
     currentUser(),
+    getShop(),
     db.deliveryZone.findMany({ where: { isActive: true }, orderBy: { position: 'asc' } }),
     // Gateway-confirmed ones first: those are the ones that will just work.
     db.bank.findMany({
@@ -73,8 +75,18 @@ export default async function CheckoutPage() {
             slug: z.slug,
             name: z.name,
             feeSantim: z.feeSantim,
+            freeAboveSantim: z.freeAboveSantim,
             etaDays: z.etaDays,
+            centreLat: z.centreLat,
+            centreLng: z.centreLng,
+            radiusKm: z.radiusKm,
           }))}
+          shopCentre={
+            store.latitude !== 0 || store.longitude !== 0
+              ? { lat: store.latitude, lng: store.longitude }
+              : null
+          }
+          subtotalSantim={cart.subtotalSantim}
           banks={banks}
           defaults={{
             name: user?.name ?? '',

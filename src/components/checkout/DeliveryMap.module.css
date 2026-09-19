@@ -1,0 +1,214 @@
+/* =========================================================================
+   Delivery map
+   ========================================================================= */
+
+.wrap { display: grid; gap: var(--space-3); }
+
+/* -------------------------------------------------------------- controls */
+
+.controls {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.searchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 240px;
+}
+
+.searchIcon { position: absolute; left: 13px; color: var(--ink-3); pointer-events: none; }
+
+.search {
+  width: 100%;
+  min-height: 48px;
+  padding: 13px 40px 13px 40px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.search:hover { border-color: var(--ink-3); }
+
+.spinner {
+  position: absolute;
+  right: 14px;
+  width: 15px;
+  height: 15px;
+  border: 2px solid color-mix(in srgb, var(--ink-3) 35%, transparent);
+  border-top-color: var(--ink-2);
+  border-radius: 50%;
+  animation: spin 620ms linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.locate {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 13px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.locate:hover:not(:disabled) { border-color: var(--ember); color: var(--ember-text); }
+.locate:disabled { opacity: 0.65; cursor: progress; }
+
+/* --------------------------------------------------------------- results */
+
+.results {
+  display: grid;
+  gap: 1px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+  overflow: hidden;
+  box-shadow: var(--shadow-2);
+}
+
+.result {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.result:hover { background: var(--bg-3); }
+
+/* The arrow-key cursor. Focus never leaves the search box in a combobox, so
+   :focus cannot show which result is live — this class is the only signal,
+   and it has to read as clearly as a focus ring would. */
+.resultActive {
+  background: var(--bg-3);
+  box-shadow: inset 3px 0 0 var(--ember);
+}
+
+.result svg { color: var(--ember-text); flex: none; margin-top: 2px; }
+.result span { display: grid; gap: 2px; min-width: 0; }
+.result strong { font-size: var(--text-sm); font-weight: 500; color: var(--ink); }
+.result small { font-size: var(--text-xs); color: var(--ink-3); }
+
+/* ------------------------------------------------------------------- map */
+
+.mapBox {
+  position: relative;
+  height: clamp(320px, 46vh, 480px);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-3);
+}
+
+.map { position: absolute; inset: 0; }
+
+/* MapLibre's own controls, brought into the shop's palette. */
+.mapBox :global(.maplibregl-ctrl-group) {
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-2);
+  background: var(--bg-2);
+}
+.mapBox :global(.maplibregl-ctrl-group button) { width: 34px; height: 34px; }
+.mapBox :global(.maplibregl-ctrl-attrib) {
+  font-size: 10.5px;
+  background: color-mix(in srgb, var(--bg-2) 86%, transparent);
+}
+.mapBox :global(.maplibregl-ctrl-attrib a) { color: var(--ink-2); }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: var(--space-5);
+  text-align: center;
+  background: var(--bg-3);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}
+.overlayHint { font-size: var(--text-xs); color: var(--ink-3); max-width: 40ch; }
+
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--ink) 88%, transparent);
+  backdrop-filter: blur(6px);
+  color: var(--ink-inverse);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------- pin */
+
+.pin {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: var(--ember);
+  cursor: grab;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.32));
+}
+.pin:active { cursor: grabbing; }
+.pin svg { width: 40px; height: 40px; fill: var(--bg-2); }
+
+/* ---------------------------------------------------------------- readout */
+
+.readout {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+}
+.readout[data-has-pin='true'] { border-color: var(--ember-line); background: var(--ember-soft); }
+
+.readoutMain { display: flex; align-items: flex-start; gap: 11px; }
+.readoutTick { color: var(--ok); flex: none; margin-top: 2px; }
+
+.readoutAddress { font-size: var(--text-sm); font-weight: 500; color: var(--ink); }
+.readoutCoords { font-size: var(--text-xs); color: var(--ink-2); margin-top: 3px; }
+.readoutEmpty { font-size: var(--text-sm); color: var(--ink-3); }
+
+.zone {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line-2);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}
+.zone svg { color: var(--ember-text); flex: none; }
+.zone strong { color: var(--ink); font-weight: 500; }
+.zone[data-tone='warn'] svg { color: var(--warn); }
+
+.note { font-size: var(--text-xs); color: var(--ink-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 1.4s; }
+}

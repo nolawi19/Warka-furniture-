@@ -34,6 +34,9 @@ export default async function DeliveryPage() {
           freeAboveBirr: z.freeAboveSantim === null ? null : z.freeAboveSantim / 100,
           etaDays: z.etaDays,
           isActive: z.isActive,
+          centreLat: z.centreLat,
+          centreLng: z.centreLng,
+          radiusKm: z.radiusKm,
         }))}
       />
     </>

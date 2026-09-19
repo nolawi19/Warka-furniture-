@@ -19,6 +19,11 @@ const ZoneSchema = z.object({
   freeAboveBirr: z.number().min(0).max(10_000_000).nullable().optional(),
   etaDays: z.string().trim().max(60).optional(),
   isActive: z.boolean().optional(),
+  // Where the zone is, for the checkout map. All three optional: a zone with
+  // no centre is not on the map and is still chosen from the list by hand.
+  centreLat: z.number().min(-90).max(90).nullable().optional(),
+  centreLng: z.number().min(-180).max(180).nullable().optional(),
+  radiusKm: z.number().min(0).max(2000).nullable().optional(),
 });
 
 export async function saveDeliveryZoneAction(input: unknown): Promise<DeliveryActionState> {
@@ -40,6 +45,9 @@ export async function saveDeliveryZoneAction(input: unknown): Promise<DeliveryAc
         : toSantim(d.freeAboveBirr),
     etaDays: d.etaDays?.trim() || null,
     isActive: d.isActive ?? true,
+    centreLat: d.centreLat ?? null,
+    centreLng: d.centreLng ?? null,
+    radiusKm: d.radiusKm ?? null,
   };
 
   try {

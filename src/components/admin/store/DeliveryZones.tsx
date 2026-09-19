@@ -20,12 +20,24 @@ export type Zone = {
   feeBirr: number;
   freeAboveBirr: number | null;
   etaDays: string | null;
+  centreLat: number | null;
+  centreLng: number | null;
+  radiusKm: number | null;
   isActive: boolean;
 };
 
 type Draft = Omit<Zone, 'id'> & { id?: string };
 
-const BLANK: Draft = { name: '', feeBirr: 0, freeAboveBirr: null, etaDays: '', isActive: true };
+const BLANK: Draft = {
+  name: '',
+  feeBirr: 0,
+  freeAboveBirr: null,
+  etaDays: '',
+  isActive: true,
+  centreLat: null,
+  centreLng: null,
+  radiusKm: null,
+};
 
 export function DeliveryZones({ zones: initial, currency }: { zones: Zone[]; currency: string }) {
   const [zones, setZones] = useServerData(initial);
@@ -183,6 +195,69 @@ export function DeliveryZones({ zones: initial, currency }: { zones: Zone[]; cur
                   onChange={(e) => setEditing({ ...editing, isActive: e.target.checked })}
                 />
                 Offer this zone at checkout
+              </label>
+
+              {/* Where the zone is, so the checkout map can recognise a pin
+                  that falls in it. All three are optional: a zone with no
+                  centre is still chosen from the list by hand, exactly as
+                  every zone was before the map existed. */}
+              <label className={styles.field}>
+                <span>Centre — latitude</span>
+                <input
+                  className="admin-input"
+                  type="number"
+                  step="0.00001"
+                  min={-90}
+                  max={90}
+                  value={editing.centreLat ?? ''}
+                  placeholder="9.01080"
+                  onChange={(e) =>
+                    setEditing({
+                      ...editing,
+                      centreLat: e.target.value === '' ? null : e.target.valueAsNumber,
+                    })
+                  }
+                />
+              </label>
+              <label className={styles.field}>
+                <span>Centre — longitude</span>
+                <input
+                  className="admin-input"
+                  type="number"
+                  step="0.00001"
+                  min={-180}
+                  max={180}
+                  value={editing.centreLng ?? ''}
+                  placeholder="38.76130"
+                  onChange={(e) =>
+                    setEditing({
+                      ...editing,
+                      centreLng: e.target.value === '' ? null : e.target.valueAsNumber,
+                    })
+                  }
+                />
+              </label>
+              <label className={styles.field}>
+                <span>Radius (km)</span>
+                <input
+                  className="admin-input"
+                  type="number"
+                  step="0.5"
+                  min={0}
+                  max={2000}
+                  value={editing.radiusKm ?? ''}
+                  placeholder="12"
+                  onChange={(e) =>
+                    setEditing({
+                      ...editing,
+                      radiusKm: e.target.value === '' ? null : e.target.valueAsNumber,
+                    })
+                  }
+                />
+                <small>
+                  Fill all three and a pin dropped inside this circle picks this zone at checkout,
+                  with this fee. Leave them blank and the zone works exactly as it does now.
+                </small>
               </label>
             </div>
             <div className={styles.dialogActions}>
