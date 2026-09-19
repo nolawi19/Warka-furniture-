@@ -16,9 +16,10 @@ export function ProductStrip({
   headingId,
   linkLabel,
   linkHref,
-  columns = { mobile: 2, tablet: 2, desktop: 3 },
+  columns = { mobile: 2, tablet: 3, desktop: 4 },
   priorityCount = 0,
   emptyLabel = 'No products are published yet.',
+  savedIds,
 }: {
   products: ProductCardData[];
   heading?: string;
@@ -29,6 +30,8 @@ export function ProductStrip({
   columns?: { mobile: number; tablet: number; desktop: number };
   priorityCount?: number;
   emptyLabel?: string;
+  /** Variant ids this visitor has saved, so hearts start filled. */
+  savedIds?: Set<string>;
 }) {
   // The sizes hint has to follow the column count or every card downloads a
   // picture sized for a layout it is not in.
@@ -62,7 +65,13 @@ export function ProductStrip({
           }
         >
           {products.map((p, i) => (
-            <ProductCard key={p.slug} product={p} priority={i < priorityCount} sizes={sizes} />
+            <ProductCard
+              key={p.slug}
+              product={p}
+              priority={i < priorityCount}
+              sizes={sizes}
+              saved={p.defaultVariantId ? (savedIds?.has(p.defaultVariantId) ?? false) : false}
+            />
           ))}
         </div>
       )}

@@ -1,59 +1,70 @@
 import Link from 'next/link';
 
 import type { SessionUser } from '@/lib/auth';
-import { isStaff } from '@/lib/auth';
 import type { HeaderSettings, NavItem, StoreSettings } from '@/lib/site/schemas';
 import { DEFAULT_HEADER_NAV } from '@/lib/site/schemas';
-import { ThemeToggle } from './ThemeToggle';
+import { Icon } from '@/components/ui/Icon';
+import { Wordmark } from './Wordmark';
+import { HeaderShell } from './HeaderShell';
+import { CategoryMenu, type MenuCategory } from './CategoryMenu';
 import { MobileNav } from './MobileNav';
 import { SearchTrigger } from './SearchTrigger';
+import { ThemeToggle } from './ThemeToggle';
 import styles from './SiteHeader.module.css';
 
+/**
+ * The header.
+ *
+ * A server component, so the basket count, the saved count and who is signed
+ * in are all correct in the first byte — no flash of an empty basket while
+ * JavaScript catches up. The two things that genuinely need the browser (the
+ * condense-on-scroll behaviour and the mobile drawer) are small client
+ * components inside it.
+ */
 export function SiteHeader({
   user,
   cartCount,
+  savedCount,
   nav,
   settings,
   store,
+  categories,
 }: {
   user: SessionUser | null;
   cartCount: number;
-  /** From Admin -> Navigation. Falls back to the original four links. */
+  savedCount: number;
+  /** From Admin → Navigation. Falls back to the shipped four links. */
   nav?: NavItem[];
-  /** From Admin -> Header. */
+  /** From Admin → Header. */
   settings?: Partial<HeaderSettings>;
-  /** From Admin -> Store Settings, for the wordmark. */
+  /** From Admin → Store Settings, for the wordmark. */
   store?: Pick<StoreSettings, 'name' | 'logoUrl' | 'logoMode'>;
+  /** Real categories, for the Categories panel. */
+  categories: MenuCategory[];
 }) {
   const items = (nav && nav.length > 0 ? nav : DEFAULT_HEADER_NAV).filter((i) => i.isVisible);
   const showSearch = settings?.showSearch ?? true;
   const showAccount = settings?.showAccount ?? true;
   const showCart = settings?.showCart ?? true;
+  const showWishlist = settings?.showWishlist ?? true;
   const showThemeToggle = settings?.showThemeToggle ?? true;
   const cartWord = settings?.cartLabel?.trim() || 'Basket';
-
-  // "WARKA Furniture" is two words set differently, so a custom store name is
-  // split the same way: first word heavy, the rest quiet beside it.
   const name = store?.name?.trim() || 'Warka Furniture';
-  const [firstWord, ...restWords] = name.split(/\s+/);
-  const rest = restWords.join(' ');
 
   return (
-    <header className={styles.header}>
+    <HeaderShell sticky={settings?.sticky ?? true}>
       <div className={`wrap ${styles.inner}`}>
-        {/* Text only. The 3D sign and the traced tree mark are both gone;
-            this paints with the first frame and costs nothing. */}
+        <MobileNav
+          user={user}
+          cartCount={cartCount}
+          savedCount={savedCount}
+          nav={items}
+          categories={categories}
+          cartLabel={cartWord}
+        />
+
         <Link href="/" className={styles.brand} aria-label={`${name}, home`}>
-          {store?.logoMode === 'image' && store.logoUrl ? (
-             
-            // uploads any shape; next/image would need known dimensions.
-            <img src={store.logoUrl} alt={name} className={styles.logoImage} />
-          ) : (
-            <span className={styles.wordmark}>
-              <strong>{firstWord.toUpperCase()}</strong>
-              {rest && <em>{rest}</em>}
-            </span>
-          )}
+          <Wordmark name={name} logoUrl={store?.logoUrl} logoMode={store?.logoMode} />
         </Link>
 
         <nav className={styles.nav} aria-label="Main">
@@ -70,57 +81,51 @@ export function SiteHeader({
                 </Link>
               </li>
             ))}
+            {categories.length > 0 && (
+              <li>
+                <CategoryMenu categories={categories} />
+              </li>
+            )}
           </ul>
         </nav>
 
         <div className={styles.actions}>
           {showSearch && <SearchTrigger />}
+
+          {showWishlist && (
+            <Link
+              href={user ? '/account/wishlist' : '/login?next=/account/wishlist'}
+              className={styles.iconLink}
+              aria-label={savedCount > 0 ? `Saved pieces, ${savedCount}` : 'Saved pieces'}
+            >
+              <Icon name={savedCount > 0 ? 'heart-filled' : 'heart'} />
+              {savedCount > 0 && <span className={styles.dot} aria-hidden="true" />}
+            </Link>
+          )}
+
           {showThemeToggle && <ThemeToggle />}
 
           {showAccount && (
-          <Link
-            href={user ? '/account' : '/login'}
-            className={styles.iconLink}
-            aria-label={user ? `Account, signed in as ${user.name}` : 'Sign in'}
-            title={user ? user.name : 'Sign in'}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
-              <circle cx="12" cy="8.5" r="3.6" />
-              <path d="M4.8 20a7.2 7.2 0 0 1 14.4 0" />
-            </svg>
-          </Link>
-          )}
-
-          {isStaff(user) && (
-            <Link href="/admin" className={styles.staffLink}>
-              Admin
+            <Link
+              href={user ? '/account' : '/login'}
+              className={styles.iconLink}
+              aria-label={user ? `Account, signed in as ${user.name}` : 'Sign in'}
+            >
+              <Icon name="user" />
             </Link>
           )}
 
           {showCart && (
-          <Link href="/cart" className={styles.cart} aria-label={cartLabel(cartCount, cartWord)}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M4 6h2.2l1.8 10.2a1.6 1.6 0 0 0 1.6 1.3h7.6a1.6 1.6 0 0 0 1.6-1.3L20.2 9H7" />
-              <circle cx="10" cy="20.2" r="1.1" fill="currentColor" stroke="none" />
-              <circle cx="17.4" cy="20.2" r="1.1" fill="currentColor" stroke="none" />
-            </svg>
-            <span className={styles.cartLabel}>{cartWord}</span>
-            {/* aria-hidden: the count is already in the link's accessible name,
-                and a live badge announcing itself twice is noise. */}
-            <span className={styles.count} aria-hidden="true" data-empty={cartCount === 0}>
-              {cartCount}
-            </span>
-          </Link>
+            <Link href="/cart" className={styles.cart} aria-label={`${cartWord}, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}>
+              <Icon name="bag" size={18} />
+              <span className={styles.cartWord}>{cartWord}</span>
+              <span className={styles.cartCount} data-empty={cartCount === 0} aria-hidden="true">
+                {cartCount}
+              </span>
+            </Link>
           )}
-
-          <MobileNav user={user} cartCount={cartCount} nav={items} />
         </div>
       </div>
-    </header>
+    </HeaderShell>
   );
-}
-
-function cartLabel(n: number, word: string): string {
-  if (n === 0) return `${word}, empty`;
-  return `${word}, ${n} ${n === 1 ? 'piece' : 'pieces'}`;
 }

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 
 import { ActionButton } from '@/components/ui/ActionButton';
+import { Icon } from '@/components/ui/Icon';
 import { HERO_DEFAULTS, type HeroContent } from './hero-content';
 import styles from './Hero.module.css';
 
@@ -16,30 +17,45 @@ export type { HeroContent, HeroFact } from './hero-content';
  * accurate picture of a design the site did not have. There is now one hero: if
  * it changes here, it changes in both places, because there is only one place.
  *
- * Every default below is the wording the site shipped with, so a shop that has
- * never opened the builder sees exactly what it saw before.
+ * Editorial rather than full-bleed, and that is a decision about the
+ * photographs rather than about fashion. The shop's pictures are its own,
+ * taken on the forecourt, and the largest is 432px across. Stretched behind a
+ * headline they would be a blur; framed at close to their own size, beside
+ * type doing the heavy lifting, they read as photographs of real furniture.
  */
 export function Hero({
   headingId = 'hero-heading',
   wrap = true,
+  priority = true,
   ...props
 }: Partial<HeroContent> & {
   headingId?: string;
   /** False inside the builder's block shell, which supplies the gutter itself. */
   wrap?: boolean;
+  priority?: boolean;
 }) {
   const c = { ...HERO_DEFAULTS, ...props };
+  const hasPanel = c.panel !== 'none' && (c.panel === 'plate' || Boolean(c.imageUrl));
 
   return (
-    <section className={wrap ? `wrap ${styles.hero}` : styles.hero} aria-labelledby={headingId} data-panel={c.panel}>
+    <section
+      className={wrap ? `wrap ${styles.hero}` : styles.hero}
+      aria-labelledby={headingId}
+      data-panel={hasPanel ? c.panel : 'none'}
+    >
       <div className={styles.copy}>
-        {c.kicker && <p className="micro micro--ember">{c.kicker}</p>}
+        {c.kicker && (
+          <p className={styles.kicker}>
+            <span className={styles.kickerRule} aria-hidden="true" />
+            {c.kicker}
+          </p>
+        )}
 
-        <h1 id={headingId} className={`dsp ${styles.headline}`}>
+        <h1 id={headingId} className={styles.headline}>
           {c.heading}
         </h1>
 
-        {c.body && <p className="lede">{c.body}</p>}
+        {c.body && <p className={styles.lede}>{c.body}</p>}
 
         {(c.primaryLabel || c.secondaryLabel) && (
           <div className={styles.cta}>
@@ -91,16 +107,20 @@ export function Hero({
 
       {c.panel === 'image' && c.imageUrl && (
         <div className={styles.stageColumn}>
-          <div className={styles.photo}>
+          <figure className={styles.photo}>
             <Image
               src={c.imageUrl}
               alt={c.imageAlt}
               fill
-              sizes="(max-width: 900px) 100vw, 50vw"
-              priority
+              sizes="(max-width: 900px) 100vw, 46vw"
+              priority={priority}
               className={styles.photoImg}
             />
-          </div>
+            <span className={styles.photoMark} aria-hidden="true">
+              <Icon name="sparkle" size={14} />
+              Made in Addis
+            </span>
+          </figure>
         </div>
       )}
     </section>

@@ -1,8 +1,9 @@
 import Link from 'next/link';
 
+import { Icon } from '@/components/ui/Icon';
 import styles from './Sections.module.css';
 
-/** The heading row every homepage section shares: a title, and a way out. */
+/** The heading row every section shares: a label, a title, and a way out. */
 export function SectionHead({
   kicker,
   heading,
@@ -10,6 +11,7 @@ export function SectionHead({
   linkLabel,
   linkHref,
   note,
+  align = 'split',
 }: {
   kicker?: string;
   heading: string;
@@ -17,15 +19,16 @@ export function SectionHead({
   linkLabel?: string;
   linkHref?: string;
   note?: string;
+  align?: 'split' | 'centre';
 }) {
   if (!heading && !kicker && !linkLabel) return null;
 
   return (
-    <header className={styles.sectionHead}>
-      <div>
-        {kicker && <p className="micro micro--ember">{kicker}</p>}
+    <header className={styles.sectionHead} data-align={align}>
+      <div className={styles.sectionHeadText}>
+        {kicker && <p className={styles.sectionKicker}>{kicker}</p>}
         {heading && (
-          <h2 id={headingId} className="dsp h2">
+          <h2 id={headingId} className={styles.sectionTitle}>
             {heading}
           </h2>
         )}
@@ -34,12 +37,10 @@ export function SectionHead({
       {linkLabel && linkHref && (
         <Link href={linkHref} className={styles.sectionLink}>
           {linkLabel}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
+          <Icon name="arrow-right" size={16} />
         </Link>
       )}
-      {note && !linkLabel && <p className="micro">{note}</p>}
+      {note && !linkLabel && <p className={styles.sectionNote}>{note}</p>}
     </header>
   );
 }

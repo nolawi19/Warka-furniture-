@@ -1,186 +1,190 @@
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  /* A light wash, not a glass panel: the page beneath should read as paper. */
-  backdrop-filter: saturate(1.4) blur(12px);
-  -webkit-backdrop-filter: saturate(1.4) blur(12px);
-  border-bottom: 1px solid var(--line-2);
-}
+/* =========================================================================
+   Site header
+   ========================================================================= */
 
+.header {
+  position: relative;
+  z-index: 60;
+  background: var(--bg);
+  transition: background var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+.header[data-sticky='true'] { position: sticky; top: 0; }
+
+/* Scrolled, the bar earns a hairline and a translucent backing so content
+   passing underneath stays legible. At the top of a page it has neither, and
+   a full-bleed hero runs right up behind it. */
+.header[data-scrolled='true'] {
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: saturate(1.6) blur(14px);
+  box-shadow: 0 1px 0 var(--line-2), var(--shadow-1);
+}
 @supports not (backdrop-filter: blur(1px)) {
-  .header { background: var(--bg); }
+  .header[data-scrolled='true'] { background: var(--bg); }
 }
 
 .inner {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-5);
   min-height: var(--header-h);
+  padding-block: 10px;
 }
 
-/* ------------------------------------------------------------- brand */
+/* ------------------------------------------------------------------ brand */
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: none;
-  padding-block: var(--space-2);
-}
-
+.brand { flex: none; margin-right: var(--space-2); }
 
 .wordmark {
-  display: flex;
+  display: inline-flex;
   align-items: baseline;
-  gap: 6px;
-  line-height: 1;
+  gap: 8px;
+  white-space: nowrap;
 }
 .wordmark strong {
-  font-weight: 700;
-  font-stretch: 118%;
-  letter-spacing: 0.06em;
-  font-size: 17px;
-  transition: color 140ms var(--ease-out);
+  font-family: var(--font-serif);
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
 }
-.brand:hover .wordmark strong { color: var(--ember-text); }
 .wordmark em {
   font-style: normal;
-  font-size: 10.5px;
+  font-size: var(--text-micro);
   font-weight: 500;
   letter-spacing: var(--tracking-micro);
   text-transform: uppercase;
-  color: var(--ink-2);
+  color: var(--ink-3);
 }
 
-/* ------------------------------------------------------------- nav */
-
-.nav { flex: 1; }
-
-.navList {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.navLink {
-  display: block;
-  font-size: var(--text-sm);
-  color: var(--ink-2);
-  padding: 9px 12px;
-  border-radius: var(--radius);
-  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
-}
-.navLink:hover { color: var(--ink); background: var(--bg-3); }
-
-/* ------------------------------------------------------------- actions */
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex: none;
-}
-
-.iconLink {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  color: var(--ink);
-  transition: background var(--dur-fast) var(--ease-out);
-}
-.iconLink:hover { background: var(--bg-3); }
-.iconLink svg { width: 18px; height: 18px; }
-
-.staffLink {
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-2);
-  border: 1px dashed var(--line-strong);
-  border-radius: var(--radius);
-  padding: 8px 10px;
-  transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
-}
-.staffLink:hover { color: var(--ink); border-color: var(--ink-3); }
-
-.cart {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--ember);
-  color: var(--ember-ink);
-  border-radius: var(--radius);
-  padding: 10px 14px;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  transition: filter var(--dur-fast) var(--ease-out), transform var(--dur-instant) var(--ease-out);
-}
-.cart:hover { filter: brightness(1.08); }
-.cart:active { transform: translateY(1px); }
-.cart svg { width: 17px; height: 17px; }
-
-.cartLabel { display: inline; }
-
-.count {
-  display: inline-grid;
-  place-items: center;
-  min-width: 20px;
-  height: 20px;
-  padding-inline: 6px;
-  background: rgba(255, 255, 255, 0.24);
-  border-radius: var(--radius-pill);
-  font-size: var(--text-micro);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-.count[data-empty='true'] { opacity: 0.6; }
-
-/* ------------------------------------------------------------- responsive */
-
-@media (max-width: 1000px) {
-  .nav { display: none; }
-  .staffLink { display: none; }
-  .cartLabel { display: none; }
-  .cart { padding: 10px 12px; }
-}
-
-@media (max-width: 560px) {
-  .iconLink { display: none; }
-  .wordmark em { display: none; }
-}
-
-/* At 320 the six controls in .actions came to 213px inside a 288px row and
-   pushed the page sideways. Search, basket and menu stay; the theme toggle
-   moves into the drawer, where there is room to label it properly. */
-@media (max-width: 420px) {
-  .inner { gap: var(--space-2); }
-  .actions { gap: 4px; }
-  .brand { gap: 7px; }
-  .wordmark strong { font-size: 15px; letter-spacing: 0.04em; }
-  .cart { padding-inline: 10px; gap: 6px; }
-}
-
-@media (pointer: coarse) {
-  .iconLink { width: 44px; height: 44px; }
-  .cart { padding-block: 12px; }
-  .navLink { padding-block: 12px; }
-}
-
-/* An uploaded logo, when the shop has chosen one over the wordmark. Capped by
-   the header's own height so a large upload cannot push the bar open. */
 .logoImage {
   display: block;
-  height: calc(var(--header-h) - 26px);
+  height: calc(var(--header-h) - 30px);
   max-height: 44px;
   width: auto;
   max-width: 190px;
   object-fit: contain;
 }
-@media (max-width: 420px) {
-  .logoImage { max-width: 130px; }
+
+/* -------------------------------------------------------------------- nav */
+
+.nav { flex: 1; min-width: 0; }
+
+.navList {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.navLink {
+  position: relative;
+  display: inline-block;
+  padding-block: 10px;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.navLink:hover { color: var(--ink); }
+
+/* A rule that grows from the middle rather than an underline that appears.
+   Transform only, so it composites. */
+.navLink::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.navLink:hover::after { transform: scaleX(1); }
+
+/* ---------------------------------------------------------------- actions */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  margin-left: auto;
+}
+
+.iconLink {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius);
+  color: var(--ink-2);
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.iconLink:hover { color: var(--ink); background: var(--ghost); }
+
+/* A dot rather than a number: the count belongs on the basket, and two
+   competing numbers in a row of icons is noise. */
+.dot {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ember);
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
+.cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 42px;
+  padding: 0 16px;
+  margin-left: 6px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  font-size: var(--text-sm);
+  color: var(--ink);
+  transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.cart:hover { border-color: var(--ink-3); background: var(--ghost); }
+
+.cartWord { font-weight: 500; }
+
+.cartCount {
+  min-width: 21px;
+  height: 21px;
+  padding-inline: 6px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--ember);
+  color: var(--ember-ink);
+  font-size: var(--text-micro);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.cartCount[data-empty='true'] { background: var(--ghost); color: var(--ink-3); }
+
+@media (pointer: coarse) {
+  .iconLink { width: 44px; height: 44px; }
+  .cart { height: 44px; }
+  .navLink { padding-block: 12px; }
+}
+
+/* ----------------------------------------------------------- narrow */
+
+@media (max-width: 1000px) {
+  .nav { display: none; }
+  .inner { gap: var(--space-3); }
+  .brand { margin-inline: auto 0; order: -1; }
+}
+
+@media (max-width: 560px) {
+  .cartWord { display: none; }
+  .cart { padding-inline: 12px; margin-left: 2px; }
+  .wordmark strong { font-size: 19px; }
+  .wordmark em { display: none; }
+  .inner { gap: 2px; }
 }

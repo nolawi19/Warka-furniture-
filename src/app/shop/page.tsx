@@ -2,120 +2,158 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { ProductCard } from '@/components/shop/ProductCard';
-import { ActionButton } from '@/components/ui/ActionButton';
-import { ShopControls } from '@/components/shop/ShopControls';
-import { getCategories, searchProducts, type ShopQuery } from '@/lib/catalogue';
+import { ShopFilters } from '@/components/shop/ShopFilters';
+import { ShopToolbar } from '@/components/shop/ShopToolbar';
+import { Pagination } from '@/components/shop/Pagination';
+import { Icon } from '@/components/ui/Icon';
+import { getCategories, searchProducts, type ShopQuery, type ShopSort } from '@/lib/catalogue';
+import { savedVariantIds } from '@/lib/wishlist';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
   title: 'Shop',
   description:
-    'Every piece Warka Furniture makes: buttoned beds, headboards, dressing tables, mirrors, chests of drawers, office pedestals and stools, made to measure in Addis Ababa.',
-  alternates: { canonical: '/shop' },
+    'Every piece Warka Furniture makes — beds, headboards, dressing tables, mirrors, chests of drawers, office pedestals and stools, built to your measurement in Addis Ababa.',
 };
 
-type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+export const revalidate = 120;
+
+type Search = Promise<Record<string, string | string[] | undefined>>;
+
+const SORTS: ShopSort[] = ['featured', 'newest', 'price-asc', 'price-desc', 'name'];
 
 function one(v: string | string[] | undefined): string | undefined {
   return Array.isArray(v) ? v[0] : v;
 }
 
-export default async function ShopPage({ searchParams }: { searchParams: SearchParams }) {
-  const sp = await searchParams;
+/** A search parameter that has to be a positive number of santim, or nothing. */
+function santim(v: string | string[] | undefined): number | undefined {
+  const raw = one(v);
+  if (raw === undefined || raw.trim() === '') return undefined;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? Math.round(n) : undefined;
+}
 
-  const sortParam = one(sp.sort);
+export default async function ShopPage({ searchParams }: { searchParams: Search }) {
+  const sp = await searchParams;
+  const sortRaw = one(sp.sort);
+
   const query: ShopQuery = {
-    q: one(sp.q)?.slice(0, 80),
+    q: one(sp.q),
     category: one(sp.category),
-    sort:
-      sortParam === 'price-asc' || sortParam === 'price-desc' || sortParam === 'name'
-        ? sortParam
-        : 'featured',
-    inStockOnly: one(sp.stock) === '1',
+    sort: SORTS.includes(sortRaw as ShopSort) ? (sortRaw as ShopSort) : 'featured',
+    inStockOnly: one(sp.inStock) === '1',
+    onSaleOnly: one(sp.onSale) === '1',
+    minSantim: santim(sp.min),
+    maxSantim: santim(sp.max),
+    page: Number(one(sp.page)) || 1,
+    perPage: 24,
   };
 
-  const [categories, products] = await Promise.all([getCategories(), searchProducts(query)]);
+  const [categories, result, saved] = await Promise.all([
+    getCategories(),
+    searchProducts(query),
+    savedVariantIds(),
+  ]);
 
   const activeCategory = categories.find((c) => c.slug === query.category);
-  const total = categories.reduce((n, c) => n + c.pieceCount, 0);
-  const shown = products.reduce((n, p) => n + p.variantCount, 0);
+  const hasFilters = Boolean(
+    query.q || query.category || query.inStockOnly || query.onSaleOnly ||
+    query.minSantim !== undefined || query.maxSantim !== undefined,
+  );
 
-  const hasFilters = Boolean(query.q || query.category || query.inStockOnly);
+  const title = activeCategory ? activeCategory.name : query.q ? `“${query.q}”` : 'Everything we make';
 
   return (
-    <div className="wrap">
+    <div className={`wrap ${styles.page}`}>
+      <nav className={styles.crumbs} aria-label="Breadcrumb">
+        <Link href="/">Home</Link>
+        <Icon name="chevron-right" size={14} />
+        {activeCategory ? <Link href="/shop">Shop</Link> : <span aria-current="page">Shop</span>}
+        {activeCategory && (
+          <>
+            <Icon name="chevron-right" size={14} />
+            <span aria-current="page">{activeCategory.name}</span>
+          </>
+        )}
+      </nav>
+
       <header className={styles.head}>
-        <nav aria-label="Breadcrumb" className={styles.crumbs}>
-          <Link href="/">Home</Link>
-          <span aria-hidden="true">/</span>
-          {activeCategory ? <Link href="/shop">Shop</Link> : <span aria-current="page">Shop</span>}
-          {activeCategory && (
-            <>
-              <span aria-hidden="true">/</span>
-              <span aria-current="page">{activeCategory.name}</span>
-            </>
-          )}
-        </nav>
-
-        <h1 className={`dsp ${styles.title}`}>{activeCategory ? activeCategory.name : 'Everything we make'}</h1>
-
-        <p className="lede">
-          {activeCategory?.blurb ??
-            'Every piece is built to the measurement you bring in. Pick the board and the colour when you order.'}
+        <div className={styles.headText}>
+          <h1 className={styles.title}>{title}</h1>
+          <p className={styles.blurb}>
+            {activeCategory?.blurb ??
+              'Bedroom and office furniture, built to your measurement in Kebena. Pick a finish, a size and a board; we build it and bring it.'}
+          </p>
+        </div>
+        <p className={styles.count}>
+          <strong className="nums">{result.total}</strong> {result.total === 1 ? 'piece' : 'pieces'}
         </p>
       </header>
 
-      <ShopControls
-        categories={categories}
-        active={{
-          q: query.q ?? '',
-          category: query.category ?? '',
-          sort: query.sort ?? 'featured',
-          inStockOnly: query.inStockOnly ?? false,
-        }}
-      />
+      <div className={styles.layout}>
+        <ShopFilters
+          categories={categories}
+          activeCategory={query.category ?? ''}
+          q={query.q ?? ''}
+          inStockOnly={query.inStockOnly ?? false}
+          onSaleOnly={query.onSaleOnly ?? false}
+          min={query.minSantim}
+          max={query.maxSantim}
+          priceFloor={result.priceFloor}
+          priceCeiling={result.priceCeiling}
+          total={result.total}
+          hasFilters={hasFilters}
+        />
 
-      <p className={styles.count} role="status">
-        {products.length === 0
-          ? 'No pieces match'
-          : `${shown} ${shown === 1 ? 'piece' : 'pieces'} across ${products.length} ${
-              products.length === 1 ? 'line' : 'lines'
-            }`}
-        {!hasFilters && total !== shown ? '' : hasFilters ? ` of ${total}` : ''}
-      </p>
+        <div className={styles.results}>
+          <ShopToolbar
+            sort={query.sort ?? 'featured'}
+            showing={result.products.length}
+            total={result.total}
+          />
 
-      {products.length === 0 ? (
-        <div className={styles.empty}>
-          <h2 className={styles.emptyTitle}>Nothing here matches that</h2>
-          <p>
-            {query.q ? (
-              <>
-                We could not find anything for <strong>{query.q}</strong>.
-              </>
-            ) : (
-              'No pieces match those filters.'
-            )}
-          </p>
-          <p className={styles.emptyHint}>
-            Everything is made to order, so if you have a size or a finish in mind that is not
-            listed, it is still worth asking.
-          </p>
-          <div className={styles.emptyCta}>
-            <ActionButton as="link" href="/shop" variant="ghost">
-              Clear the filters
-            </ActionButton>
-            <ActionButton as="link" href="/contact" variant="primary" icon="arrow">
-              Ask the workshop
-            </ActionButton>
-          </div>
+          {result.products.length === 0 ? (
+            <div className={styles.empty}>
+              <Icon name="search" size={28} />
+              <h2 className={styles.emptyTitle}>
+                {hasFilters ? 'Nothing matches those filters.' : 'Nothing is published yet.'}
+              </h2>
+              <p className={styles.emptyBody}>
+                Everything is made to order, so if you have a size or a finish in mind that is not
+                listed, it is still worth asking.
+              </p>
+              <div className={styles.emptyCta}>
+                {hasFilters && (
+                  <Link href="/shop" className={styles.emptyLink}>
+                    Clear the filters
+                  </Link>
+                )}
+                <Link href="/contact" className={styles.emptyLink} data-tone="brass">
+                  Ask the workshop
+                  <Icon name="arrow-right" size={15} />
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className={styles.grid}>
+                {result.products.map((p, i) => (
+                  <ProductCard
+                    key={p.slug}
+                    product={p}
+                    priority={i < 4}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1100px) 33vw, 320px"
+                    saved={p.defaultVariantId ? saved.has(p.defaultVariantId) : false}
+                  />
+                ))}
+              </div>
+
+              <Pagination page={result.page} pageCount={result.pageCount} />
+            </>
+          )}
         </div>
-      ) : (
-        <div className={styles.grid}>
-          {products.map((p, i) => (
-            <ProductCard key={p.slug} product={p} priority={i < 4} />
-          ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 }

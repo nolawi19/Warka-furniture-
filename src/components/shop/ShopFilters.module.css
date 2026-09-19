@@ -1,0 +1,226 @@
+/* =========================================================================
+   Shop filters
+   =========================================================================
+   One set of controls, rendered twice: as a rail beside the grid on a wide
+   screen, and inside a sheet on a narrow one. The markup is shared so the two
+   cannot drift; only which container is visible changes.
+   ========================================================================= */
+
+.rail { position: sticky; top: calc(var(--header-h) + 16px); }
+
+.body {
+  display: grid;
+  gap: var(--space-6);
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.body[data-pending='true'] { opacity: 0.55; }
+
+.group { display: grid; gap: var(--space-3); }
+
+.groupTitle {
+  font-size: var(--text-micro);
+  font-weight: 500;
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ---------------------------------------------------------------- search */
+
+.searchWrap { position: relative; display: flex; align-items: center; }
+
+.searchIcon { position: absolute; left: 12px; color: var(--ink-3); pointer-events: none; }
+
+.search {
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 12px 11px 38px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.search:hover { border-color: var(--ink-3); }
+.search::-webkit-search-cancel-button { cursor: pointer; }
+
+/* -------------------------------------------------------------- category */
+
+.list { display: grid; gap: 1px; }
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 12px;
+  margin-inline: -12px;
+  width: calc(100% + 24px);
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  text-align: left;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.option:hover { background: var(--ghost); color: var(--ink); }
+.option[data-active='true'] { background: var(--ember-soft); color: var(--ember-text); font-weight: 500; }
+
+.optionCount {
+  font-size: var(--text-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+.option[data-active='true'] .optionCount { color: inherit; opacity: 0.75; }
+
+/* ----------------------------------------------------------------- price */
+
+.priceRead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  font-weight: 500;
+}
+.priceDash { color: var(--ink-3); font-weight: 400; }
+
+.sliders { display: grid; gap: 6px; }
+.sliders input[type='range'] { width: 100%; accent-color: var(--ember); cursor: pointer; }
+
+/* ------------------------------------------------------------ checkboxes */
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 40px;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.check input { accent-color: var(--ember); width: 17px; height: 17px; cursor: pointer; }
+.check:hover { color: var(--ink); }
+
+.clear {
+  justify-self: start;
+  font-size: var(--text-sm);
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 2px;
+  min-height: 32px;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.clear:hover { color: var(--ember-text); border-color: currentColor; }
+
+/* ------------------------------------------------------------- the sheet */
+
+.mobileTrigger {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 12px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.triggerCount {
+  min-width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--ember);
+  color: var(--ember-ink);
+  font-size: var(--text-micro);
+  font-variant-numeric: tabular-nums;
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: color-mix(in srgb, var(--ink) 42%, transparent);
+  animation: fade var(--dur-base) var(--ease-out);
+}
+@keyframes fade { from { opacity: 0; } }
+
+.sheet {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 91;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border-top-left-radius: var(--radius-xl);
+  border-top-right-radius: var(--radius-xl);
+  box-shadow: var(--shadow-4);
+  animation: rise var(--dur-base) var(--ease-out);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@keyframes rise { from { transform: translateY(100%); } }
+
+.sheetHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--line-2);
+}
+
+.sheetTitle {
+  font-family: var(--font-serif);
+  font-size: var(--text-h4);
+  font-weight: 500;
+}
+
+.sheetClose {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-right: -10px;
+  border-radius: var(--radius);
+  color: var(--ink-2);
+}
+.sheetClose:hover { background: var(--ghost); color: var(--ink); }
+
+.sheetScroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-5);
+}
+
+.sheetFoot { padding: var(--space-4) var(--space-5); border-top: 1px solid var(--line-2); }
+
+.sheetApply {
+  width: 100%;
+  min-height: 50px;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--ink-inverse);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.sheetApply:hover { background: var(--ember); }
+
+@media (max-width: 860px) {
+  .rail { display: none; }
+  .mobileTrigger { display: inline-flex; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim, .sheet { animation: none; }
+}

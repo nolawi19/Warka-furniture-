@@ -1,54 +1,119 @@
-.head { padding-block: clamp(24px, 3vw, 44px) var(--space-5); max-width: 62ch; }
+.page { padding-block: clamp(24px, 3vw, 44px) clamp(48px, 6vw, 96px); }
 
 .crumbs {
   display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 7px;
   font-size: var(--text-xs);
-  color: var(--ink-2);
-  margin-bottom: var(--space-4);
+  color: var(--ink-3);
+  margin-bottom: var(--space-5);
 }
-.crumbs a:hover { color: var(--ink); text-decoration: underline; }
-.crumbs span[aria-hidden] { color: var(--ink-2); }
+.crumbs a { transition: color var(--dur-fast) var(--ease-out); }
+.crumbs a:hover { color: var(--ember-text); }
+.crumbs [aria-current] { color: var(--ink-2); }
 
-.title { font-size: var(--text-h1); margin-bottom: var(--space-3); }
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  padding-bottom: clamp(24px, 3vw, 40px);
+  border-bottom: 1px solid var(--line-2);
+  margin-bottom: clamp(24px, 3vw, 44px);
+}
+
+.headText { display: grid; gap: var(--space-3); min-width: 0; }
+
+.title {
+  font-family: var(--font-serif);
+  font-size: var(--text-h1);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+.blurb {
+  font-size: var(--text-lg);
+  color: var(--ink-2);
+  max-width: 58ch;
+  line-height: var(--leading-body);
+  text-wrap: pretty;
+}
 
 .count {
-  font-size: var(--text-xs);
-  color: var(--ink-2);
-  margin-bottom: var(--space-4);
-  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--ink-3);
+  white-space: nowrap;
 }
+.count strong { color: var(--ink); font-weight: 500; }
+
+/* ---------------------------------------------------------------- layout */
+
+.layout {
+  display: grid;
+  grid-template-columns: 252px minmax(0, 1fr);
+  gap: clamp(28px, 3.4vw, 56px);
+  align-items: start;
+}
+
+.results { min-width: 0; display: grid; gap: clamp(20px, 2.4vw, 32px); }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: clamp(12px, 1.6vw, 22px);
-  padding-bottom: var(--space-8);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 2.2vw, 32px) clamp(12px, 1.5vw, 22px);
 }
-@media (max-width: 560px) {
-  .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 214px minmax(0, 1fr); }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+@media (max-width: 860px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .grid { gap: var(--space-5) 10px; }
+}
+
+/* ----------------------------------------------------------------- empty */
 
 .empty {
-  padding: clamp(48px, 8vw, 96px) var(--space-4);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
   text-align: center;
-  max-width: 48ch;
-  margin-inline: auto;
-  color: var(--ink-2);
+  padding: clamp(48px, 7vw, 96px) var(--space-5);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  color: var(--ink-3);
 }
+
 .emptyTitle {
+  font-family: var(--font-serif);
   font-size: var(--text-h3);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink);
-  margin-bottom: var(--space-3);
-  letter-spacing: var(--tracking-tight);
+  margin-top: var(--space-2);
 }
-.emptyHint { margin-top: var(--space-3); font-size: var(--text-sm); }
-.emptyCta { display: flex; gap: var(--space-3); justify-content: center; margin-top: var(--space-5); flex-wrap: wrap; }
 
+.emptyBody { font-size: var(--text-sm); color: var(--ink-2); max-width: 46ch; text-wrap: pretty; }
 
-@media (pointer: coarse) {
-  /* Same reason as the footer: a 19px-tall crumb is hard to hit. */
-  .crumbs a { display: inline-block; padding-block: 6px; }
+.emptyCta { display: flex; gap: var(--space-4); flex-wrap: wrap; justify-content: center; margin-top: var(--space-4); }
+
+.emptyLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 11px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  color: var(--ink);
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
+.emptyLink:hover { border-color: var(--ink-3); }
+.emptyLink[data-tone='brass'] { background: var(--ember); border-color: var(--ember); color: var(--ember-ink); }
+.emptyLink[data-tone='brass']:hover { filter: brightness(1.08); }

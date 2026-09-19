@@ -6,37 +6,34 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { SessionUser } from '@/lib/auth';
 import type { NavItem } from '@/lib/site/schemas';
+import { Icon } from '@/components/ui/Icon';
+import type { MenuCategory } from './CategoryMenu';
 import { ThemeChoice } from './ThemeChoice';
 import styles from './MobileNav.module.css';
 
-const FALLBACK_LINKS = [
-  { href: '/shop', label: 'Shop everything' },
-  { href: '/craft', label: 'Our craft' },
-  { href: '/visit', label: 'Visit the workshop' },
-  { href: '/contact', label: 'Contact' },
-];
-
+/**
+ * The drawer, on a phone.
+ *
+ * A dialog in every way that matters: it traps focus while it is open, it
+ * closes on Escape and on the scrim, the page behind it cannot scroll, and
+ * focus goes back to the button that opened it. A drawer that does none of
+ * those is a div that happens to slide.
+ */
 export function MobileNav({
   user,
   cartCount,
+  savedCount,
   nav,
+  categories,
+  cartLabel,
 }: {
   user: SessionUser | null;
   cartCount: number;
-  nav?: NavItem[];
+  savedCount: number;
+  nav: NavItem[];
+  categories: MenuCategory[];
+  cartLabel: string;
 }) {
-  // The drawer shows whatever the header shows, plus Contact, which is only in
-  // the footer on a wide screen and is the link people reach for on a phone.
-  const LINKS =
-    nav && nav.length > 0
-      ? [
-          ...nav.map((i) => ({ href: i.href, label: i.label })),
-          ...(nav.some((i) => i.href === '/contact')
-            ? []
-            : [{ href: '/contact', label: 'Contact' }]),
-        ]
-      : FALLBACK_LINKS;
-
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -44,8 +41,8 @@ export function MobileNav({
 
   const close = useCallback(() => setOpen(false), []);
 
-  // Route change closes the drawer; otherwise tapping a link leaves it hanging
-  // open over the page you just asked for.
+  // Tapping a link inside the drawer navigates; the drawer should not still be
+  // hanging over the page you just asked for.
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
@@ -53,26 +50,27 @@ export function MobileNav({
   useEffect(() => {
     if (!open) return;
 
-    const previouslyFocused = document.activeElement as HTMLElement | null;
     const { overflow } = document.body.style;
     document.body.style.overflow = 'hidden';
 
-    function onKeyDown(e: KeyboardEvent) {
+    const panel = panelRef.current;
+    panel?.querySelector<HTMLElement>('a[href], button:not([disabled])')?.focus();
+
+    function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        e.preventDefault();
-        close();
+        setOpen(false);
+        triggerRef.current?.focus();
         return;
       }
-      if (e.key !== 'Tab' || !panelRef.current) return;
+      if (e.key !== 'Tab' || !panel) return;
 
-      // Focus stays inside the drawer while it is open: tabbing must not walk
-      // out into the page behind it.
-      const focusables = panelRef.current.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])',
+      const focusable = panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
-      if (!focusables.length) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
       if (e.shiftKey && document.activeElement === first) {
         e.preventDefault();
         last.focus();
@@ -82,85 +80,111 @@ export function MobileNav({
       }
     }
 
-    document.addEventListener('keydown', onKeyDown);
-    panelRef.current?.querySelector<HTMLElement>('a, button')?.focus();
-
+    document.addEventListener('keydown', onKey);
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = overflow;
-      previouslyFocused?.focus?.();
+      document.removeEventListener('keydown', onKey);
     };
-  }, [open, close]);
+  }, [open]);
 
   return (
     <>
       <button
-        ref={triggerRef}
         type="button"
+        ref={triggerRef}
         className={styles.trigger}
         onClick={() => setOpen(true)}
-        aria-label="Open the menu"
+        aria-label="Menu"
         aria-expanded={open}
-        aria-controls="mobile-nav"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">
-          <path d="M4 7h16M4 12h16M4 17h16" />
-        </svg>
+        <Icon name="menu" />
       </button>
 
       {open && (
-        <div className={styles.scrim} onClick={close} role="presentation">
+        <>
+          <div className={styles.scrim} onClick={close} aria-hidden="true" />
           <div
-            id="mobile-nav"
-            ref={panelRef}
             className={styles.panel}
+            ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
-            onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.panelHead}>
-              <span className="micro">Warka Furniture</span>
-              <button type="button" className={styles.close} onClick={close} aria-label="Close the menu">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">
-                  <path d="M6 6l12 12M18 6L6 18" />
-                </svg>
+              <span className={styles.panelTitle}>Menu</span>
+              <button type="button" onClick={close} className={styles.close} aria-label="Close">
+                <Icon name="close" />
               </button>
             </div>
 
-            <nav aria-label="Mobile">
-              <ul className={styles.list}>
-                {LINKS.map((l) => (
-                  <li key={l.href}>
-                    <Link href={l.href} className={styles.link}>
-                      {l.label}
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                        <path d="M9 6l6 6-6 6" />
-                      </svg>
+            <div className={styles.panelScroll}>
+              <nav aria-label="Main">
+                <ul className={styles.links}>
+                  {nav.map((item) => (
+                    <li key={item.id}>
+                      <Link href={item.href} className={styles.link}>
+                        {item.label}
+                        <Icon name="arrow-right" size={17} />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+
+              {categories.length > 0 && (
+                <section className={styles.group}>
+                  <h2 className={styles.groupTitle}>Categories</h2>
+                  <ul className={styles.chips}>
+                    {categories.map((c) => (
+                      <li key={c.slug}>
+                        <Link href={`/shop?category=${c.slug}`} className={styles.chip}>
+                          {c.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              <section className={styles.group}>
+                <h2 className={styles.groupTitle}>You</h2>
+                <ul className={styles.links}>
+                  <li>
+                    <Link href="/cart" className={styles.link}>
+                      {cartLabel}
+                      <span className={styles.badge}>{cartCount}</span>
                     </Link>
                   </li>
-                ))}
-              </ul>
-            </nav>
+                  <li>
+                    <Link
+                      href={user ? '/account/wishlist' : '/login?next=/account/wishlist'}
+                      className={styles.link}
+                    >
+                      Saved pieces
+                      {savedCount > 0 && <span className={styles.badge}>{savedCount}</span>}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={user ? '/account' : '/login'} className={styles.link}>
+                      {user ? 'Your account' : 'Sign in'}
+                      <Icon name="arrow-right" size={17} />
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/contact" className={styles.link}>
+                      Contact
+                      <Icon name="arrow-right" size={17} />
+                    </Link>
+                  </li>
+                </ul>
+              </section>
 
-            <div className={styles.panelFoot}>
-              {/* On a narrow phone the header has no room for the toggle, so
-                  the choice lives here instead of disappearing entirely. */}
-              <ThemeChoice />
-              <Link href="/cart" className={styles.footLink}>
-                Basket{cartCount > 0 ? ` (${cartCount})` : ''}
-              </Link>
-              <Link href={user ? '/account' : '/login'} className={styles.footLink}>
-                {user ? 'Your account' : 'Sign in'}
-              </Link>
-              {(user?.role === 'ADMIN' || user?.role === 'STAFF') && (
-                <Link href="/admin" className={styles.footLink}>
-                  Admin
-                </Link>
-              )}
+              <div className={styles.themeRow}>
+                <ThemeChoice />
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );

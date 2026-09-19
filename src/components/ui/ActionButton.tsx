@@ -18,7 +18,7 @@ import styles from './ActionButton.module.css';
  * a transition can be and still be seen.
  */
 
-type Variant = 'primary' | 'ghost' | 'quiet' | 'danger';
+type Variant = 'primary' | 'brass' | 'ghost' | 'quiet' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
 type Icon = 'arrow' | 'cart' | 'none';
 
@@ -94,7 +94,6 @@ function Chrome({
 }) {
   return (
     <>
-      <span className={styles.sheen} aria-hidden="true" />
 
       {ripples.map((r) => (
         <span

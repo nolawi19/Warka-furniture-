@@ -19,6 +19,7 @@ export function ProductCarousel({
   visibleDesktop = 4,
   visibleMobile = 1.4,
   emptyLabel = 'No products are published yet.',
+  savedIds,
 }: {
   products: ProductCardData[];
   heading?: string;
@@ -29,6 +30,8 @@ export function ProductCarousel({
   visibleDesktop?: number;
   visibleMobile?: number;
   emptyLabel?: string;
+  /** Variant ids this visitor has saved, so hearts start filled. */
+  savedIds?: Set<string>;
 }) {
   return (
     <>
@@ -55,7 +58,11 @@ export function ProductCarousel({
         >
           {products.map((p) => (
             <li key={p.slug}>
-              <ProductCard product={p} sizes="(max-width: 560px) 70vw, 320px" />
+              <ProductCard
+                product={p}
+                sizes="(max-width: 560px) 70vw, 320px"
+                saved={p.defaultVariantId ? (savedIds?.has(p.defaultVariantId) ?? false) : false}
+              />
             </li>
           ))}
         </ul>

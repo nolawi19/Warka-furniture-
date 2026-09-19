@@ -108,15 +108,15 @@ const PaletteSchema = z.object({
 export type Palette = z.infer<typeof PaletteSchema>;
 
 export const LIGHT_PALETTE: Palette = {
-  bg: '#f4f2ed',
+  bg: '#faf9f7',
   bg2: '#ffffff',
-  bg3: '#eae7e0',
-  ink: '#191814',
-  ink2: '#5e5a51',
-  ink3: '#8a857a',
-  line: 'rgba(25, 24, 20, 0.14)',
-  ember: '#bc431e',
-  emberText: '#b5411d',
+  bg3: '#f1eee9',
+  ink: '#14110e',
+  ink2: '#57514a',
+  ink3: '#8b8279',
+  line: 'rgba(20, 17, 14, 0.12)',
+  ember: '#7c4f26',
+  emberText: '#6e4520',
   emberInk: '#ffffff',
   ok: '#2f6b41',
   warn: '#8a5a14',
@@ -124,26 +124,26 @@ export const LIGHT_PALETTE: Palette = {
 };
 
 export const DARK_PALETTE: Palette = {
-  bg: '#0d0c0a',
-  bg2: '#161510',
-  bg3: '#201e18',
-  ink: '#f3f1ea',
-  ink2: '#a39d90',
-  ink3: '#7c7768',
-  line: 'rgba(243, 241, 234, 0.14)',
-  ember: '#d2451d',
-  emberText: '#f0714a',
-  emberInk: '#ffffff',
+  bg: '#121110',
+  bg2: '#1b1917',
+  bg3: '#252220',
+  ink: '#f5f2ec',
+  ink2: '#b5ada2',
+  ink3: '#847c72',
+  line: 'rgba(245, 242, 236, 0.13)',
+  ember: '#c79a4e',
+  emberText: '#d9a441',
+  emberInk: '#1b1614',
   ok: '#6fbf8a',
   warn: '#d9a441',
-  danger: '#f0705f',
+  danger: '#e8796b',
 };
 
 export const ThemeSchema = z.object({
   light: PaletteSchema.partial().default({}),
   dark: PaletteSchema.partial().default({}),
-  radius: Px.default(3),
-  radiusLg: Px.default(6),
+  radius: Px.default(8),
+  radiusLg: Px.default(16),
   /**
    * How pronounced every shadow on the site is. 1 is the stylesheet's own
    * values; 0 turns shadows off entirely, which is a real design choice and
@@ -153,8 +153,8 @@ export const ThemeSchema = z.object({
   shadowStrength: z.number().min(0).max(2).default(1),
   spacingScale: z.number().min(0.6).max(2).default(1),
   containerWidth: Px.default(1360),
-  narrowWidth: Px.default(780),
-  headerHeight: Px.default(64),
+  narrowWidth: Px.default(760),
+  headerHeight: Px.default(72),
   defaultTheme: z.enum(['light', 'dark', 'system']).default('light'),
 });
 
@@ -163,8 +163,8 @@ export type ThemeSettings = z.infer<typeof ThemeSchema>;
 /* ------------------------------------------------------------- typography */
 
 export const FONT_CHOICES = [
-  { id: 'sans', label: 'Archivo (the shop’s sans)', stack: 'var(--font-sans)' },
-  { id: 'serif', label: 'Instrument Serif (italic display)', stack: 'var(--font-serif)' },
+  { id: 'sans', label: 'Inter (the shop’s sans)', stack: 'var(--font-sans)' },
+  { id: 'serif', label: 'Playfair Display (the brand voice)', stack: 'var(--font-serif)' },
   { id: 'amharic', label: 'Noto Sans Ethiopic', stack: 'var(--font-amharic)' },
   { id: 'system', label: 'System UI', stack: 'system-ui, -apple-system, sans-serif' },
   { id: 'georgia', label: 'Georgia', stack: 'Georgia, "Times New Roman", serif' },
@@ -179,7 +179,7 @@ export function fontStack(id: FontChoice): string {
 }
 
 export const TypographySchema = z.object({
-  headingFont: FontId.default('sans'),
+  headingFont: FontId.default('serif'),
   bodyFont: FontId.default('sans'),
   buttonFont: FontId.default('sans'),
 
@@ -187,12 +187,12 @@ export const TypographySchema = z.object({
   // the responsive behaviour survives whatever the admin picks.
   scale: z.number().min(0.75).max(1.5).default(1),
 
-  h1Weight: z.number().int().min(100).max(900).default(700),
+  h1Weight: z.number().int().min(100).max(900).default(500),
   bodyWeight: z.number().int().min(100).max(900).default(400),
   bodySize: Px.default(16),
-  leadingBody: z.number().min(1).max(2.4).default(1.55),
-  leadingTight: z.number().min(0.9).max(2).default(1.08),
-  trackingTight: z.number().min(-0.1).max(0.3).default(-0.01),
+  leadingBody: z.number().min(1).max(2.4).default(1.62),
+  leadingTight: z.number().min(0.9).max(2).default(1.04),
+  trackingTight: z.number().min(-0.1).max(0.3).default(-0.014),
 });
 
 export type TypographySettings = z.infer<typeof TypographySchema>;
@@ -289,6 +289,7 @@ export const NavSchema = z
 export type NavSettings = z.infer<typeof NavSchema>;
 
 export const DEFAULT_HEADER_NAV: NavItem[] = [
+  { id: 'home', label: 'Home', href: '/', isVisible: true, openInNewTab: false, children: [] },
   { id: 'shop', label: 'Shop', href: '/shop', isVisible: true, openInNewTab: false, children: [] },
   { id: 'craft', label: 'Our craft', href: '/craft', isVisible: true, openInNewTab: false, children: [] },
   { id: 'visit', label: 'Visit', href: '/visit', isVisible: true, openInNewTab: false, children: [] },
@@ -302,6 +303,7 @@ export const HeaderSchema = z.object({
   showAccount: z.boolean().default(true),
   showCart: z.boolean().default(true),
   showThemeToggle: z.boolean().default(true),
+  showWishlist: z.boolean().default(true),
   cartLabel: Text(24).default('Basket'),
 });
 

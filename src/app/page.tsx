@@ -1,27 +1,34 @@
 import { Hero } from '@/components/hero/Hero';
+import { BrandStory } from '@/components/sections/BrandStory';
 import { CategoryStrip } from '@/components/sections/CategoryStrip';
+import { ProductCarousel } from '@/components/sections/ProductCarousel';
 import { ProductStrip } from '@/components/sections/ProductStrip';
 import { Quote } from '@/components/sections/Quote';
 import { Section } from '@/components/sections/Section';
-import { Steps } from '@/components/sections/Steps';
 import { StorePanel } from '@/components/sections/StorePanel';
-import { getCategories, getPhotographedProducts } from '@/lib/catalogue';
 import { BlockRenderer } from '@/components/blocks/BlockRenderer';
+import {
+  getCategories,
+  getFeaturedProducts,
+  getNewestProducts,
+  getPhotographedProducts,
+} from '@/lib/catalogue';
 import { db } from '@/lib/db';
 import { parseBlocks } from '@/lib/site/blocks';
 import { getShop } from '@/lib/site/shop';
-import { HOME_STEPS, HOME_QUOTE, HOME_VISIT } from '@/lib/site/home-defaults';
+import { HOME_QUOTE, HOME_VISIT } from '@/lib/site/home-defaults';
+import { savedVariantIds } from '@/lib/wishlist';
 
 export const revalidate = 300;
 
 export default async function HomePage() {
   // If the shop has built and published a homepage in the Website Builder,
-  // that is the homepage. Otherwise the original one below stands — so the
-  // site has a homepage from the first minute, and gains an editable one the
-  // moment somebody wants it.
+  // that is the homepage. Otherwise the one below stands — so the site has a
+  // homepage from the first minute, and gains an editable one the moment
+  // somebody wants it.
   // Optional by nature: "has someone built a homepage?" If the database
-  // cannot answer, that is not a reason to fail here — fall through to the
-  // original homepage below and let its own queries report the real problem.
+  // cannot answer, that is not a reason to fail here — fall through and let
+  // the queries below report the real problem.
   const built = await db.page
     .findFirst({ where: { slug: 'home', status: 'PUBLISHED' } })
     .catch(() => null);
@@ -31,60 +38,120 @@ export default async function HomePage() {
     if (blocks.length > 0) return <BlockRenderer blocks={blocks} />;
   }
 
-  const SHOP = await getShop();
-  const [categories, showroom] = await Promise.all([
+  const [shop, categories, featured, newest, photographed, saved] = await Promise.all([
+    getShop(),
     getCategories(),
-    getPhotographedProducts(6),
+    getFeaturedProducts(8),
+    getNewestProducts(8),
+    getPhotographedProducts(1),
+    savedVariantIds(),
   ]);
 
-  const pieceCount = categories.reduce((n, c) => n + c.pieceCount, 0);
+  // The hero leads with a real photograph when the shop has one, and with the
+  // typographic plate when it does not. Neither is a placeholder.
+  const lead = photographed[0];
 
-  // Every section below is the same component the Website Builder renders for
-  // the matching block. There is no second homepage design to keep in step.
+  // "Featured" is a flag the admin sets. When nothing is flagged yet, the
+  // shelf shows what has actually been photographed rather than sitting empty
+  // or inventing a reason a piece is special.
+  const shelf = featured.length > 0 ? featured : await getPhotographedProducts(8);
+  const shelfHeading = featured.length > 0 ? 'Featured pieces' : 'On the floor now';
+
   return (
     <>
-      <Hero />
+      <Hero
+        panel={lead?.imageUrl ? 'image' : 'plate'}
+        imageUrl={lead?.imageUrl ?? ''}
+        imageAlt={lead?.imageAlt ?? ''}
+      />
 
       <Section id="categories" labelledBy="categories-heading">
         <CategoryStrip
           categories={categories}
+          kicker="Every room"
           headingId="categories-heading"
-          linkLabel={`All ${pieceCount} pieces`}
+          linkLabel="All {count} pieces"
           linkHref="/shop"
         />
       </Section>
 
-      <Section labelledBy="showroom-heading">
+      <Section labelledBy="featured-heading">
         <ProductStrip
-          products={showroom}
+          products={shelf}
           kicker="Photographed in the workshop"
-          heading="On the floor now"
-          headingId="showroom-heading"
+          heading={shelfHeading}
+          headingId="featured-heading"
           linkLabel="Browse everything"
           linkHref="/shop"
-          priorityCount={3}
+          priorityCount={4}
+          savedIds={saved}
           emptyLabel="Nothing is photographed yet. The catalogue is still the place to look."
         />
       </Section>
 
-      <Section labelledBy="how-heading">
-        <Steps steps={HOME_STEPS} heading="How you buy it" headingId="how-heading" note={SHOP.area} />
-      </Section>
+      {newest.length > 0 && (
+        <Section labelledBy="new-heading" flush>
+          <ProductCarousel
+            products={newest}
+            kicker="Latest from the workshop"
+            heading="New arrivals"
+            headingId="new-heading"
+            linkLabel="See the catalogue"
+            linkHref="/shop"
+            visibleDesktop={4}
+            visibleMobile={1.35}
+            savedIds={saved}
+          />
+        </Section>
+      )}
+
+      <div className="band">
+        <Section labelledBy="brand-heading">
+          <BrandStory
+            kicker="Warka Furniture"
+            heading="Built to your measurement, in Kebena."
+            headingId="brand-heading"
+            body={shop.tagline || undefined}
+            points={[
+              {
+                icon: 'ruler',
+                title: 'Made to size',
+                body: 'Beds and tables are built to the measurement you bring in, not to a fixed catalogue size.',
+              },
+              {
+                icon: 'sparkle',
+                title: 'You pick the board',
+                body: 'The same piece in white melamine or grey marble laminate, chosen when you order.',
+              },
+              {
+                icon: 'truck',
+                title: 'Delivered in Addis',
+                body: shop.deliveryNote,
+              },
+            ]}
+            imageUrl={HOME_VISIT.imageUrl}
+            imageAlt={HOME_VISIT.imageAlt}
+            linkLabel="How we build"
+            linkHref="/craft"
+          />
+        </Section>
+      </div>
 
       <Quote text={HOME_QUOTE} label="About the name" />
 
       <Section id="visit" labelledBy="visit-heading">
         <StorePanel
+          kicker="Come and see"
           heading="Visit the workshop"
           headingId="visit-heading"
           body={HOME_VISIT.body}
-          imageUrl={HOME_VISIT.imageUrl}
-          imageAlt={HOME_VISIT.imageAlt}
+          imageUrl={lead?.imageUrl ?? HOME_VISIT.imageUrl}
+          imageAlt={lead?.imageAlt ?? HOME_VISIT.imageAlt}
           details={[
-            { label: 'Shop', value: SHOP.area },
-            { label: 'Open', value: SHOP.openingHours },
-            { label: 'Phone', value: SHOP.phone, href: `tel:${SHOP.phoneHref}` },
-            { label: 'Delivery', value: SHOP.deliveryNote },
+            { label: 'Shop', value: shop.area },
+            { label: 'Open', value: shop.openingHours },
+            { label: 'Phone', value: shop.phone, href: `tel:${shop.phoneHref}` },
+            { label: 'Delivery', value: shop.deliveryNote },
           ]}
           primaryLabel="See the pieces"
           primaryHref="/shop"

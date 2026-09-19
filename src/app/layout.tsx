@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { headers } from 'next/headers';
-import { Archivo, Instrument_Serif, Noto_Sans_Ethiopic } from 'next/font/google';
+import { Inter, Noto_Sans_Ethiopic, Playfair_Display } from 'next/font/google';
 
 import '@/styles/globals.css';
 import { AnnouncementBar } from '@/components/site/AnnouncementBar';
@@ -10,6 +10,8 @@ import { ThemeScript } from '@/components/site/ThemeScript';
 import { MaintenanceScreen } from '@/components/site/MaintenanceScreen';
 import { currentUser, isStaff } from '@/lib/auth';
 import { getCartSummary } from '@/lib/cart';
+import { getCategories } from '@/lib/catalogue';
+import { savedCount } from '@/lib/wishlist';
 import { getBanners } from '@/lib/site/banners';
 import { getPublishedSettings } from '@/lib/site/settings';
 import { buildThemeCss } from '@/lib/site/theme-css';
@@ -17,23 +19,24 @@ import { buildThemeCss } from '@/lib/site/theme-css';
 // next/font downloads these at build time and serves them from our own origin,
 // so a visitor in Addis makes no request to Google and the page cannot be
 // blocked by someone else's CDN going dark.
-const archivo = Archivo({
+const inter = Inter({
   subsets: ['latin'],
-  axes: ['wdth'],
   display: 'swap',
-  variable: '--font-archivo',
+  variable: '--font-inter',
 });
 
-const instrument = Instrument_Serif({
+// The brand voice. Playfair's high stroke contrast is what makes a furniture
+// headline read as a gallery label rather than a product listing.
+const playfair = Playfair_Display({
   subsets: ['latin'],
-  weight: '400',
-  style: 'italic',
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
   display: 'swap',
-  variable: '--font-instrument',
+  variable: '--font-playfair',
 });
 
-// Archivo has no Ethiopic coverage. Without this, every Amharic word on the
-// site renders in whatever the device happens to have installed.
+// Neither Latin face has Ethiopic coverage. Without this, every Amharic word
+// on the site renders in whatever the device happens to have installed.
 const ethiopic = Noto_Sans_Ethiopic({
   subsets: ['ethiopic'],
   weight: ['400', '500', '600', '700'],
@@ -97,12 +100,17 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [user, cart, settings, announcements, headerList] = await Promise.all([
+  // Everything the chrome needs, in one round of queries rather than five
+  // sequential ones. Each falls back on its own if the database is unreachable,
+  // so a blip takes out a number in the header rather than the whole site.
+  const [user, cart, settings, announcements, headerList, categories, saved] = await Promise.all([
     currentUser(),
     getCartSummary(),
     getPublishedSettings(),
     getBanners('ANNOUNCEMENT'),
     headers(),
+    getCategories().catch(() => []),
+    savedCount(),
   ]);
 
   const { store, theme, typography, buttons, seo, social, header, animations } = settings;
@@ -146,7 +154,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang="en"
       data-theme={theme.defaultTheme === 'system' ? undefined : theme.defaultTheme}
-      className={`${archivo.variable} ${instrument.variable} ${ethiopic.variable}`}
+      className={`${inter.variable} ${playfair.variable} ${ethiopic.variable}`}
       suppressHydrationWarning
     >
       <body>
@@ -184,6 +192,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <SiteHeader
               user={user}
               cartCount={cart.count}
+              savedCount={saved}
+              categories={categories}
               nav={nav.items}
               settings={header}
               store={store}

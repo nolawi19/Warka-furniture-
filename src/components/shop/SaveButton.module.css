@@ -1,0 +1,39 @@
+.heart {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-pill);
+  color: var(--ink-2);
+  background: color-mix(in srgb, var(--bg-2) 86%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--line-2);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out),
+    transform var(--dur-instant) var(--ease-out);
+}
+.heart[data-size='sm'] { width: 32px; height: 32px; }
+
+.heart:hover:not(:disabled) { color: var(--ember-text); background: var(--bg-2); }
+.heart:active:not(:disabled) { transform: scale(0.9); }
+.heart[data-saved='true'] { color: var(--ember-text); }
+.heart:disabled { opacity: 0.6; }
+
+/* The fill is the feedback, so it gets a beat of its own. */
+.heart[data-saved='true'] svg { animation: pop var(--dur-base) var(--ease-spring); }
+@keyframes pop {
+  0% { transform: scale(0.6); }
+  60% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+@media (pointer: coarse) {
+  .heart { width: 44px; height: 44px; }
+  .heart[data-size='sm'] { width: 40px; height: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heart[data-saved='true'] svg { animation: none; }
+  .heart:active:not(:disabled) { transform: none; }
+}

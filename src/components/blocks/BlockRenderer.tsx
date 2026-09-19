@@ -557,8 +557,8 @@ async function BlockBody({ block }: { block: Block }) {
  * The grid and the carousel offer the same four choices, so they read them in
  * the same place — otherwise "newest" would quietly come to mean two things.
  *
- * searchProducts has no limit of its own (it returns the whole matching set),
- * so the caller takes the first N rather than asking for N.
+ * The block asks for exactly the page it needs, so a grid of six does not
+ * fetch the catalogue to throw most of it away.
  */
 async function productsFor(p: {
   source: string;
@@ -566,9 +566,10 @@ async function productsFor(p: {
   limit: number;
 }): Promise<ProductCardData[]> {
   if (p.source === 'category' && p.categorySlug) {
-    return (await searchProducts({ category: p.categorySlug, sort: 'featured' })).slice(0, p.limit);
+    return (await searchProducts({ category: p.categorySlug, sort: 'featured', perPage: p.limit }))
+      .products;
   }
-  if (p.source === 'newest') return (await searchProducts({ sort: 'featured' })).slice(0, p.limit);
+  if (p.source === 'newest') return (await searchProducts({ sort: 'newest', perPage: p.limit })).products;
   if (p.source === 'photographed') return getPhotographedProducts(p.limit);
   return getFeaturedProducts(p.limit);
 }

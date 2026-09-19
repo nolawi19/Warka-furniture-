@@ -49,7 +49,10 @@ select {
 button {
   background: none;
   border: 0;
+  /* A thing that responds to a click should say so before it is clicked. */
+  cursor: pointer;
 }
+button:disabled { cursor: default; }
 
 a {
   color: inherit;
@@ -87,31 +90,39 @@ ul, ol {
    Typography primitives
    ========================================================================= */
 
-/* The brand voice: condensed, uppercase, tight. Used for the display line and
-   section headings only — never for anything a person has to read at length. */
+/* The brand voice.
+   Playfair's high stroke contrast is what makes a furniture headline read as
+   a gallery label rather than a product listing. Mixed case, not uppercase:
+   at display size, capitals lose the letterforms that make the face worth
+   using. Used for display lines and section headings only. */
 .dsp {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-stretch: 125%;
-  text-transform: uppercase;
+  font-family: var(--font-serif);
+  font-weight: 500;
   letter-spacing: var(--tracking-display);
-  line-height: 0.88;
+  line-height: var(--leading-tight);
   /* Stops a two-word heading breaking one word onto its own line. */
   text-wrap: balance;
 }
+
+/* The same voice, set in italic, for pull quotes and the odd emphasised line. */
+.dsp--italic { font-style: italic; font-weight: 400; }
 
 .display { font-size: var(--text-display); }
 .h1 { font-size: var(--text-h1); }
 .h2 { font-size: var(--text-h2); }
 .h3 { font-size: var(--text-h3); letter-spacing: var(--tracking-tight); line-height: var(--leading-snug); }
+.h4 { font-size: var(--text-h4); letter-spacing: var(--tracking-tight); line-height: var(--leading-snug); }
 
 .lede {
   font-size: var(--text-lg);
+  line-height: var(--leading-body);
   color: var(--ink-2);
-  max-width: 56ch;
+  max-width: 58ch;
   text-wrap: pretty;
 }
 
+/* The small capitalised line above a heading. Tracking is what makes it read
+   as a label rather than as shouting. */
 .micro {
   font-size: var(--text-micro);
   font-weight: 500;
@@ -125,6 +136,11 @@ ul, ol {
   font-family: var(--font-serif);
   font-style: italic;
 }
+
+/* Tabular figures for anything a person compares down a column: prices,
+   quantities, totals. Without this, a 1 is narrower than a 7 and the column
+   visibly wobbles. */
+.nums { font-variant-numeric: tabular-nums; }
 
 /* Any element carrying Amharic. Applied by <Amharic> so a mixed line does not
    silently fall back to a system face mid-sentence. */
@@ -148,10 +164,31 @@ ul, ol {
 .wrap--narrow { max-width: var(--wrap-narrow); }
 
 .section {
-  padding-block: clamp(48px, 6vw, 88px);
+  padding-block: clamp(56px, 7vw, 120px);
 }
+.section--tight { padding-block: clamp(36px, 4.5vw, 72px); }
+.section--flush-top { padding-top: 0; }
+
+/* A full-bleed band that breaks the page's rhythm on purpose — the dark strip
+   a brand statement or a promotion sits in. Ink flips with the surface so
+   nothing inside has to know it is on one. */
+.band {
+  background: var(--bg-invert);
+  color: var(--ink-inverse);
+}
+.band a { color: inherit; }
 
 .stack > * + * { margin-top: var(--space-4); }
+
+/* The heading row every section shares: a label, a title, and a way out. */
+.sectionHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  margin-bottom: clamp(24px, 3vw, 44px);
+}
 
 /* Screen-reader-only, but focusable when it needs to be (skip links). */
 .sr-only {
