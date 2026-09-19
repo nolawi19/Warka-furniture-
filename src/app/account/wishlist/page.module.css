@@ -10,6 +10,14 @@
   color: var(--ink-3);
 }
 .crumbs a { color: var(--ink-3); }
+/* Breadcrumb words are small by design. Padding gives each one a target a
+   thumb can hit without making the trail look like a row of buttons. */
+.crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding-inline: 2px;
+}
 .crumbs a:hover { color: var(--ember-text); }
 
 .title { font-size: clamp(30px, 4.4vw, 50px); margin-top: var(--space-3); }

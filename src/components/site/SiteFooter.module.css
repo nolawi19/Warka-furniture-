@@ -46,9 +46,17 @@
 }
 
 .brandCol { display: grid; gap: var(--space-4); align-content: start; max-width: 42ch; }
-.brandLink { justify-self: start; }
+.brandLink { display: inline-flex; align-items: center; min-height: 44px; justify-self: start; }
 .brandAm { font-size: var(--text-sm); color: var(--ink-3); margin-top: -8px; }
 .brandLine { line-height: var(--leading-body); text-wrap: pretty; }
+
+/* Phone and email in the footer are things people tap on a phone, not words
+   in a sentence. The gap between them is what makes each one reachable. */
+.address a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+}
 
 .address {
   display: grid;

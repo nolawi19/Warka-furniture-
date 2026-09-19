@@ -24,6 +24,22 @@
 .trigger:hover { background: var(--ink); color: var(--ink-inverse); border-color: var(--ink); }
 .triggerLabel { white-space: nowrap; }
 
+/* On a two-column phone grid the card is about 165px wide, and "Quick view"
+   spelled out covers most of the photograph. The eye alone is enough there —
+   the button's aria-label still names the piece, so nothing is lost to a
+   screen reader. */
+@media (max-width: 560px) {
+  .trigger { padding: 0; }
+  .triggerLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 /* -------------------------------------------------------------- dialog */
 
 .dialog {

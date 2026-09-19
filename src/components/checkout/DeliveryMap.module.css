@@ -146,7 +146,10 @@
 .hint {
   position: absolute;
   left: 50%;
-  bottom: 18px;
+  /* Clear of MapLibre's attribution strip along the bottom edge. The licence
+     requires that credit to stay readable, and on a narrow map the hint sat
+     right on top of it. */
+  bottom: 42px;
   transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
@@ -158,6 +161,9 @@
   color: var(--ink-inverse);
   font-size: var(--text-xs);
   white-space: nowrap;
+  max-width: calc(100% - 24px);
+  overflow: hidden;
+  text-overflow: ellipsis;
   pointer-events: none;
 }
 

@@ -57,6 +57,7 @@
 }
 
 .sectionLink {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -66,6 +67,17 @@
   color: var(--ink);
   border-bottom: 1px solid var(--line);
   transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+/* The underline has to sit tight under the words, so the box cannot simply
+   grow to a 44px tap target without the rule drifting away from the text.
+   This extends the target above and below instead: a thumb finds it, and the
+   layout never sees it. */
+.sectionLink::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: -10px;
 }
 .sectionLink:hover { color: var(--ember-text); border-color: currentColor; }
 .sectionLink svg { transition: transform var(--dur-fast) var(--ease-out); }

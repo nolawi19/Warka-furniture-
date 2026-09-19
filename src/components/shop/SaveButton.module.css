@@ -1,8 +1,11 @@
 .heart {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  /* 44px, because this was 38 and a thumb misses that often enough to be
+     noticed. The disc is the target, so it grows with it — which also puts it
+     at the same size as the header's own icon buttons. */
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-pill);
   color: var(--ink-2);
   background: color-mix(in srgb, var(--bg-2) 86%, transparent);

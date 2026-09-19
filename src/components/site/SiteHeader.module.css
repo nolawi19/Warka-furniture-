@@ -32,7 +32,16 @@
 
 /* ------------------------------------------------------------------ brand */
 
-.brand { flex: none; margin-right: var(--space-2); }
+/* The wordmark is short and not very tall, and it is the way back to the
+   homepage from every page. display:flex with a min-height gives it a target
+   worth aiming at without changing where the letters sit. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  flex: none;
+  margin-right: var(--space-2);
+}
 
 .wordmark {
   display: inline-flex;
@@ -114,8 +123,8 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius);
   color: var(--ink-2);
   transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
@@ -139,7 +148,7 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  height: 42px;
+  height: 44px;
   padding: 0 16px;
   margin-left: 6px;
   border-radius: var(--radius);
