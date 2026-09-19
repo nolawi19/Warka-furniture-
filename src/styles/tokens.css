@@ -39,6 +39,22 @@
   --ink-3: #706962;
   --ink-inverse: #faf9f7;
 
+  /* Text that sits on a photograph, under a dark scrim. It does NOT flip with
+     the theme, because the scrim does not either — a gradient down to
+     rgba(12,10,8,.82) is dark in both. --ink-inverse looks right for this and
+     is a trap: in dark mode it resolves to near-black and the words disappear
+     into the picture. */
+  --on-photo: #faf9f7;
+  --on-photo-2: rgba(250, 249, 247, 0.82);
+
+  /* A .band flips its surface — dark in the light theme, light in the dark
+     one. Text inherits --ink-inverse and is fine, but an accent or a muted
+     grey does not flip with it, and ends up at 2:1 on a surface it was never
+     meant for. These are the values for a band's subtree; .band assigns them
+     so a component inside one needs to know nothing about it. */
+  --ember-on-invert: #d9a441;   /* 8.4:1 on the dark band */
+  --ink-2-on-invert: #c2bab0;   /* 9.8:1 */
+
   /* -- lines ---------------------------------------------------------- */
   --line: rgba(20, 17, 14, 0.12);
   --line-2: rgba(20, 17, 14, 0.06);
@@ -172,6 +188,15 @@
      until the worst dark surface clears 4.5. */
   --ink-3: #938a80;       /*  4.7:1 on --bg-3, 5.2:1 on --stage, 5.6:1 on --bg */
   --ink-inverse: #14110e;
+
+  /* Deliberately the same as the light theme: the scrim over a photograph is
+     dark in both, so the words on it are light in both. */
+  --on-photo: #faf9f7;
+  --on-photo-2: rgba(250, 249, 247, 0.82);
+
+  /* The dark theme's band is light, so its accent and muted ink are dark. */
+  --ember-on-invert: #6e4520;   /* 7.4:1 on the light band */
+  --ink-2-on-invert: #57514a;   /* 7.0:1 */
 
   --line: rgba(245, 242, 236, 0.13);
   --line-2: rgba(245, 242, 236, 0.06);

@@ -175,6 +175,13 @@ ul, ol {
 .band {
   background: var(--bg-invert);
   color: var(--ink-inverse);
+  /* Redefined for the whole subtree, so a component dropped into a band gets
+     colours that work on the flipped surface without knowing it is in one.
+     Headings and body text already inherit the colour above; these two are
+     what components reach for by name. */
+  --ember-text: var(--ember-on-invert);
+  --ink-2: var(--ink-2-on-invert);
+  --ink-3: var(--ink-2-on-invert);
 }
 .band a { color: inherit; }
 

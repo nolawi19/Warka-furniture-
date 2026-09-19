@@ -108,7 +108,11 @@
   border-radius: var(--radius);
   overflow: hidden;
   background: var(--bg-3);
-  color: var(--ink-inverse);
+  /* Not --ink-inverse: this text sits on a photograph under a fixed dark
+     gradient, so it has to stay light in both themes. --ink-inverse flips,
+     and in dark mode turned every category name into near-black on a dark
+     picture. */
+  color: var(--on-photo);
   isolation: isolate;
 }
 .categoryCell[data-lead='true'] .category { min-height: 400px; }
@@ -160,11 +164,11 @@
 }
 .categoryCell[data-lead='true'] .categoryName { font-size: var(--text-h3); }
 
-.categoryAm { font-size: var(--text-xs); font-weight: 400; opacity: 0.78; }
+.categoryAm { font-size: var(--text-xs); font-weight: 400; color: var(--on-photo-2); }
 
 .categoryBlurb {
   font-size: var(--text-sm);
-  opacity: 0.82;
+  color: var(--on-photo-2);
   text-wrap: pretty;
   display: -webkit-box;
   -webkit-line-clamp: 2;
