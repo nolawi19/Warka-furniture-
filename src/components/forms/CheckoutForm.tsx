@@ -58,9 +58,19 @@ export function CheckoutForm({
   // The map picks the zone when the pin lands inside a mapped one. The list
   // below stays, because not every zone has a centre and because somebody
   // should always be able to say where they are by hand.
-  useEffect(() => {
-    if (place.zoneSlug && place.zoneSlug !== zone) setZone(place.zoneSlug);
-  }, [place.zoneSlug, zone]);
+  //
+  // Adjusted during render rather than in an effect, and keyed on the last
+  // zone the MAP reported rather than on the current selection. That
+  // distinction is the whole point: an effect comparing against `zone` fires
+  // again the moment somebody picks a different area by hand and drags them
+  // straight back to the map's answer, which makes the selector look broken.
+  // Following the pin only when the pin actually moves leaves a manual choice
+  // alone.
+  const [zoneFromMap, setZoneFromMap] = useState<string | null>(null);
+  if (place.zoneSlug && place.zoneSlug !== zoneFromMap) {
+    setZoneFromMap(place.zoneSlug);
+    setZone(place.zoneSlug);
+  }
 
   const selectedZone = zones.find((z) => z.slug === zone);
 

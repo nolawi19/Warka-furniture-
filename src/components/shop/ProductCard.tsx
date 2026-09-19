@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Price } from '@/components/ui/Price';
 import { SaveButton } from '@/components/shop/SaveButton';
 import { QuickAdd } from '@/components/shop/QuickAdd';
+import { QuickView } from '@/components/shop/QuickView';
 import styles from './ProductCard.module.css';
 
 export type ProductCardData = {
@@ -98,11 +99,17 @@ export function ProductCard({
           {!product.inStock && <span className={styles.badge}>Made to order</span>}
         </div>
 
-        {product.defaultVariantId && (
-          <div className={styles.save}>
+        <div className={styles.tools}>
+          {product.defaultVariantId && (
             <SaveButton variantId={product.defaultVariantId} saved={saved} label={product.name} />
+          )}
+          {/* Quick view is what lets a piece with several finishes be bought
+              from the grid at all — the bar below can only add when there is
+              exactly one thing to add. */}
+          <div className={styles.peek}>
+            <QuickView slug={product.slug} name={product.name} />
           </div>
-        )}
+        </div>
 
         <div className={styles.hoverBar}>
           <QuickAdd

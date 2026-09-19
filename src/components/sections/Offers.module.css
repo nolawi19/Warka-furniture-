@@ -1,0 +1,88 @@
+.wrap { display: grid; gap: var(--space-6); }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-4);
+}
+
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  border: 1px solid var(--ember-line);
+  border-radius: var(--radius-lg);
+  background: var(--ember-soft);
+}
+.card[data-tone='quiet'] { background: var(--bg-2); border-color: var(--line-2); }
+
+.cardKicker {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+  color: var(--ember-text);
+}
+.card[data-tone='quiet'] .cardKicker { color: var(--ink-2); }
+.cardKicker svg { flex: none; }
+
+.cardHeadline {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 3.2vw, 34px);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.scope {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--ink-2);
+  letter-spacing: normal;
+}
+
+.code { font-size: var(--text-sm); color: var(--ink-2); }
+.code strong {
+  display: inline-block;
+  padding: 3px 9px;
+  margin-inline: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  border: 1px dashed var(--ember);
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.terms {
+  display: grid;
+  gap: 4px;
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+}
+
+.reduced { margin-top: var(--space-1); }
+
+.footLink { font-size: var(--text-sm); }
+.footLink a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  color: var(--ember-text);
+  transition: gap var(--dur-fast) var(--ease-out);
+}
+.footLink a:hover { gap: 11px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .footLink a { transition: none; }
+  .footLink a:hover { gap: 7px; }
+}

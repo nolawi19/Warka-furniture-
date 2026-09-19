@@ -22,7 +22,14 @@
   border-radius: var(--radius);
   overflow: hidden;
   background: var(--bg-3);
+  /* isolation: isolate keeps the badges, heart and hover bar stacking among
+     themselves. The consequence is that the whole subtree stacks as ONE layer
+     in the card, so it needs a z-index above .nameHit below — without it the
+     stretched title link paints over the image and every control inside it
+     stops responding to a click. Clicking the photograph still navigates:
+     .mediaLink covers it and goes to the same page. */
   isolation: isolate;
+  z-index: 2;
 }
 
 .mediaLink { position: absolute; inset: 0; display: block; }
@@ -87,11 +94,34 @@
 }
 .badgeSale { background: var(--ember); color: var(--ember-ink); }
 
-.save {
+.tools {
   position: absolute;
   top: 10px;
   right: 10px;
   z-index: 3;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+/* The heart is always there — it is the only way to save a piece. Quick view
+   appears with the hover bar, because it is a convenience rather than a
+   function the card would otherwise lack. */
+.peek {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-base) var(--ease-out);
+}
+.card:hover .peek,
+.card:focus-within .peek { opacity: 1; transform: none; }
+
+/* No hover on a finger. */
+@media (pointer: coarse) {
+  .peek { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peek { transition: opacity var(--dur-fast) var(--ease-out); transform: none; }
 }
 
 /* --------------------------------------------------------------- hover bar */
@@ -148,6 +178,9 @@
 .nameHit {
   position: absolute;
   inset: 0;
+  /* Deliberately below .media: it makes the text half of the card clickable,
+     and the photograph has its own link. Raising it above .media would bury
+     the heart and the basket bar. */
   z-index: 1;
 }
 

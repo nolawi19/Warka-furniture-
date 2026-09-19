@@ -3,6 +3,7 @@ import { BrandStory } from '@/components/sections/BrandStory';
 import { CategoryStrip } from '@/components/sections/CategoryStrip';
 import { ProductCarousel } from '@/components/sections/ProductCarousel';
 import { ProductStrip } from '@/components/sections/ProductStrip';
+import { Offers } from '@/components/sections/Offers';
 import { Quote } from '@/components/sections/Quote';
 import { Section } from '@/components/sections/Section';
 import { StorePanel } from '@/components/sections/StorePanel';
@@ -15,6 +16,7 @@ import {
 } from '@/lib/catalogue';
 import { db } from '@/lib/db';
 import { parseBlocks } from '@/lib/site/blocks';
+import { getOffers, hasOffers } from '@/lib/offers';
 import { getShop } from '@/lib/site/shop';
 import { HOME_QUOTE, HOME_VISIT } from '@/lib/site/home-defaults';
 import { savedVariantIds } from '@/lib/wishlist';
@@ -38,13 +40,14 @@ export default async function HomePage() {
     if (blocks.length > 0) return <BlockRenderer blocks={blocks} />;
   }
 
-  const [shop, categories, featured, newest, photographed, saved] = await Promise.all([
+  const [shop, categories, featured, newest, photographed, saved, offers] = await Promise.all([
     getShop(),
     getCategories(),
     getFeaturedProducts(8),
     getNewestProducts(8),
     getPhotographedProducts(1),
     savedVariantIds(),
+    getOffers(4),
   ]);
 
   // The hero leads with a real photograph when the shop has one, and with the
@@ -102,6 +105,19 @@ export default async function HomePage() {
             visibleMobile={1.35}
             savedIds={saved}
           />
+        </Section>
+      )}
+
+      {/* Only when the shop has actually configured something. getOffers reads
+          sale prices, coupons and delivery zones; it invents nothing, and
+          hasOffers is false on a shop that has set none of them — in which
+          case no band renders at all. */}
+      {hasOffers(offers) && (
+        <Section labelledBy="offers-heading">
+          <h2 id="offers-heading" className="sr-only">
+            Current offers
+          </h2>
+          <Offers offers={offers} savedIds={saved} />
         </Section>
       )}
 

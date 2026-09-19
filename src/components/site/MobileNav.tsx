@@ -42,10 +42,14 @@ export function MobileNav({
   const close = useCallback(() => setOpen(false), []);
 
   // Tapping a link inside the drawer navigates; the drawer should not still be
-  // hanging over the page you just asked for.
-  useEffect(() => {
+  // hanging over the page you just asked for. Done during render rather than
+  // in an effect so it closes in the same commit as the new page — an effect
+  // leaves the drawer over the destination for a frame.
+  const [lastPath, setLastPath] = useState(pathname);
+  if (pathname !== lastPath) {
+    setLastPath(pathname);
     setOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     if (!open) return;

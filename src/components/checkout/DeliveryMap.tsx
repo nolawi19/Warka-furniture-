@@ -66,8 +66,14 @@ export function DeliveryMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markerRef = useRef<Marker | null>(null);
+  // The latest onChange, so the map's own listeners can call the current one
+  // without being torn down and rebuilt every render. Written in an effect,
+  // not during render: a render React throws away must not leave a mutation
+  // behind, and under concurrent rendering that happens.
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  });
 
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
   const [query, setQuery] = useState('');
@@ -82,6 +88,17 @@ export function DeliveryMap({
   // typing never stops working.
   const [active, setActive] = useState(-1);
   const listId = useId();
+
+  // What the list shows is derived, not stored. `places` holds whatever the
+  // last completed search returned; whether any of it is on screen depends on
+  // what is in the box right now. Deleting back to two characters therefore
+  // hides the results immediately, with no effect and no extra render — and
+  // typing the third character back shows them again while the new search
+  // runs, instead of flashing empty.
+  const searchable = query.trim().length >= 3;
+  const visiblePlaces = searchable ? places : [];
+  // Never point aria-activedescendant at an option that is not rendered.
+  const activeIndex = active < visiblePlaces.length ? active : -1;
 
   const pin = value.pin;
 
@@ -228,22 +245,25 @@ export function DeliveryMap({
 
   // ------------------------------------------------------------- search
   useEffect(() => {
-    const term = query.trim();
-    if (term.length < 3) {
-      setPlaces([]);
-      setSearching(false);
-      return;
-    }
+    // Two characters is not a place name; it is somebody mid-word. Nothing is
+    // cleared here — what the list shows is derived from the query below, so
+    // shortening the box hides the old results without a second render.
+    if (!searchable) return;
 
+    const term = query.trim();
     const controller = new AbortController();
-    setSearching(true);
-    setSearchFailed(false);
 
     // Debounced, and an in-flight search is abandoned when a newer keystroke
     // arrives — otherwise a slow reply for "bo" can land after "bole" and
     // replace the right answers with stale ones.
+    //
+    // The spinner is switched on inside the timer rather than beside it, so
+    // "searching" means a request is actually in flight rather than "a key
+    // was pressed 400ms ago".
     const timer = window.setTimeout(() => {
       void (async () => {
+        setSearching(true);
+        setSearchFailed(false);
         try {
           const res = await fetch(`/api/geocode?q=${encodeURIComponent(term)}`, {
             signal: controller.signal,
@@ -264,7 +284,7 @@ export function DeliveryMap({
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [query]);
+  }, [query, searchable]);
 
   function goTo(lat: number, lng: number, zoom = 16) {
     const map = mapRef.current;
@@ -291,18 +311,18 @@ export function DeliveryMap({
    * input otherwise does.
    */
   function onSearchKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
-    if (places.length === 0) return;
+    if (visiblePlaces.length === 0) return;
 
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
       const step = event.key === 'ArrowDown' ? 1 : -1;
-      setActive((i) => (i + step + places.length) % places.length);
+      setActive((i) => (i + step + visiblePlaces.length) % visiblePlaces.length);
       return;
     }
 
     if (event.key === 'Enter') {
       event.preventDefault();
-      if (active >= 0 && places[active]) choosePlace(places[active]);
+      if (activeIndex >= 0 && visiblePlaces[activeIndex]) choosePlace(visiblePlaces[activeIndex]);
       return;
     }
 
@@ -357,10 +377,10 @@ export function DeliveryMap({
 
   // One sentence describing the current state, in the order somebody would
   // want to hear it: what the search did, then where the pin ended up.
-  const announcement = searching
+  const announcement = searching && searchable
     ? 'Searching…'
-    : places.length > 0
-      ? `${places.length} ${places.length === 1 ? 'place' : 'places'} found. Use the up and down arrows to review them.`
+    : visiblePlaces.length > 0
+      ? `${visiblePlaces.length} ${visiblePlaces.length === 1 ? 'place' : 'places'} found. Use the up and down arrows to review them.`
       : resolving
         ? 'Looking up the address…'
         : pin
@@ -384,12 +404,12 @@ export function DeliveryMap({
             aria-label="Search for a place"
             role="combobox"
             aria-autocomplete="list"
-            aria-expanded={places.length > 0}
+            aria-expanded={visiblePlaces.length > 0}
             aria-controls={listId}
-            aria-activedescendant={active >= 0 ? `${listId}-${active}` : undefined}
+            aria-activedescendant={activeIndex >= 0 ? `${listId}-${activeIndex}` : undefined}
             autoComplete="off"
           />
-          {searching && <span className={styles.spinner} aria-hidden="true" />}
+          {searching && searchable && <span className={styles.spinner} aria-hidden="true" />}
         </div>
 
         <button type="button" className={styles.locate} onClick={useMyLocation} disabled={locating}>
@@ -398,9 +418,9 @@ export function DeliveryMap({
         </button>
       </div>
 
-      {places.length > 0 && (
+      {visiblePlaces.length > 0 && (
         <ul className={styles.results} id={listId} role="listbox" aria-label="Places">
-          {places.map((place, i) => (
+          {visiblePlaces.map((place, i) => (
             // role="option" on the li itself, not on a button inside it: a
             // listbox may only contain options, and a button nested in one is
             // announced as an empty list. Focus stays in the input, so these
@@ -410,8 +430,8 @@ export function DeliveryMap({
               key={place.id}
               id={`${listId}-${i}`}
               role="option"
-              aria-selected={i === active}
-              className={`${styles.result} ${i === active ? styles.resultActive : ''}`}
+              aria-selected={i === activeIndex}
+              className={`${styles.result} ${i === activeIndex ? styles.resultActive : ''}`}
               onClick={() => choosePlace(place)}
               onMouseEnter={() => setActive(i)}
             >
@@ -425,7 +445,7 @@ export function DeliveryMap({
         </ul>
       )}
 
-      {searchFailed && query.trim().length >= 3 && !searching && (
+      {searchFailed && searchable && !searching && (
         <p className={styles.note}>
           Place search is unavailable right now. Tap the map where the furniture should go.
         </p>

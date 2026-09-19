@@ -25,7 +25,14 @@ export function SearchTrigger() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Results | null>(null);
-  const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
+  const [rawStatus, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
+
+  // Two characters is the shortest thing worth searching for. What the panel
+  // shows is derived from that rather than stored: below the threshold it is
+  // idle with no hits, whatever the last completed search left behind.
+  const searchable = query.trim().length >= 2;
+  const status = searchable ? rawStatus : 'idle';
+  const hits = searchable ? results : null;
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -55,15 +62,15 @@ export function SearchTrigger() {
 
   // Debounced so a fast typist fires one request, not eight.
   useEffect(() => {
+    // One character is somebody mid-word, not a search. Nothing is cleared
+    // here — what the panel shows is derived from the query below, so
+    // shortening the box hides the old hits without a second render.
+    if (!searchable) return;
+
     const q = query.trim();
-    if (q.length < 2) {
-      setResults(null);
-      setStatus('idle');
-      return;
-    }
-    setStatus('loading');
     const controller = new AbortController();
     const timer = setTimeout(async () => {
+      setStatus('loading');
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`, {
           signal: controller.signal,
@@ -81,7 +88,7 @@ export function SearchTrigger() {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [query]);
+  }, [query, searchable]);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -174,9 +181,9 @@ export function SearchTrigger() {
                 </p>
               )}
 
-              {status === 'done' && results && (
+              {status === 'done' && hits && (
                 <>
-                  {results.products.length === 0 && results.categories.length === 0 ? (
+                  {hits.products.length === 0 && hits.categories.length === 0 ? (
                     <div className={styles.empty}>
                       <p>
                         Nothing matched <strong>{query}</strong>.
@@ -188,7 +195,7 @@ export function SearchTrigger() {
                     </div>
                   ) : (
                     <ul className={styles.hits}>
-                      {results.products.map((hit) => (
+                      {hits.products.map((hit) => (
                         <li key={hit.slug}>
                           <Link href={`/product/${hit.slug}`} className={styles.hit} onClick={close}>
                             <span className={styles.thumb}>
@@ -208,7 +215,7 @@ export function SearchTrigger() {
                           </Link>
                         </li>
                       ))}
-                      {results.categories.map((c) => (
+                      {hits.categories.map((c) => (
                         <li key={c.slug}>
                           <Link href={`/shop?category=${c.slug}`} className={styles.hitCat} onClick={close}>
                             Browse all <strong>{c.name}</strong>
