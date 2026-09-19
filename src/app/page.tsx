@@ -78,6 +78,10 @@ export default async function HomePage() {
         />
       </Section>
 
+      {/* priorityCount is 0 on purpose: the hero photograph is the largest
+          thing on the first screen and the only image worth preloading. These
+          cards sit below the fold at every width, and marking them priority
+          put four more images in front of the hero on a phone connection. */}
       <Section labelledBy="featured-heading">
         <ProductStrip
           products={shelf}
@@ -86,7 +90,7 @@ export default async function HomePage() {
           headingId="featured-heading"
           linkLabel="Browse everything"
           linkHref="/shop"
-          priorityCount={4}
+          priorityCount={0}
           savedIds={saved}
           emptyLabel="Nothing is photographed yet. The catalogue is still the place to look."
         />

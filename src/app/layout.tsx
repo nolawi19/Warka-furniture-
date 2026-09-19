@@ -27,9 +27,12 @@ const inter = Inter({
 
 // The brand voice. Playfair's high stroke contrast is what makes a furniture
 // headline read as a gallery label rather than a product listing.
+// No weight list: Playfair Display is a variable font, and naming weights
+// forces next/font to cut a separate static file for each one. Eight files
+// (four weights, two styles) came to 88kB; the variable pair covers every
+// weight the theme editor can ask for in two.
 const playfair = Playfair_Display({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
   style: ['normal', 'italic'],
   display: 'swap',
   variable: '--font-playfair',
@@ -37,10 +40,20 @@ const playfair = Playfair_Display({
 
 // Neither Latin face has Ethiopic coverage. Without this, every Amharic word
 // on the site renders in whatever the device happens to have installed.
+// Ethiopic carries several hundred glyphs, so each static weight is large —
+// four of them were 194kB, fetched on every page for a line in the footer.
+// This is a variable font too, so the whole weight range costs one file.
 const ethiopic = Noto_Sans_Ethiopic({
   subsets: ['ethiopic'],
-  weight: ['400', '500', '600', '700'],
   display: 'swap',
+  // Not preloaded. The Ethiopic block is several hundred glyphs and this file
+  // is 198kB — bigger than all three Latin faces together, and bigger than
+  // every script on the page. The Amharic it renders is a line in the footer
+  // and the second line of a category name: real, worth having, and never the
+  // thing somebody is waiting to read. Preloading it put 198kB in front of
+  // the first paint of every page. It is fetched when it is needed instead,
+  // and display: swap means the words are on screen before it lands.
+  preload: false,
   variable: '--font-ethiopic',
 });
 
