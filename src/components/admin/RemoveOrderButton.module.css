@@ -26,7 +26,24 @@
 }
 .dialog::backdrop { background: rgb(0 0 0 / 46%); }
 
-.panel { display: grid; gap: 10px; padding: 22px; }
+.panel {
+  display: grid;
+  /* minmax(0,1fr), not the implicit auto: an auto column sizes to its
+     max-content and a grid child cannot shrink below it. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  padding: 22px;
+  /* The orders table sets white-space: nowrap on its cells, and the dialog is
+     rendered from inside a row, so every line in here inherited it. Nothing
+     could wrap, the column sized itself to the longest sentence at 529px, and
+     the "Remove order" button was pushed outside a 420px dialog where nobody
+     could click it. */
+  white-space: normal;
+  /* And the cell is a numeric one, which is right-aligned — so the title and
+     the message came out flush right too. The dialog sets its own alignment
+     rather than inheriting the table's. */
+  text-align: left;
+}
 
 .title { font-size: 17px; font-weight: 600; }
 .message { font-size: 14px; line-height: 1.55; color: var(--admin-ink-2, #57514a); }
@@ -42,7 +59,7 @@
 
 .error { font-size: 13px; color: var(--danger, #a32d20); }
 
-.actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+.actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 6px; }
 
 .cancel,
 .confirm {
