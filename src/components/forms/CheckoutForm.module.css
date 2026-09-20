@@ -247,3 +247,11 @@
   text-transform: none;
   color: var(--ink-3);
 }
+
+/* Sits under the payment heading and names who actually takes the money. */
+.stepNote {
+  margin-top: calc(var(--space-2) * -1 + 2px);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}

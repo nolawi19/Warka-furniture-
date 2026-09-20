@@ -95,7 +95,7 @@ export function CheckoutForm({
       {/* ---------------------------------------------------- 1. who */}
       <section className={styles.step} aria-labelledby="step-contact">
         <h2 id="step-contact" className={styles.stepTitle}>
-          <span className={styles.stepNum}>1</span> Who it is for
+          <span className={styles.stepNum}>1</span> Contact information
         </h2>
         <div className={styles.grid}>
           <Field name="name" label="Full name" autoComplete="name" defaultValue={defaults.name} error={state.errors?.name} />
@@ -107,7 +107,7 @@ export function CheckoutForm({
       {/* ---------------------------------------------------- 2. where */}
       <section className={styles.step} aria-labelledby="step-delivery">
         <h2 id="step-delivery" className={styles.stepTitle}>
-          <span className={styles.stepNum}>2</span> Where it goes
+          <span className={styles.stepNum}>2</span> Delivery details
         </h2>
 
         {/* A pin, not a street address. Most of Addis has no house numbers,
@@ -190,8 +190,10 @@ export function CheckoutForm({
       {/* ---------------------------------------------------- 4. how */}
       <section className={styles.step} aria-labelledby="step-payment">
         <h2 id="step-payment" className={styles.stepTitle}>
-          <span className={styles.stepNum}>4</span> How you pay
+          <span className={styles.stepNum}>4</span> Choose a payment method
         </h2>
+
+        <p className={styles.stepNote}>Secure payment is processed through Chapa.</p>
 
         {nothingToCharge && (
           <div className={styles.freeNotice}>
