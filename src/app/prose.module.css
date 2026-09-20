@@ -23,6 +23,18 @@
   background: var(--ink-3);
 }
 .body a { color: var(--ember-text); text-decoration: underline; }
+
+/* The two buttons some prose pages end on. Its own row so the flex column's
+   gap still spaces it like a paragraph, and it wraps rather than overflowing
+   on a phone. Links inside are buttons, so they opt out of the prose
+   underline above. */
+.cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+.cta a { text-decoration: none; }
 .note {
   background: var(--bg-3);
   border-radius: var(--radius);
