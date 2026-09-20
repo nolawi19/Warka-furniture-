@@ -53,6 +53,13 @@ export type AdminGroup = {
   links: AdminLink[];
 };
 
+/**
+ * The Website and Design groups were removed from this list on request. The
+ * routes behind them still exist and still work if typed directly — nothing
+ * was deleted — they are simply no longer offered in the admin. Because this
+ * file is the single source for the sidebar, the mobile drawer, the command
+ * search and the breadcrumb, removing them here removes them from all four.
+ */
 export const ADMIN_NAV: AdminGroup[] = [
   {
     id: 'dashboard',
@@ -65,29 +72,6 @@ export const ADMIN_NAV: AdminGroup[] = [
       { href: '/admin/inventory', label: 'Inventory', icon: 'inventory', hint: 'Stock counts and the history behind them' },
       { href: '/admin/customers', label: 'Customers', icon: 'customers', hint: 'Who has ordered, and what they spent' },
       { href: '/admin/discounts', label: 'Discounts', icon: 'discounts', hint: 'Codes, percentages and time limits' },
-    ],
-  },
-  {
-    id: 'website',
-    label: 'Website',
-    links: [
-      { href: '/admin/builder', label: 'Website Builder', icon: 'builder', hint: 'Arrange the homepage and every page visually' },
-      { href: '/admin/pages', label: 'Pages', icon: 'pages', hint: 'Create and publish pages' },
-      { href: '/admin/media', label: 'Media Library', icon: 'media', hint: 'Upload, name and reuse images' },
-      { href: '/admin/navigation', label: 'Navigation', icon: 'navigation', hint: 'The links across the top of the site' },
-      { href: '/admin/header', label: 'Header', icon: 'header', hint: 'Logo, search, basket and account controls' },
-      { href: '/admin/footer', label: 'Footer', icon: 'footer', hint: 'Footer columns, text and newsletter' },
-      { href: '/admin/banners', label: 'Banners', icon: 'banners', hint: 'Announcements and promotions, with dates' },
-    ],
-  },
-  {
-    id: 'design',
-    label: 'Design',
-    links: [
-      { href: '/admin/appearance', label: 'Appearance', icon: 'appearance', hint: 'Colours, corners, spacing and width' },
-      { href: '/admin/typography', label: 'Typography', icon: 'typography', hint: 'Fonts, sizes, weight and line height' },
-      { href: '/admin/buttons', label: 'Buttons', icon: 'buttons', hint: 'How every button on the site looks' },
-      { href: '/admin/animations', label: 'Animations', icon: 'animations', hint: 'Movement, and how much of it' },
     ],
   },
   {

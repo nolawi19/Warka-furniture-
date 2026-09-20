@@ -18,6 +18,88 @@ const ORDER_STATUSES = [
 
 // ------------------------------------------------------------------ orders
 
+/**
+ * Permanently remove an order.
+ *
+ * What goes with it, checked against the live foreign keys rather than assumed:
+ *
+ *   OrderItem          ON DELETE CASCADE  — goes with the order
+ *   OrderStatusHistory ON DELETE CASCADE  — goes with the order
+ *   Payment            ON DELETE CASCADE  — goes with the order
+ *   InventoryMovement  ON DELETE SET NULL — SURVIVES, and loses its link
+ *
+ * That last one is deliberate and worth understanding. The stock really did
+ * move; deleting the paperwork does not put it back on the shelf, and throwing
+ * the movement away would leave the stock count unexplainable. So the movement
+ * stays — but on its own it would read "two left the shelf" with no reason
+ * attached. Before the link is broken we write the order's reference into the
+ * movement's note, so the trail still says where the stock went.
+ *
+ * All of it in one transaction: either the order and its children go and the
+ * movements keep their provenance, or nothing happens at all.
+ *
+ * This does NOT restore stock. Un-selling a delivered order is a business
+ * decision, not a side effect of tidying a list.
+ */
+export async function deleteOrderAction(orderId: string): Promise<AdminResult> {
+  const staff = await assertStaff();
+  if (!staff) return { ok: false, message: 'Not allowed.' };
+
+  const order = await db.order.findUnique({
+    where: { id: orderId },
+    select: {
+      id: true,
+      reference: true,
+      status: true,
+      totalSantim: true,
+      email: true,
+      _count: { select: { items: true, payments: true, history: true } },
+    },
+  });
+  if (!order) return { ok: false, message: 'Unable to remove this order. Please try again.' };
+
+  try {
+    await db.$transaction(async (tx) => {
+      // Keep the provenance before SET NULL takes the link away.
+      const movements = await tx.inventoryMovement.findMany({
+        where: { orderId },
+        select: { id: true, note: true },
+      });
+      for (const m of movements) {
+        const kept = `Order ${order.reference} (removed ${new Date().toISOString().slice(0, 10)})`;
+        await tx.inventoryMovement.update({
+          where: { id: m.id },
+          data: { note: m.note ? `${m.note} · ${kept}`.slice(0, 500) : kept },
+        });
+      }
+
+      await tx.order.delete({ where: { id: orderId } });
+    });
+  } catch {
+    // The real reason belongs in the server log, not on a shopkeeper's screen.
+    return { ok: false, message: 'Unable to remove this order. Please try again.' };
+  }
+
+  // Written after the delete, so the log only ever claims what actually happened.
+  await audit({
+    actor: staff,
+    action: 'order.delete',
+    entityType: 'Order',
+    entityId: orderId,
+    diff: {
+      reference: order.reference,
+      status: order.status,
+      totalSantim: order.totalSantim,
+      email: order.email,
+      removed: order._count,
+    },
+  });
+
+  revalidatePath('/admin/orders');
+  revalidatePath('/admin');
+  return { ok: true, message: 'Order removed successfully.' };
+}
+
 export async function updateOrderStatusAction(
   orderId: string,
   status: string,

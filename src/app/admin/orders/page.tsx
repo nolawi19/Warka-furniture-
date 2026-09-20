@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { RemoveOrderButton } from '@/components/admin/RemoveOrderButton';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 import { EmptyState } from '@/components/admin/ui/EmptyState';
 import { PageHeader } from '@/components/admin/ui/PageHeader';
@@ -153,6 +154,7 @@ export default async function AdminOrders({ searchParams }: { searchParams: Sear
               <th className={cell.num}>Total</th>
               <th>Status</th>
               <th>Placed</th>
+              <th aria-label="Actions" />
             </>
           }
         >
@@ -184,6 +186,9 @@ export default async function AdminOrders({ searchParams }: { searchParams: Sear
                 <span className={cell.faint} style={{ display: 'block' }}>
                   {STATUS_LABEL[o.status]}
                 </span>
+              </td>
+              <td className={cell.num}>
+                <RemoveOrderButton orderId={o.id} reference={o.reference} />
               </td>
             </tr>
           ))}

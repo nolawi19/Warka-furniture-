@@ -1,0 +1,69 @@
+.trigger {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--admin-line, rgba(0, 0, 0, 0.12));
+  border-radius: 6px;
+  background: transparent;
+  color: var(--danger, #a32d20);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms ease-out, border-color 120ms ease-out;
+}
+.trigger:hover {
+  background: color-mix(in srgb, var(--danger, #a32d20) 8%, transparent);
+  border-color: color-mix(in srgb, var(--danger, #a32d20) 40%, transparent);
+}
+
+.dialog {
+  width: min(420px, 92vw);
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background: var(--admin-surface, #fff);
+  color: var(--admin-ink, #14110e);
+  box-shadow: 0 24px 64px -16px rgb(0 0 0 / 38%);
+}
+.dialog::backdrop { background: rgb(0 0 0 / 46%); }
+
+.panel { display: grid; gap: 10px; padding: 22px; }
+
+.title { font-size: 17px; font-weight: 600; }
+.message { font-size: 14px; line-height: 1.55; color: var(--admin-ink-2, #57514a); }
+
+/* Which order, so a misclick in a long list is visible before it is final. */
+.which {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: var(--admin-sunken, rgba(0, 0, 0, 0.04));
+}
+
+.error { font-size: 13px; color: var(--danger, #a32d20); }
+
+.actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+
+.cancel,
+.confirm {
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 120ms ease-out;
+}
+.cancel {
+  border: 1px solid var(--admin-line, rgba(0, 0, 0, 0.14));
+  background: transparent;
+  color: inherit;
+}
+.cancel:hover { background: var(--admin-sunken, rgba(0, 0, 0, 0.04)); }
+
+.confirm { border: none; background: var(--danger, #a32d20); color: #fff; font-weight: 500; }
+.confirm:hover:not(:disabled) { background: color-mix(in srgb, var(--danger, #a32d20) 86%, #000); }
+.cancel:disabled, .confirm:disabled { opacity: 0.55; cursor: not-allowed; }
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger, .cancel, .confirm { transition: none; }
+}
