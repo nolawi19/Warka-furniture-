@@ -40,15 +40,24 @@ export default async function HomePage() {
     if (blocks.length > 0) return <BlockRenderer blocks={blocks} />;
   }
 
-  const [shop, categories, featured, newest, photographed, saved, offers] = await Promise.all([
-    getShop(),
-    getCategories(),
-    getFeaturedProducts(8),
-    getNewestProducts(8),
-    getPhotographedProducts(1),
-    savedVariantIds(),
-    getOffers(4),
-  ]);
+  const [shop, categories, featured, newest, photographed, saved, configuredOffers] =
+    await Promise.all([
+      getShop(),
+      getCategories(),
+      getFeaturedProducts(8),
+      getNewestProducts(8),
+      getPhotographedProducts(1),
+      savedVariantIds(),
+      getOffers(4),
+    ]);
+
+  // The homepage does not carry a delivery card. Free-delivery zones are still
+  // configured in the admin, still priced at checkout, and the pin still picks
+  // the area — that is untouched. It is simply not advertised here, so the
+  // offers band is dropped to what is left. When free delivery was the only
+  // offer configured, hasOffers below is now false and no band renders at all,
+  // which is right: there is nothing else to say.
+  const offers = { ...configuredOffers, freeDelivery: null };
 
   // The hero leads with a real photograph when the shop has one, and with the
   // typographic plate when it does not. Neither is a placeholder.
