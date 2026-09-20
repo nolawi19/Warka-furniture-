@@ -337,8 +337,7 @@ export const FooterSchema = z.object({
 export type FooterSettings = z.infer<typeof FooterSchema>;
 
 /** What the footer said before it was editable. Used when nothing is set. */
-export const DEFAULT_FOOTER_DESCRIPTION =
-  'The warka is the sycamore fig — the tree a village meets under. We build furniture meant to last about as long.';
+export const DEFAULT_FOOTER_DESCRIPTION = 'Beautiful furniture. Beautiful living.';
 
 export const DEFAULT_FOOTER_COLUMNS: FooterColumn[] = [
   {

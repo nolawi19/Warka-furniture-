@@ -56,6 +56,20 @@
   color: var(--ink-3);
 }
 
+/* An optional sentence under a section heading. It sits in the gap the head
+   already reserves rather than adding its own, so a section without one is
+   spaced exactly as before. Same type as the hero's lede, so the two read as
+   one voice. */
+.sectionLede {
+  max-width: 62ch;
+  margin-top: calc(clamp(26px, 3.2vw, 48px) * -1 + var(--space-4));
+  margin-bottom: clamp(26px, 3.2vw, 48px);
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
 .sectionLink {
   position: relative;
   display: inline-flex;

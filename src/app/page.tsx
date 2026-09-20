@@ -58,7 +58,7 @@ export default async function HomePage() {
   // shelf shows what has actually been photographed rather than sitting empty
   // or inventing a reason a piece is special.
   const shelf = featured.length > 0 ? featured : await getPhotographedProducts(8);
-  const shelfHeading = featured.length > 0 ? 'Featured pieces' : 'On the floor now';
+  const shelfHeading = featured.length > 0 ? 'Designed for Beautiful Living' : 'On the floor now';
 
   return (
     <>
@@ -71,7 +71,8 @@ export default async function HomePage() {
       <Section id="categories" labelledBy="categories-heading">
         <CategoryStrip
           categories={categories}
-          kicker="Every room"
+          kicker="Shop by category"
+          heading="Find Furniture You'll Love"
           headingId="categories-heading"
           linkLabel="All {count} pieces"
           linkHref="/shop"
@@ -85,8 +86,9 @@ export default async function HomePage() {
       <Section labelledBy="featured-heading">
         <ProductStrip
           products={shelf}
-          kicker="Photographed in the workshop"
+          kicker="Our furniture collection"
           heading={shelfHeading}
+          body="Explore our carefully selected furniture pieces, created for comfort, style, and everyday living."
           headingId="featured-heading"
           linkLabel="Browse everything"
           linkHref="/shop"
@@ -100,8 +102,9 @@ export default async function HomePage() {
         <Section labelledBy="new-heading" flush>
           <ProductCarousel
             products={newest}
-            kicker="Latest from the workshop"
-            heading="New arrivals"
+            kicker="New arrivals"
+            heading="Something New for Your Space"
+            body="Discover our latest furniture and bring a fresh look to your home."
             headingId="new-heading"
             linkLabel="See the catalogue"
             linkHref="/shop"
@@ -128,25 +131,30 @@ export default async function HomePage() {
       <div className="band">
         <Section labelledBy="brand-heading">
           <BrandStory
-            kicker="Warka Furniture"
-            heading="Built to your measurement, in Kebena."
+            kicker="Why Warka Furniture?"
+            heading="Your Home. Your Style. Your Warka."
             headingId="brand-heading"
-            body={shop.tagline || undefined}
+            body="Create spaces that feel warm, comfortable, elegant, and uniquely yours."
             points={[
               {
-                icon: 'ruler',
-                title: 'Made to size',
-                body: 'Beds and tables are built to the measurement you bring in, not to a fixed catalogue size.',
-              },
-              {
                 icon: 'sparkle',
-                title: 'You pick the board',
-                body: 'The same piece in white melamine or grey marble laminate, chosen when you order.',
+                title: 'Beautiful Design',
+                body: 'Modern furniture made to stand out.',
               },
               {
-                icon: 'truck',
-                title: 'Delivered in Addis',
-                body: shop.deliveryNote,
+                icon: 'heart',
+                title: 'Comfort You Can Feel',
+                body: 'Designed for relaxing, living, and enjoying your space.',
+              },
+              {
+                icon: 'ruler',
+                title: 'Quality & Detail',
+                body: 'Thoughtfully crafted with attention to every detail.',
+              },
+              {
+                icon: 'shield',
+                title: 'Timeless Style',
+                body: 'Furniture made to complement your home for years to come.',
               },
             ]}
             imageUrl={HOME_VISIT.imageUrl}
@@ -162,9 +170,9 @@ export default async function HomePage() {
       <Section id="visit" labelledBy="visit-heading">
         <StorePanel
           kicker="Come and see"
-          heading="Visit the workshop"
+          heading="Make Your Space Beautiful"
           headingId="visit-heading"
-          body={HOME_VISIT.body}
+          body="Find the furniture that belongs in your home."
           imageUrl={lead?.imageUrl ?? HOME_VISIT.imageUrl}
           imageAlt={lead?.imageAlt ?? HOME_VISIT.imageAlt}
           details={[
@@ -173,7 +181,7 @@ export default async function HomePage() {
             { label: 'Phone', value: shop.phone, href: `tel:${shop.phoneHref}` },
             { label: 'Delivery', value: shop.deliveryNote },
           ]}
-          primaryLabel="See the pieces"
+          primaryLabel="Shop Warka Furniture"
           primaryHref="/shop"
           secondaryLabel="Ask a question"
           secondaryHref="/contact"

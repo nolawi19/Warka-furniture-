@@ -29,12 +29,12 @@ export type HeroContent = {
 
 export const HERO_DEFAULTS: HeroContent = {
   kicker: 'Made in Addis Ababa since the shop opened',
-  heading: 'Beds, dressing tables, drawers.',
-  body: 'Warka Furniture builds bedroom and office furniture to your measurement. Buttoned beds, mirrors, chests and pedestals, in the board and the colour you pick.',
-  primaryLabel: 'Shop the catalogue',
+  heading: 'Furniture That Makes Your Space Feel Like Home',
+  body: 'Discover beautiful, comfortable furniture designed to bring elegance and character to every room.',
+  primaryLabel: 'Shop Now',
   primaryHref: '/shop',
-  secondaryLabel: 'How we build',
-  secondaryHref: '/craft',
+  secondaryLabel: 'Explore Collection',
+  secondaryHref: '/shop',
   facts: [
     { value: 'Made to size', label: 'not a fixed catalogue' },
     { value: 'Addis delivery', label: 'set up on arrival' },

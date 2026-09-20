@@ -13,6 +13,7 @@ export function ProductStrip({
   products,
   heading,
   kicker,
+  body,
   headingId,
   linkLabel,
   linkHref,
@@ -24,6 +25,8 @@ export function ProductStrip({
   products: ProductCardData[];
   heading?: string;
   kicker?: string;
+  /** Optional sentence under the heading. */
+  body?: string;
   headingId?: string;
   linkLabel?: string;
   linkHref?: string;
@@ -50,6 +53,8 @@ export function ProductStrip({
           linkHref={linkHref}
         />
       )}
+
+      {body && <p className={styles.sectionLede}>{body}</p>}
 
       {products.length === 0 ? (
         <p className={styles.empty}>{emptyLabel}</p>
