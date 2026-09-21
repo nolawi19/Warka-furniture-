@@ -354,6 +354,12 @@
   box-shadow: var(--shadow-2);
 }
 
+/* See BrandStory: a poster is shown whole rather than cropped to 4:5. */
+.visitImage[data-shape='whole'] {
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+}
+
 .visitBody { display: flex; flex-direction: column; gap: var(--space-5); }
 
 .details {

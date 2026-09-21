@@ -23,6 +23,7 @@ export function BrandStory({
   points,
   imageUrl,
   imageAlt,
+  mediaShape = 'crop',
   linkLabel,
   linkHref,
 }: {
@@ -33,6 +34,8 @@ export function BrandStory({
   points: BrandPoint[];
   imageUrl?: string | null;
   imageAlt?: string;
+  /** 'whole' shows all of a picture that is not a croppable photograph. */
+  mediaShape?: 'crop' | 'whole';
   linkLabel?: string;
   linkHref?: string;
 }) {
@@ -71,7 +74,7 @@ export function BrandStory({
       </div>
 
       {imageUrl && (
-        <figure className={styles.media}>
+        <figure className={styles.media} data-shape={mediaShape}>
           <Image src={imageUrl} alt={imageAlt ?? ''} fill sizes="(max-width: 900px) 100vw, 44vw" className={styles.image} />
         </figure>
       )}

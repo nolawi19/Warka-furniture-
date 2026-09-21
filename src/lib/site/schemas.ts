@@ -340,24 +340,17 @@ export type FooterSettings = z.infer<typeof FooterSchema>;
 export const DEFAULT_FOOTER_DESCRIPTION = 'Beautiful furniture. Beautiful living.';
 
 export const DEFAULT_FOOTER_COLUMNS: FooterColumn[] = [
-  {
-    id: 'shop',
-    title: 'Shop',
-    links: [
-      { id: 'all', label: 'Everything', href: '/shop' },
-      { id: 'beds', label: 'Beds', href: '/shop?category=beds' },
-      { id: 'dressers', label: 'Dressing tables', href: '/shop?category=dressers' },
-      { id: 'drawers', label: 'Chests of drawers', href: '/shop?category=drawers' },
-      { id: 'office', label: 'Office', href: '/shop?category=office' },
-    ],
-  },
+  // The per-category Shop list is gone: it pointed at categories the shop had
+  // not published, so half of it led nowhere. One column of real pages does
+  // the job, and there is no second copy of it anywhere in the footer.
   {
     id: 'warka',
     title: 'Warka',
     links: [
-      { id: 'craft', label: 'How we build', href: '/craft' },
-      { id: 'visit', label: 'Visit the workshop', href: '/visit' },
-      { id: 'contact', label: 'Contact', href: '/contact' },
+      { id: 'home', label: 'Home', href: '/' },
+      { id: 'shop', label: 'Shop', href: '/shop' },
+      { id: 'craft', label: 'Our craft', href: '/craft' },
+      { id: 'visit', label: 'Visit', href: '/visit' },
     ],
   },
   {

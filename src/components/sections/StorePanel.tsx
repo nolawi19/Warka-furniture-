@@ -17,6 +17,7 @@ export function StorePanel({
   body,
   imageUrl,
   imageAlt,
+  mediaShape = 'crop',
   details,
   primaryLabel,
   primaryHref,
@@ -29,6 +30,8 @@ export function StorePanel({
   body?: string;
   imageUrl?: string;
   imageAlt?: string;
+  /** 'whole' shows all of a picture that is not a croppable photograph. */
+  mediaShape?: 'crop' | 'whole';
   details: StoreDetail[];
   primaryLabel?: string;
   primaryHref?: string;
@@ -50,6 +53,7 @@ export function StorePanel({
             height={511}
             sizes="(max-width: 900px) 100vw, 50vw"
             className={styles.visitImage}
+            data-shape={mediaShape}
           />
         )}
 

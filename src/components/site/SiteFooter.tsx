@@ -63,22 +63,24 @@ export async function SiteFooter() {
             )}
             <p className={styles.brandLine}>{description}</p>
 
+            {/* The two numbers the shop actually answers, from its own
+                business material. The placeholder phone and the example.com
+                address the site shipped with are gone, and no email is shown
+                in their place because there is no confirmed one. Opening hours
+                are out for the same reason: nothing has verified them. */}
             <address className={styles.address}>
               <span className={styles.addressRow}>
                 <Icon name="pin" size={16} />
                 {SHOP.area}
               </span>
               <span className={styles.addressRow}>
-                <Icon name="truck" size={16} />
-                {SHOP.openingHours}
+                <Icon name="phone" size={16} />
+                <a href="tel:+251932214095">+251-932-214095</a>
               </span>
               <span className={styles.addressRow}>
                 <Icon name="phone" size={16} />
-                <a href={`tel:${SHOP.phoneHref}`}>{SHOP.phone}</a>
-              </span>
-              <span className={styles.addressRow}>
-                <Icon name="mail" size={16} />
-                <a href={`mailto:${SHOP.email}`}>{SHOP.email}</a>
+                <a href="tel:+251949196561">+251-949-196561</a>
+                <span className={styles.addressNote}>direct orders</span>
               </span>
             </address>
 

@@ -75,6 +75,11 @@
 }
 .image { object-fit: cover; }
 
+/* A poster carries its own type out to its own edges, so cropping it to the
+   4:5 frame cuts the words off. Given its own square, all of it shows. */
+.media[data-shape='whole'] { aspect-ratio: 1 / 1; }
+.media[data-shape='whole'] .image { object-fit: contain; }
+
 @media (max-width: 900px) {
   .grid { grid-template-columns: minmax(0, 1fr); }
   .media { aspect-ratio: 3 / 2; order: -1; }

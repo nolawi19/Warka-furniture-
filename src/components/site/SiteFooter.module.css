@@ -132,3 +132,9 @@
   .legal { gap: var(--space-6); }
   .legal a { display: inline-block; padding-block: 6px; }
 }
+
+/* The quiet label that says which number is which. */
+.addressNote {
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+}

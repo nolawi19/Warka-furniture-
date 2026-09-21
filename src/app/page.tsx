@@ -1,24 +1,20 @@
 import { Hero } from '@/components/hero/Hero';
 import { BrandStory } from '@/components/sections/BrandStory';
-import { CategoryStrip } from '@/components/sections/CategoryStrip';
 import { ProductCarousel } from '@/components/sections/ProductCarousel';
-import { ProductStrip } from '@/components/sections/ProductStrip';
+import { FurnitureShowcase } from '@/components/sections/FurnitureShowcase';
 import { Offers } from '@/components/sections/Offers';
 import { Quote } from '@/components/sections/Quote';
 import { Section } from '@/components/sections/Section';
 import { StorePanel } from '@/components/sections/StorePanel';
 import { BlockRenderer } from '@/components/blocks/BlockRenderer';
 import {
-  getCategories,
-  getFeaturedProducts,
   getNewestProducts,
-  getPhotographedProducts,
 } from '@/lib/catalogue';
 import { db } from '@/lib/db';
 import { parseBlocks } from '@/lib/site/blocks';
 import { getOffers, hasOffers } from '@/lib/offers';
 import { getShop } from '@/lib/site/shop';
-import { HOME_QUOTE, HOME_VISIT } from '@/lib/site/home-defaults';
+import { HOME_QUOTE } from '@/lib/site/home-defaults';
 import { savedVariantIds } from '@/lib/wishlist';
 
 export const revalidate = 300;
@@ -40,16 +36,12 @@ export default async function HomePage() {
     if (blocks.length > 0) return <BlockRenderer blocks={blocks} />;
   }
 
-  const [shop, categories, featured, newest, photographed, saved, configuredOffers] =
-    await Promise.all([
-      getShop(),
-      getCategories(),
-      getFeaturedProducts(8),
-      getNewestProducts(8),
-      getPhotographedProducts(1),
-      savedVariantIds(),
-      getOffers(4),
-    ]);
+  const [shop, newest, saved, configuredOffers] = await Promise.all([
+    getShop(),
+    getNewestProducts(8),
+    savedVariantIds(),
+    getOffers(4),
+  ]);
 
   // The homepage does not carry a delivery card. Free-delivery zones are still
   // configured in the admin, still priced at checkout, and the pin still picks
@@ -59,51 +51,33 @@ export default async function HomePage() {
   // which is right: there is nothing else to say.
   const offers = { ...configuredOffers, freeDelivery: null };
 
-  // The hero leads with a real photograph when the shop has one, and with the
-  // typographic plate when it does not. Neither is a placeholder.
-  const lead = photographed[0];
-
-  // "Featured" is a flag the admin sets. When nothing is flagged yet, the
-  // shelf shows what has actually been photographed rather than sitting empty
-  // or inventing a reason a piece is special.
-  const shelf = featured.length > 0 ? featured : await getPhotographedProducts(8);
-  const shelfHeading = featured.length > 0 ? 'Designed for Beautiful Living' : 'On the floor now';
-
   return (
     <>
-      <Hero
-        panel={lead?.imageUrl ? 'image' : 'plate'}
-        imageUrl={lead?.imageUrl ?? ''}
-        imageAlt={lead?.imageAlt ?? ''}
-      />
+      {/* The plate, always. The hero used to show whichever product happened to
+          be photographed; it now carries the Warka name, the Amharic and the
+          note about the sycamore fig, which is the shop's own identity rather
+          than a piece of stock. */}
+      <Hero panel="plate" />
 
-      <Section id="categories" labelledBy="categories-heading">
-        <CategoryStrip
-          categories={categories}
-          kicker="Shop by category"
-          heading="Find Furniture You'll Love"
-          headingId="categories-heading"
-          linkLabel="All {count} pieces"
-          linkHref="/shop"
-        />
-      </Section>
-
-      {/* priorityCount is 0 on purpose: the hero photograph is the largest
-          thing on the first screen and the only image worth preloading. These
-          cards sit below the fold at every width, and marking them priority
-          put four more images in front of the hero on a phone connection. */}
-      <Section labelledBy="featured-heading">
-        <ProductStrip
-          products={shelf}
-          kicker="Our furniture collection"
-          heading={shelfHeading}
-          body="Explore our carefully selected furniture pieces, created for comfort, style, and everyday living."
-          headingId="featured-heading"
+      <Section id="furniture" labelledBy="furniture-heading">
+        <FurnitureShowcase
+          kicker="What we make"
+          heading="Furniture Made for Your Space"
+          headingId="furniture-heading"
+          body="Designed for comfort, built with care, and made to bring character to your home."
+          images={[
+            {
+              src: '/marketing/warka-wood-works.jpg',
+              alt: 'Warka Wood Works — Industrial: a fitted white kitchen being installed by the workshop team, with wardrobes, kitchen cabinets and wooden doors shown below',
+            },
+            {
+              src: '/marketing/warka-collection.jpg',
+              alt: 'Warka Wood Works — Industrial: a fitted kitchen, a wardrobe and a panelled wooden door made by the workshop',
+            },
+          ]}
+          services={['Furniture', 'Kitchen furniture', 'Doors', 'Custom woodwork']}
           linkLabel="Browse everything"
           linkHref="/shop"
-          priorityCount={0}
-          savedIds={saved}
-          emptyLabel="Nothing is photographed yet. The catalogue is still the place to look."
         />
       </Section>
 
@@ -166,8 +140,9 @@ export default async function HomePage() {
                 body: 'Furniture made to complement your home for years to come.',
               },
             ]}
-            imageUrl={HOME_VISIT.imageUrl}
-            imageAlt={HOME_VISIT.imageAlt}
+            imageUrl="/marketing/warka-collection.jpg"
+            imageAlt="A fitted kitchen, a wardrobe and a panelled wooden door made by Warka Wood Works"
+            mediaShape="whole"
             linkLabel="How we build"
             linkHref="/craft"
           />
@@ -182,13 +157,13 @@ export default async function HomePage() {
           heading="Make Your Space Beautiful"
           headingId="visit-heading"
           body="Find the furniture that belongs in your home."
-          imageUrl={lead?.imageUrl ?? HOME_VISIT.imageUrl}
-          imageAlt={lead?.imageAlt ?? HOME_VISIT.imageAlt}
+          imageUrl="/marketing/warka-wood-works.jpg"
+          imageAlt="The Warka Wood Works team fitting a white kitchen"
+          mediaShape="whole"
           details={[
             { label: 'Shop', value: shop.area },
-            { label: 'Open', value: shop.openingHours },
-            { label: 'Phone', value: shop.phone, href: `tel:${shop.phoneHref}` },
-            { label: 'Delivery', value: shop.deliveryNote },
+            { label: 'More information', value: '+251-932-214095', href: 'tel:+251932214095' },
+            { label: 'Direct orders', value: '+251-949-196561', href: 'tel:+251949196561' },
           ]}
           primaryLabel="Shop Warka Furniture"
           primaryHref="/shop"
