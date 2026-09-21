@@ -140,9 +140,6 @@ export default async function HomePage() {
                 body: 'Furniture made to complement your home for years to come.',
               },
             ]}
-            imageUrl="/marketing/warka-collection.jpg"
-            imageAlt="A fitted kitchen, a wardrobe and a panelled wooden door made by Warka Wood Works"
-            mediaShape="whole"
             linkLabel="How we build"
             linkHref="/craft"
           />
@@ -157,9 +154,6 @@ export default async function HomePage() {
           heading="Make Your Space Beautiful"
           headingId="visit-heading"
           body="Find the furniture that belongs in your home."
-          imageUrl="/marketing/warka-wood-works.jpg"
-          imageAlt="The Warka Wood Works team fitting a white kitchen"
-          mediaShape="whole"
           details={[
             { label: 'Shop', value: shop.area },
             { label: 'More information', value: '+251-932-214095', href: 'tel:+251932214095' },
