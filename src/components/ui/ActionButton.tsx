@@ -47,6 +47,9 @@ type LinkProps = Common & {
   as: 'link';
   href: string;
   prefetch?: boolean;
+  /** For an href that leaves the site. Pass rel alongside it. */
+  target?: '_blank' | '_self';
+  rel?: string;
   'aria-label'?: string;
 };
 
@@ -161,6 +164,8 @@ export function ActionButton(props: ButtonProps | LinkProps) {
       <Link
         href={props.href}
         prefetch={props.prefetch}
+        target={props.target}
+        rel={props.rel}
         className={cls}
         aria-label={props['aria-label']}
         onClick={spawn}

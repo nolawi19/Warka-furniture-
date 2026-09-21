@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 
+import { StoreMap } from '@/components/sections/StoreMap';
 import { ActionButton } from '@/components/ui/ActionButton';
 import styles from '../prose.module.css';
 
@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   alternates: { canonical: '/visit' },
 };
 
-// The Google Maps URL API, given the workshop's name and area as the query.
-// A search link rather than an invented place id: it finds the listing without
-// this file claiming to know a place id nobody has given it. Swap in the real
-// Business Profile link when there is one.
+// The workshop's own Google Maps place, and the coordinates from it. Both come
+// from the shop; nothing here is guessed.
 const MAPS_URL =
-  'https://www.google.com/maps/search/?api=1&query=WARKA+FURNITURE+INDUSTRIAL+Kebena+Addis+Ababa';
+  'https://www.google.com/maps/place/WARKA+FURNITURE+INDUSTRIAL/@8.9644192,38.7325278,61m/data=!3m1!1e3!4m7!3m6!1s0x164b8103cd9488c3:0xe2110a02535f58b2!4b1!8m2!3d8.9643517!4d38.7326431';
+const LAT = 8.9643517;
+const LNG = 38.7326431;
 
 export default function VisitPage() {
   return (
@@ -30,19 +30,27 @@ export default function VisitPage() {
           needs.
         </p>
 
-        <Image
-          src="/brand/shopfront.jpg"
-          alt="The Warka Furniture workshop in Kebena, Addis Ababa, with a finished buttoned bed standing outside"
-          width={432}
-          height={511}
-          sizes="(max-width: 700px) 100vw, 680px"
-          style={{
-            width: '100%',
-            height: 'auto',
-            borderRadius: 'var(--radius)',
-            border: '1px solid var(--line-2)',
-          }}
+        <StoreMap
+          lat={LAT}
+          lng={LNG}
+          label="WARKA FURNITURE"
+          note="Kebena, Addis Ababa, Ethiopia"
+          zoom={17}
+          height={420}
         />
+
+        <div className={styles.cta}>
+          <ActionButton
+            as="link"
+            href={MAPS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="ghost"
+            size="sm"
+          >
+            Get Directions
+          </ActionButton>
+        </div>
 
         <div className={styles.body}>
           <h2>Our Workshop</h2>

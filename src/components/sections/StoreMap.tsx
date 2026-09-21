@@ -24,12 +24,15 @@ export function StoreMap({
   lat,
   lng,
   label,
+  note,
   zoom = 16,
   height = 320,
 }: {
   lat: number;
   lng: number;
   label: string;
+  /** A second line. Given one, the pin opens a small card when clicked. */
+  note?: string;
   zoom?: number;
   height?: number;
 }) {
@@ -61,7 +64,7 @@ export function StoreMap({
           attribution: '© OpenStreetMap contributors',
         }).addTo(map);
 
-        L.circleMarker([lat, lng], {
+        const marker = L.circleMarker([lat, lng], {
           radius: 9,
           color: '#ffffff',
           weight: 3,
@@ -70,6 +73,20 @@ export function StoreMap({
         })
           .addTo(map)
           .bindTooltip(label, { permanent: false, direction: 'top' });
+
+        if (note) {
+          // Built as nodes rather than an HTML string: the label and the note
+          // are text, and text put through innerHTML is a way to be surprised
+          // later by whatever ends up in them.
+          const card = document.createElement('div');
+          const name = document.createElement('strong');
+          name.textContent = label;
+          const line = document.createElement('span');
+          line.textContent = note;
+          line.style.display = 'block';
+          card.append(name, line);
+          marker.bindPopup(card);
+        }
 
         mapRef.current = map;
         setStatus('ready');
