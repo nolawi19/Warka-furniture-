@@ -42,6 +42,12 @@ export function StoreEditor({
                   onChange={(v) => set((p) => ({ ...p, name: v }))}
                 />
                 <TextField
+                  label="Workshop name"
+                  value={value.workshopName}
+                  hint="The trading name on your business material."
+                  onChange={(v) => set((p) => ({ ...p, workshopName: v }))}
+                />
+                <TextField
                   label="Name in Amharic"
                   value={value.nameAm}
                   onChange={(v) => set((p) => ({ ...p, nameAm: v }))}
@@ -89,6 +95,20 @@ export function StoreEditor({
                   onChange={(v) => set((p) => ({ ...p, phoneHref: v }))}
                 />
                 <TextField
+                  label="Order line, as written"
+                  value={value.orderPhone}
+                  placeholder="+251 94 919 6561"
+                  hint="The number for placing an order. Leave blank to hide it."
+                  onChange={(v) => set((p) => ({ ...p, orderPhone: v }))}
+                />
+                <TextField
+                  label="Order line, for dialling"
+                  value={value.orderPhoneHref}
+                  placeholder="+251949196561"
+                  hint="No spaces."
+                  onChange={(v) => set((p) => ({ ...p, orderPhoneHref: v }))}
+                />
+                <TextField
                   label="Email"
                   value={value.email}
                   onChange={(v) => set((p) => ({ ...p, email: v }))}
@@ -107,12 +127,29 @@ export function StoreEditor({
                 <TextField
                   label="Opening hours"
                   value={value.openingHours}
+                  hint="Leave blank until confirmed — nothing is shown while it is."
                   onChange={(v) => set((p) => ({ ...p, openingHours: v }))}
+                />
+                <TextField
+                  label="Services"
+                  value={value.services.join(', ')}
+                  hint="What the workshop makes, separated by commas."
+                  wide
+                  onChange={(v) =>
+                    set((p) => ({
+                      ...p,
+                      services: v
+                        .split(',')
+                        .map((x) => x.trim())
+                        .filter(Boolean)
+                        .slice(0, 12),
+                    }))
+                  }
                 />
                 <TextField
                   label="Delivery note"
                   value={value.deliveryNote}
-                  hint="One line, shown on product pages."
+                  hint="One line, shown on product pages. Leave blank until confirmed."
                   wide
                   onChange={(v) => set((p) => ({ ...p, deliveryNote: v }))}
                 />
@@ -143,6 +180,13 @@ export function StoreEditor({
                 somewhere else.
               </p>
             )}
+            <TextField
+              label="Google Maps link"
+              value={value.mapsUrl}
+              hint="Your Google Maps listing. The Get Directions buttons open it."
+              wide
+              onChange={(v) => set((p) => ({ ...p, mapsUrl: v }))}
+            />
           </Card>
 
             <Card title="Money and place">

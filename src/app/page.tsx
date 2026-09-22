@@ -156,8 +156,9 @@ export default async function HomePage() {
           body="Find the furniture that belongs in your home."
           details={[
             { label: 'Shop', value: shop.area },
-            { label: 'More information', value: '+251-932-214095', href: 'tel:+251932214095' },
-            { label: 'Direct orders', value: '+251-949-196561', href: 'tel:+251949196561' },
+            { label: 'More information', value: shop.phone, href: `tel:${shop.phoneHref}` },
+            { label: 'Direct orders', value: shop.orderPhone, href: `tel:${shop.orderPhoneHref}` },
+            { label: 'Email', value: shop.email, href: `mailto:${shop.email}` },
           ]}
           primaryLabel="Shop Warka Furniture"
           primaryHref="/shop"

@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
+import { IMAGE_SRC_MESSAGE, isImageSrc } from '@/lib/image-src';
 import { slugify } from '@/lib/slug';
 
 export type CategoryActionState = { ok: boolean; message: string; id?: string } | null;
@@ -15,7 +16,14 @@ const CategorySchema = z.object({
   nameAm: z.string().trim().max(80).optional(),
   slug: z.string().trim().max(80).optional(),
   blurb: z.string().trim().max(400).optional(),
-  imageUrl: z.string().trim().max(500).optional(),
+  // Blank is fine — the menu borrows a product photograph, or shows an icon.
+  // Anything else has to be something next/image can draw; see image-src.ts.
+  imageUrl: z
+    .string()
+    .trim()
+    .max(500)
+    .optional()
+    .refine((v) => !v || isImageSrc(v), IMAGE_SRC_MESSAGE),
   parentId: z.string().trim().max(40).optional(),
   isPublished: z.boolean().optional(),
   isFeatured: z.boolean().optional(),

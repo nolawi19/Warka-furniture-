@@ -16,7 +16,8 @@ export default async function PrivacyPage() {
         <p className={`micro ${styles.kicker}`}>Legal</p>
         <h1 className={`dsp ${styles.title}`}>Privacy</h1>
         <p className={styles.lede}>
-          What this site stores about you, why, and for how long. It is a short list because we
+          What {SHOP.name} ({SHOP.workshopName}, {SHOP.area}) stores about you, why, and for how
+          long. It is a short list because we
           collect very little.
         </p>
 

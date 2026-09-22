@@ -144,21 +144,29 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // stylesheet's own value. A shop on the defaults ships a handful of lines.
   const themeCss = buildThemeCss({ theme, typography, buttons, animations });
 
+  // Only what Store Settings actually holds. A blank field is left out rather
+  // than sent as an empty string, which Google reads as a claim that the shop
+  // has no opening hours at all.
   const organisation = {
     '@context': 'https://schema.org',
     '@type': 'FurnitureStore',
     name: store.name,
+    ...(store.workshopName ? { alternateName: [store.workshopName, store.nameAm].filter(Boolean) } : {}),
     description: seo.defaultDescription,
     url: siteUrl,
-    telephone: store.phone,
-    email: store.email,
+    ...(store.phone ? { telephone: store.phone } : {}),
+    ...(store.email ? { email: store.email } : {}),
     address: {
       '@type': 'PostalAddress',
       streetAddress: store.area,
       addressLocality: store.city,
       addressCountry: store.country,
     },
-    openingHours: store.openingHours,
+    ...(store.latitude !== 0 || store.longitude !== 0
+      ? { geo: { '@type': 'GeoCoordinates', latitude: store.latitude, longitude: store.longitude } }
+      : {}),
+    ...(store.mapsUrl ? { hasMap: store.mapsUrl } : {}),
+    ...(store.openingHours ? { openingHours: store.openingHours } : {}),
     currenciesAccepted: store.currency,
     sameAs: social.links.filter((l) => l.isVisible && l.url).map((l) => l.url),
   };

@@ -24,8 +24,8 @@ export default async function ReturnsPage() {
         <div className={styles.body}>
           <h2>If it arrives damaged or is not what was agreed</h2>
           <p>
-            Tell us within 48 hours of delivery and we will collect it and put it right at our
-            cost — repaired, remade or refunded, whichever suits you.
+            Call us as soon as you can, with your order reference, and we will look at it with
+            you and agree what happens next.
           </p>
 
           <h2>If you simply change your mind</h2>
@@ -36,16 +36,16 @@ export default async function ReturnsPage() {
             want.
           </p>
 
-          <h2>Before we cut anything</h2>
+          <h2>Changing an order</h2>
           <p>
-            You can change or cancel an order at no cost up until we start building it. Call and
-            quote your order reference.
+            Call as early as you can and quote your order reference. A change is easiest to make
+            before we start building.
           </p>
 
           <h2>Ready-made pieces</h2>
           <p>
-            Anything bought off the showroom floor unused and undamaged can come back within seven
-            days.
+            For a piece bought ready-made, talk to us about a return and we will tell you what we
+            can do.
           </p>
 
           <p className={styles.note}>

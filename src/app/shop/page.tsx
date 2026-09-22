@@ -13,7 +13,7 @@ import styles from './page.module.css';
 export const metadata: Metadata = {
   title: 'Shop',
   description:
-    'Every piece Warka Furniture makes — beds, headboards, dressing tables, mirrors, chests of drawers, office pedestals and stools, built to your measurement in Addis Ababa.',
+    'Shop Warka Furniture — furniture, kitchen furniture, doors and custom woodwork, made to your measurements in Kebena, Addis Ababa.',
 };
 
 export const revalidate = 120;

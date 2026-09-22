@@ -21,14 +21,19 @@ export default async function ContactPage() {
         <h1 className={`dsp ${styles.title}`}>Contact</h1>
         <p className={styles.lede}>
           The quickest way to get an answer about a size, a finish or a delivery date is to call.
-          Someone is in the workshop {SHOP.openingHours.toLowerCase()}.
+          {SHOP.openingHours && <> Someone is in the workshop {SHOP.openingHours.toLowerCase()}.</>}
         </p>
 
         <div className={styles.body}>
           <h2>Phone</h2>
           <p>
-            <a href={`tel:${SHOP.phoneHref}`}>{SHOP.phone}</a>
+            For more information: <a href={`tel:${SHOP.phoneHref}`}>{SHOP.phone}</a>
           </p>
+          {SHOP.orderPhone && (
+            <p>
+              For direct orders: <a href={`tel:${SHOP.orderPhoneHref}`}>{SHOP.orderPhone}</a>
+            </p>
+          )}
 
           <h2>Email</h2>
           <p>
@@ -37,8 +42,11 @@ export default async function ContactPage() {
 
           <h2>Where we are</h2>
           <p>
-            {SHOP.area}. There is usually a bed and a dressing table finished and standing on the
-            floor, and you are welcome to open the drawers.
+            {SHOP.workshopName}, {SHOP.area}. Come and see our work in person —{' '}
+            <a href={SHOP.mapsUrl} target="_blank" rel="noopener noreferrer">
+              get directions
+            </a>
+            .
           </p>
 
           <h2>What to have ready</h2>

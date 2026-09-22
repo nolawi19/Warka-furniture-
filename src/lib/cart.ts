@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { randomBytes } from 'node:crypto';
 
 import { db } from './db';
+import { toImageSrc } from './image-src';
 import { currentUser } from './auth';
 import { effectivePriceSantim } from './money';
 
@@ -129,7 +130,7 @@ export async function getCart(): Promise<CartView> {
       productName: v.product.name,
       productSlug: v.product.slug,
       variantLabel: v.label,
-      imageUrl: v.images[0]?.url ?? fallbackImage?.url ?? null,
+      imageUrl: toImageSrc(v.images[0]?.url) ?? toImageSrc(fallbackImage?.url),
       unitPriceSantim: price,
       listPriceSantim: v.priceSantim,
       lineTotalSantim: price === null ? null : price * item.qty,

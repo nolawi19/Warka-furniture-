@@ -136,7 +136,7 @@ export default async function ProductPage({ params }: { params: Params }) {
           <div className={styles.prose}>
             {product.description
               ? product.description.split(/\n{2,}/).filter(Boolean).map((para, i) => <p key={i}>{para}</p>)
-              : <p>Built to order in the Kebena workshop. Come and see one standing on the floor.</p>}
+              : <p>Built to order in the Kebena workshop.</p>}
             {product.materials && <p>{product.materials}</p>}
             {product.careNotes && <p>{product.careNotes}</p>}
           </div>
@@ -159,10 +159,12 @@ export default async function ProductPage({ params }: { params: Params }) {
                 <dd>{product.brand}</dd>
               </div>
             )}
-            <div>
-              <dt>Delivery</dt>
-              <dd>{SHOP.deliveryNote}</dd>
-            </div>
+            {SHOP.deliveryNote && (
+              <div>
+                <dt>Delivery</dt>
+                <dd>{SHOP.deliveryNote}</dd>
+              </div>
+            )}
             <div>
               <dt>Seen first</dt>
               <dd>Visit the workshop in {SHOP.area}.</dd>

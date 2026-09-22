@@ -17,14 +17,16 @@ export default async function DeliveryPage() {
         <p className={`micro ${styles.kicker}`}>Help</p>
         <h1 className={`dsp ${styles.title}`}>Delivery</h1>
         <p className={styles.lede}>
-          We bring the piece to your floor and set it up. You are not left with a flat pack.
+          How getting your furniture to you works. Your delivery area and its fee are shown at
+          checkout, before you pay.
         </p>
 
         <div className={styles.body}>
-          <h2>Addis Ababa</h2>
+          <h2>Your delivery area</h2>
           <p>
-            Delivered and set up in the room. You pick the day when you place the order, and the
-            driver calls the number on the order before setting out.
+            You drop a pin on the map at checkout, and the area it falls in sets the delivery fee.
+            The fee is shown before you pay. We use the phone number on the order to arrange the
+            delivery with you.
           </p>
 
           <h2>Outside Addis</h2>

@@ -35,10 +35,9 @@ export const HERO_DEFAULTS: HeroContent = {
   primaryHref: '/shop',
   secondaryLabel: 'Explore Collection',
   secondaryHref: '/shop',
-  facts: [
-    { value: 'Made to size', label: 'not a fixed catalogue' },
-    { value: 'Addis delivery', label: 'set up on arrival' },
-  ],
+  // "Made to size" is the shop's own claim (see /craft). A delivery promise is
+  // not, so there is none here.
+  facts: [{ value: 'Made to size', label: 'not a fixed catalogue' }],
   panel: 'plate',
   plateKicker: 'Est. Kebena, Addis Ababa',
   wordmarkMain: 'WARKA',

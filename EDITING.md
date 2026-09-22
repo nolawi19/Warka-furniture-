@@ -33,15 +33,19 @@ copy to a USB stick, or give to whoever puts it online.
 
 ```js
 var CONTACT = {
-  phone:     '+251 00 000 0000',
-  phoneHref: '+251000000000',
-  mail:      'warka@example.com'
+  phone:     '+251-932-214095',
+  phoneHref: '+251932214095',
+  mail:      'warkaplc@gmail.com'
 };
 ```
 
 Three lines. `phone` is what people read, `phoneHref` is what their phone
 dials (digits and a leading `+` only, no spaces), `mail` is where an order
-is sent. **These are placeholders — replace them before the site goes out.**
+is sent. They are set to the shop's real details.
+
+> This file describes the old single-file `index.html`. The Next.js site keeps
+> the same details in **Admin → Store Settings**, whose defaults live in
+> `src/lib/site/schemas.ts` (`StoreSchema`).
 
 ---
 

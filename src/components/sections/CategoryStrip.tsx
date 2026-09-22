@@ -1,4 +1,6 @@
 import Image from 'next/image';
+
+import { isImageSrc } from '@/lib/image-src';
 import Link from 'next/link';
 
 import { Icon } from '@/components/ui/Icon';
@@ -82,7 +84,7 @@ export function CategoryStrip({
           <li key={c.slug} className={styles.categoryCell} data-lead={feature && i === 0 ? 'true' : undefined}>
             <Link href={`/shop?category=${c.slug}`} className={styles.category}>
               <span className={styles.categoryMedia}>
-                {c.imageUrl ? (
+                {isImageSrc(c.imageUrl) ? (
                   <Image
                     src={c.imageUrl}
                     alt=""

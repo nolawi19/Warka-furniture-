@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
+import { IMAGE_SRC_MESSAGE, isImageSrc } from '@/lib/image-src';
 import { revalidateBanners } from '@/lib/site/banners';
 
 export type BannerActionState = { ok: boolean; message: string; id?: string } | null;
@@ -15,7 +16,12 @@ const BannerSchema = z.object({
   placement: z.enum(['ANNOUNCEMENT', 'HOMEPAGE_TOP', 'HOMEPAGE_MIDDLE', 'SHOP_TOP', 'PRODUCT_PAGE']),
   headline: z.string().trim().max(160).optional(),
   body: z.string().trim().max(400).optional(),
-  imageUrl: z.string().trim().max(500).optional(),
+  imageUrl: z
+    .string()
+    .trim()
+    .max(500)
+    .optional()
+    .refine((v) => !v || isImageSrc(v), IMAGE_SRC_MESSAGE),
   linkUrl: z.string().trim().max(500).optional(),
   linkLabel: z.string().trim().max(60).optional(),
   bgColor: z.string().trim().max(60).optional(),

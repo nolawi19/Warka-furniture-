@@ -3,6 +3,7 @@ import 'server-only';
 import type { OrderStatus } from '@prisma/client';
 
 import { db, type TxClient } from './db';
+import { toImageSrc } from './image-src';
 import { effectivePriceSantim } from './money';
 import { orderReference } from './slug';
 
@@ -143,7 +144,7 @@ export async function priceCart(
         productName: v.product.name,
         variantLabel: v.label,
         sku: v.sku,
-        imageUrl: v.images[0]?.url ?? null,
+        imageUrl: toImageSrc(v.images[0]?.url),
         unitPriceSantim: 0,
         qty: item.qty,
         lineTotalSantim: 0,
@@ -160,7 +161,7 @@ export async function priceCart(
       productName: v.product.name,
       variantLabel: v.label,
       sku: v.sku,
-      imageUrl: v.images[0]?.url ?? null,
+      imageUrl: toImageSrc(v.images[0]?.url),
       unitPriceSantim: price,
       qty: item.qty,
       lineTotalSantim: lineTotal,

@@ -349,10 +349,10 @@ async function BlockBody({ block }: { block: Block }) {
       const shop = await getShop();
       const details: StoreDetail[] = [];
       if (p.showArea) details.push({ label: 'Shop', value: shop.area });
-      if (p.showHours) details.push({ label: 'Open', value: shop.openingHours });
+      if (p.showHours && shop.openingHours) details.push({ label: 'Open', value: shop.openingHours });
       if (p.showPhone) details.push({ label: 'Phone', value: shop.phone, href: `tel:${shop.phoneHref}` });
       if (p.showEmail) details.push({ label: 'Email', value: shop.email, href: `mailto:${shop.email}` });
-      if (p.showDelivery) details.push({ label: 'Delivery', value: shop.deliveryNote });
+      if (p.showDelivery && shop.deliveryNote) details.push({ label: 'Delivery', value: shop.deliveryNote });
 
       return (
         <StorePanel
@@ -517,10 +517,12 @@ async function BlockBody({ block }: { block: Block }) {
                 </dd>
               </div>
             )}
-            <div>
-              <dt>Open</dt>
-              <dd>{shop.openingHours}</dd>
-            </div>
+            {shop.openingHours && (
+              <div>
+                <dt>Open</dt>
+                <dd>{shop.openingHours}</dd>
+              </div>
+            )}
           </dl>
         </div>
       );

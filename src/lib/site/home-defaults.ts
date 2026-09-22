@@ -38,7 +38,7 @@ export const HOME_QUOTE =
   'A bed is used eight hours a night. Everything else in the house gets less.';
 
 export const HOME_VISIT = {
-  body: 'Come and see a piece before you order. There is usually a bed and a dressing table finished and standing on the floor, and you can open the drawers.',
+  body: 'Furniture is better experienced in person. Visit the workshop in Kebena to see our work and talk to our team.',
   imageUrl: '/brand/shopfront.jpg',
   imageAlt:
     'The Warka Furniture shopfront in Kebena, Addis Ababa, with a finished buttoned bed standing outside',

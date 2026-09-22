@@ -3,6 +3,7 @@ import 'server-only';
 import { unstable_cache, revalidateTag } from 'next/cache';
 
 import { db } from '@/lib/db';
+import { toImageSrc } from '@/lib/image-src';
 import type { BannerPlacement } from '@prisma/client';
 
 export const BANNERS_TAG = 'site-banners';
@@ -66,5 +67,5 @@ export async function getBanners(placement: BannerPlacement): Promise<LiveBanner
   const now = Date.now();
   return rows
     .filter((b) => (!b.startsAt || b.startsAt.getTime() <= now) && (!b.endsAt || b.endsAt.getTime() >= now))
-    .map(({ startsAt: _s, endsAt: _e, ...rest }) => rest);
+    .map(({ startsAt: _s, endsAt: _e, ...rest }) => ({ ...rest, imageUrl: toImageSrc(rest.imageUrl) }));
 }

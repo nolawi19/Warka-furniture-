@@ -17,7 +17,7 @@ export default async function TermsPage() {
         <p className={`micro ${styles.kicker}`}>Legal</p>
         <h1 className={`dsp ${styles.title}`}>Terms</h1>
         <p className={styles.lede}>
-          How ordering from Warka Furniture works, in plain words.
+          How ordering from {SHOP.name} ({SHOP.workshopName}) works, in plain words.
         </p>
 
         <div className={styles.body}>
@@ -31,8 +31,8 @@ export default async function TermsPage() {
           <h2>Placing an order</h2>
           <p>
             An order is a request until we have confirmed it. If something in your basket has sold
-            or can no longer be made as specified, we will tell you and refund anything already
-            paid for it.
+            or can no longer be made as specified, we will tell you and agree with you what happens
+            to anything already paid for it.
           </p>
 
           <h2>Payment</h2>
@@ -45,7 +45,7 @@ export default async function TermsPage() {
           <h2>Delivery</h2>
           <p>
             See <Link href="/help/delivery">Delivery</Link>. Dates are our honest estimate, not a
-            guarantee; if we are going to be late, we will call you.
+            guarantee.
           </p>
 
           <h2>Returns</h2>
@@ -56,8 +56,10 @@ export default async function TermsPage() {
 
           <h2>Getting hold of us</h2>
           <p>
-            <a href={`tel:${SHOP.phoneHref}`}>{SHOP.phone}</a> or{' '}
-            <a href={`mailto:${SHOP.email}`}>{SHOP.email}</a>, {SHOP.area}.
+            {SHOP.name} ({SHOP.workshopName}), {SHOP.area}. Call{' '}
+            <a href={`tel:${SHOP.phoneHref}`}>{SHOP.phone}</a>, or{' '}
+            <a href={`tel:${SHOP.orderPhoneHref}`}>{SHOP.orderPhone}</a> for orders, or email{' '}
+            <a href={`mailto:${SHOP.email}`}>{SHOP.email}</a>.
           </p>
 
           <p className={styles.note}>

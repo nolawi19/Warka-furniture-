@@ -501,7 +501,7 @@ export const STARTER_PROPS: Partial<Record<BlockType, Record<string, unknown>>> 
   },
   cta: {
     heading: 'Come and see a piece before you order.',
-    body: 'There is usually a bed and a dressing table finished and standing on the floor.',
+    body: 'Visit the workshop in Kebena to see our work and talk to our team.',
     primaryLabel: 'Shop the catalogue',
     primaryHref: '/shop',
     secondaryLabel: 'Ask a question',

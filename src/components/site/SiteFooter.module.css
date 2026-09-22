@@ -138,3 +138,15 @@
   font-size: var(--text-xs);
   color: var(--ink-3);
 }
+
+/* The workshop's trading name, and what it makes: quieter than the brand. */
+.workshop {
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.services {
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}

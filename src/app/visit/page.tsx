@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { StoreMap } from '@/components/sections/StoreMap';
 import { ActionButton } from '@/components/ui/ActionButton';
+import { getShop } from '@/lib/site/shop';
 import styles from '../prose.module.css';
 
 export const metadata: Metadata = {
@@ -11,18 +12,15 @@ export const metadata: Metadata = {
   alternates: { canonical: '/visit' },
 };
 
-// The workshop's own Google Maps place, and the coordinates from it. Both come
-// from the shop; nothing here is guessed.
-const MAPS_URL =
-  'https://www.google.com/maps/place/WARKA+FURNITURE+INDUSTRIAL/@8.9644192,38.7325278,61m/data=!3m1!1e3!4m7!3m6!1s0x164b8103cd9488c3:0xe2110a02535f58b2!4b1!8m2!3d8.9643517!4d38.7326431';
-const LAT = 8.9643517;
-const LNG = 38.7326431;
-
-export default function VisitPage() {
+export default async function VisitPage() {
+  // The map pin, the directions link, the address and the numbers all come
+  // from Store Settings, so this page cannot drift from the footer or the
+  // contact page.
+  const shop = await getShop();
   return (
     <div className="wrap">
       <div className={styles.page}>
-        <p className={`micro micro--ember ${styles.kicker}`}>Warka Wood Works — Industrial</p>
+        <p className={`micro micro--ember ${styles.kicker}`}>{shop.workshopName}</p>
         <h1 className={`dsp ${styles.title}`}>Visit Warka Furniture</h1>
         <p className={styles.lede}>
           Furniture is better experienced in person. Visit Warka Furniture to see our work, explore
@@ -31,10 +29,10 @@ export default function VisitPage() {
         </p>
 
         <StoreMap
-          lat={LAT}
-          lng={LNG}
+          lat={shop.latitude}
+          lng={shop.longitude}
           label="WARKA FURNITURE"
-          note="Kebena, Addis Ababa, Ethiopia"
+          note={shop.area}
           zoom={17}
           height={420}
         />
@@ -42,7 +40,7 @@ export default function VisitPage() {
         <div className={styles.cta}>
           <ActionButton
             as="link"
-            href={MAPS_URL}
+            href={shop.mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             variant="ghost"
@@ -55,15 +53,14 @@ export default function VisitPage() {
         <div className={styles.body}>
           <h2>Our Workshop</h2>
           <p>
-            Warka Wood Works — Industrial creates furniture and woodwork designed for homes and
-            spaces in Ethiopia.
+            {shop.workshopName} creates furniture and woodwork designed for homes and spaces in
+            Ethiopia.
           </p>
           <p>Our work includes:</p>
           <ul>
-            <li>Furniture</li>
-            <li>Kitchen furniture</li>
-            <li>Doors</li>
-            <li>Custom woodwork</li>
+            {shop.services.map((s) => (
+              <li key={s}>{s}</li>
+            ))}
           </ul>
           <p>
             You can discuss your preferred design, size, materials, finish, and requirements
@@ -71,10 +68,10 @@ export default function VisitPage() {
           </p>
 
           <h2>Find Us</h2>
-          <p>Kebena, Addis Ababa, Ethiopia</p>
+          <p>{shop.area}</p>
           <p>
             You can use our{' '}
-            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer">
+            <a href={shop.mapsUrl} target="_blank" rel="noopener noreferrer">
               Google Maps location
             </a>{' '}
             to find WARKA FURNITURE INDUSTRIAL and get directions to the workshop.
@@ -82,10 +79,13 @@ export default function VisitPage() {
 
           <h2>Contact Warka Furniture</h2>
           <p>
-            For more information: <a href="tel:+251932214095">+251-932-214095</a>
+            For more information: <a href={`tel:${shop.phoneHref}`}>{shop.phone}</a>
           </p>
           <p>
-            For direct orders: <a href="tel:+251949196561">+251-949-196561</a>
+            For direct orders: <a href={`tel:${shop.orderPhoneHref}`}>{shop.orderPhone}</a>
+          </p>
+          <p>
+            Email: <a href={`mailto:${shop.email}`}>{shop.email}</a>
           </p>
 
           <h2>See Our Work in Person</h2>

@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
+import { IMAGE_SRC_MESSAGE, isImageSrc } from '@/lib/image-src';
 import { slugify } from '@/lib/slug';
 
 export type ProductActionState = { ok: boolean; message: string; id?: string } | null;
@@ -217,7 +218,7 @@ export async function setPrimaryImageAction(
 
 const AddImageSchema = z.object({
   productId: z.string().min(1),
-  url: z.string().trim().min(1).max(500),
+  url: z.string().trim().min(1).max(500).refine(isImageSrc, IMAGE_SRC_MESSAGE),
   alt: z.string().trim().max(300),
   variantId: z.string().trim().max(40).optional(),
 });
@@ -227,7 +228,9 @@ export async function addProductImageAction(input: unknown): Promise<ProductActi
   if (!staff) return { ok: false, message: 'You are not signed in as staff.' };
 
   const parsed = AddImageSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, message: 'Check that image.' };
+  if (!parsed.success) {
+    return { ok: false, message: parsed.error.issues[0]?.message ?? 'Check that image.' };
+  }
   const d = parsed.data;
 
   const count = await db.productImage.count({ where: { productId: d.productId } });

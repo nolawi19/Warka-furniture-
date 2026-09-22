@@ -4,6 +4,7 @@ import { unstable_cache, revalidateTag } from 'next/cache';
 
 import { db } from '@/lib/db';
 import {
+  SETTINGS_FINGERPRINT,
   SETTING_KEYS,
   defaultSetting,
   parseSetting,
@@ -57,7 +58,7 @@ export const getPublishedSetting = <K extends SettingKey>(key: K): Promise<Setti
         return defaultSetting(key);
       }
     },
-    ['site-setting', key],
+    ['site-setting', key, SETTINGS_FINGERPRINT],
     { tags: [SETTINGS_TAG, `${SETTINGS_TAG}:${key}`] },
   )();
 
@@ -82,7 +83,7 @@ export const getPublishedSettings = unstable_cache(
     }
     return out;
   },
-  ['site-settings-all'],
+  ['site-settings-all', SETTINGS_FINGERPRINT],
   { tags: [SETTINGS_TAG] },
 );
 

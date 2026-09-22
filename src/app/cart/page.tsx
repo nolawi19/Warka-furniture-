@@ -136,10 +136,12 @@ export default async function CartPage() {
               <Icon name="shield" size={16} />
               Prices are confirmed on the server, never in your browser.
             </li>
-            <li>
-              <Icon name="truck" size={16} />
-              {shop.deliveryNote}
-            </li>
+            {shop.deliveryNote && (
+              <li>
+                <Icon name="truck" size={16} />
+                {shop.deliveryNote}
+              </li>
+            )}
             <li>
               <Icon name="pin" size={16} />
               You drop a pin at checkout — no house number needed.

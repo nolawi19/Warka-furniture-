@@ -3,6 +3,7 @@ import 'server-only';
 import type { Prisma } from '@prisma/client';
 
 import { db, type Row } from './db';
+import { toImageSrc } from './image-src';
 import { effectivePriceSantim } from './money';
 import type { ProductCardData } from '@/components/shop/ProductCard';
 
@@ -57,9 +58,9 @@ function toCard(p: CardRow): ProductCardData {
     categoryName: p.category.name,
     categorySlug: p.category.slug,
     blurb: p.shortDescription || null,
-    imageUrl: p.images[0]?.url ?? null,
+    imageUrl: toImageSrc(p.images[0]?.url),
     imageAlt: p.images[0]?.alt ?? `${p.name} by Warka Furniture`,
-    hoverImageUrl: p.images[1]?.url ?? null,
+    hoverImageUrl: toImageSrc(p.images[1]?.url),
     fromSantim: cheapest,
     wasSantim: was,
     variantCount: p.variants.length,
@@ -144,7 +145,13 @@ export async function getCategories() {
     name: c.name,
     nameAm: c.nameAm,
     blurb: c.blurb,
-    imageUrl: c.imageUrl || c.products.find((p) => p.images.length > 0)?.images[0]?.url || null,
+    // Each candidate is checked, not just the first: a category whose own
+    // picture was saved as something unrenderable still borrows a good product
+    // photograph, and next/image is never handed an address it cannot parse.
+    imageUrl:
+      toImageSrc(c.imageUrl) ??
+      c.products.map((p) => toImageSrc(p.images[0]?.url)).find((u) => u !== null) ??
+      null,
     isFeatured: c.isFeatured,
     // What a shopper cares about is how many things they can actually pick,
     // which is the variant count, not the number of product lines.

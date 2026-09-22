@@ -50,24 +50,47 @@ export const StoreSchema = z.object({
   logoUrl: z.string().trim().max(500).default(''),
   logoMode: z.enum(['text', 'image']).default('text'),
 
-  // These two are still the placeholders the original site shipped with. The
-  // admin overview says so until they are replaced.
-  email: Text(120).default('warka@example.com'),
-  phone: Text(40).default('+251 00 000 0000'),
-  phoneHref: Text(40).default('+251000000000'),
+  /** The workshop's trading name, as it appears on its own business material. */
+  workshopName: Text(120).default('Warka Wood Works — Industrial'),
 
-  area: Text(120).default('Kebena, Addis Ababa'),
+  // The shop's real contact details, from its own business material. Every
+  // page that shows them reads them from here.
+  email: Text(120).default('warkaplc@gmail.com'),
+  phone: Text(40).default('+251-932-214095'),
+  phoneHref: Text(40).default('+251932214095'),
+  /** The line for placing an order, which is not the general enquiries one. */
+  orderPhone: Text(40).default('+251-949-196561'),
+  orderPhoneHref: Text(40).default('+251949196561'),
+
+  area: Text(120).default('Kebena, Addis Ababa, Ethiopia'),
   city: Text(80).default('Addis Ababa'),
   country: Text(2).default('ET'),
-  openingHours: Text(120).default('Tuesday to Saturday, 9 to 6'),
-  deliveryNote: Text(200).default('Delivered anywhere in Addis and set up on arrival.'),
+  // Empty on purpose. Nobody has confirmed opening hours or a delivery promise,
+  // so none is stated; every place that shows these hides the line when blank.
+  openingHours: Text(120).default(''),
+  deliveryNote: Text(200).default(''),
+
+  /** What the workshop makes, as its own material lists it. */
+  services: z
+    .array(Text(60))
+    .max(12)
+    .default(['Furniture', 'Kitchen furniture', 'Doors', 'Custom woodwork']),
 
   /**
    * Where the shop is, for the map on the website. 0,0 means "not set", which
-   * is why the map block renders nothing rather than the Gulf of Guinea.
+   * is why the map block renders nothing rather than the Gulf of Guinea. The
+   * default is the workshop's own pin in Kebena.
    */
-  latitude: z.number().min(-90).max(90).default(0),
-  longitude: z.number().min(-180).max(180).default(0),
+  latitude: z.number().min(-90).max(90).default(8.9643517),
+  longitude: z.number().min(-180).max(180).default(38.7326431),
+  /** The shop's own Google Maps listing, for "Get directions". */
+  mapsUrl: z
+    .string()
+    .trim()
+    .max(600)
+    .default(
+      'https://www.google.com/maps/place/WARKA+FURNITURE+INDUSTRIAL/@8.9644192,38.7325278,61m/data=!3m1!1e3!4m7!3m6!1s0x164b8103cd9488c3:0xe2110a02535f58b2!4b1!8m2!3d8.9643517!4d38.7326431!16s%2Fg%2F11szjw34qp',
+    ),
 
   currency: Text(8).default('ETB'),
   currencyLabel: Text(40).default('Ethiopian Birr'),
@@ -370,10 +393,10 @@ export const DEFAULT_FOOTER_COLUMNS: FooterColumn[] = [
 export const SeoSchema = z.object({
   titleTemplate: Text(120).default('%s · Warka Furniture'),
   defaultTitle: Text(160).default(
-    'Warka Furniture — beds, dressing tables and drawers made in Addis Ababa',
+    'Warka Furniture — furniture, kitchens, doors and custom woodwork made in Addis Ababa',
   ),
   defaultDescription: Text(320).default(
-    'Warka Furniture builds buttoned beds, dressing tables, mirrors, chests of drawers and office pedestals to your measurement in Addis Ababa.',
+    'Warka Furniture (Warka Wood Works — Industrial) makes furniture, kitchen furniture, doors and custom woodwork to your measurements in Kebena, Addis Ababa, Ethiopia.',
   ),
   ogImageUrl: z.string().trim().max(500).default(''),
   /** Blank means the icon in /public, which is what the site shipped with. */
@@ -527,6 +550,36 @@ export type SettingValue<K extends SettingKey> = z.infer<(typeof SETTING_SCHEMAS
 export const SETTING_KEYS = Object.keys(SETTING_SCHEMAS) as SettingKey[];
 
 /**
+ * Bump when parseSetting's upgrade rules change without any default changing.
+ * Schema and default changes need nothing: the fingerprint below sees them.
+ */
+const UPGRADE_REVISION = 1;
+
+/**
+ * A fingerprint of every settings group's defaults, for the settings cache key.
+ *
+ * Published settings are cached with no expiry and only cleared when something
+ * is published. That is right for a shop editing its own details, and wrong
+ * for a deploy: values cached by the previous build keep the previous shape
+ * and the previous defaults. When Store Settings gained `services`, the cached
+ * copy had none, and every page that listed them crashed. Folding this into the
+ * key means a new build that changes any field or default reads fresh, and a
+ * build that changes nothing keeps its cache.
+ *
+ * FNV-1a rather than node:crypto because this module also runs in the browser.
+ */
+export const SETTINGS_FINGERPRINT = (() => {
+  const text =
+    JSON.stringify(SETTING_KEYS.map((k) => [k, SETTING_SCHEMAS[k].parse({})])) + UPGRADE_REVISION;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(36);
+})();
+
+/**
  * Parse whatever is in the database into a complete, valid settings object.
  * Never throws: a row that cannot be parsed falls back to defaults, because a
  * bad colour in one field is not a reason for the shop to go down.
@@ -534,8 +587,59 @@ export const SETTING_KEYS = Object.keys(SETTING_SCHEMAS) as SettingKey[];
 export function parseSetting<K extends SettingKey>(key: K, raw: unknown): SettingValue<K> {
   const schema = SETTING_SCHEMAS[key];
   const attempt = schema.safeParse(raw ?? {});
-  if (attempt.success) return attempt.data;
-  return schema.parse({});
+  const value = attempt.success ? attempt.data : schema.parse({});
+  if (key === 'store') return upgradeStore(value as StoreSettings);
+  if (key === 'seo') return upgradeSeo(value as SeoSettings);
+  return value;
+}
+
+/**
+ * The values the site shipped with before it had the shop's real details.
+ *
+ * A database that saved Store Settings back then still holds them, and a new
+ * default does nothing for a value that is already stored. So each one is
+ * recognised here, exactly, and swapped for the real value on the way out.
+ * Only an exact match is replaced: anything an admin actually typed is kept.
+ * The next time the settings are published, the real values are what get
+ * saved, and this has nothing left to do.
+ */
+const LEGACY_STORE: Partial<Record<keyof StoreSettings, unknown>> = {
+  email: 'warka@example.com',
+  phone: '+251 00 000 0000',
+  phoneHref: '+251000000000',
+  area: 'Kebena, Addis Ababa',
+  openingHours: 'Tuesday to Saturday, 9 to 6',
+  deliveryNote: 'Delivered anywhere in Addis and set up on arrival.',
+};
+
+/** The same, for the two search defaults that listed only part of what the shop makes. */
+const LEGACY_SEO: Partial<Record<keyof SeoSettings, string>> = {
+  defaultTitle: 'Warka Furniture — beds, dressing tables and drawers made in Addis Ababa',
+  defaultDescription:
+    'Warka Furniture builds buttoned beds, dressing tables, mirrors, chests of drawers and office pedestals to your measurement in Addis Ababa.',
+};
+
+function upgradeSeo(seo: SeoSettings): SeoSettings {
+  const fresh = SeoSchema.parse({});
+  const out = { ...seo };
+  for (const [field, legacy] of Object.entries(LEGACY_SEO) as [keyof SeoSettings, string][]) {
+    if (out[field] === legacy) (out as Record<string, unknown>)[field] = fresh[field];
+  }
+  return out;
+}
+
+function upgradeStore(store: StoreSettings): StoreSettings {
+  const fresh = StoreSchema.parse({});
+  const out = { ...store };
+  for (const [field, legacy] of Object.entries(LEGACY_STORE) as [keyof StoreSettings, unknown][]) {
+    if (out[field] === legacy) (out as Record<string, unknown>)[field] = fresh[field];
+  }
+  // 0,0 was "not set"; the shop's own pin is now known.
+  if (out.latitude === 0 && out.longitude === 0) {
+    out.latitude = fresh.latitude;
+    out.longitude = fresh.longitude;
+  }
+  return out;
 }
 
 export function defaultSetting<K extends SettingKey>(key: K): SettingValue<K> {

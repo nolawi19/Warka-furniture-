@@ -2,6 +2,7 @@ import 'server-only';
 
 import { currentUser } from './auth';
 import { db } from './db';
+import { toImageSrc } from './image-src';
 import { effectivePriceSantim } from './money';
 import type { ProductCardData } from '@/components/shop/ProductCard';
 
@@ -97,9 +98,9 @@ export async function savedPieces(): Promise<SavedPiece[]> {
         categoryName: v.product.category.name,
         categorySlug: v.product.category.slug,
         blurb: null,
-        imageUrl: v.product.images[0]?.url ?? null,
+        imageUrl: toImageSrc(v.product.images[0]?.url),
         imageAlt: v.product.images[0]?.alt ?? `${v.product.name} by Warka Furniture`,
-        hoverImageUrl: v.product.images[1]?.url ?? null,
+        hoverImageUrl: toImageSrc(v.product.images[1]?.url),
         fromSantim: price,
         wasSantim: was,
         variantCount: 1,
