@@ -10,6 +10,8 @@ import { Icon } from '@/components/ui/Icon';
 import { getProductBySlug, getRelatedProducts } from '@/lib/catalogue';
 import { savedVariantIds } from '@/lib/wishlist';
 import { effectivePriceSantim } from '@/lib/money';
+import { toImageSrc } from '@/lib/image-src';
+import { autoDescription } from '@/lib/seo-auto';
 import { getShop } from '@/lib/site/shop';
 import styles from './page.module.css';
 
@@ -23,9 +25,15 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const prices = product.variants.map(effectivePriceSantim).filter((n): n is number => n !== null);
   const from = prices.length ? Math.min(...prices) : null;
 
+  // autoDescription, not `?.slice() ??`: an empty description is "" rather
+  // than null, and `??` let it through as empty metadata.
   const description =
-    product.description?.slice(0, 155) ??
-    `${product.name} by Warka Furniture, made to measure in Addis Ababa.`;
+    product.seoDescription ||
+    autoDescription(
+      product.description,
+      `${product.name} by Warka Furniture, made to your measurements in Kebena, Addis Ababa.`,
+    );
+  const ogImage = toImageSrc(product.images[0]?.url);
 
   return {
     title: product.name,
@@ -35,7 +43,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       type: 'website',
       title: `${product.name} · Warka Furniture`,
       description,
-      images: product.images[0] ? [{ url: product.images[0].url }] : undefined,
+      images: ogImage ? [{ url: ogImage }] : undefined,
     },
     other: from ? { 'product:price:amount': String(from / 100) } : undefined,
   };
@@ -68,7 +76,8 @@ export default async function ProductPage({ params }: { params: Params }) {
     description: product.description ?? undefined,
     category: product.category.name,
     material: product.materials ?? undefined,
-    image: product.images.map((i) => i.url),
+    color: product.color ?? undefined,
+    image: product.images.map((i) => toImageSrc(i.url)).filter((u): u is string => u !== null),
     brand: { '@type': 'Brand', name: 'Warka Furniture' },
     offers: from
       ? {
@@ -94,15 +103,18 @@ export default async function ProductPage({ params }: { params: Params }) {
     stock: v.stock,
     trackStock: v.trackStock,
     allowBackorder: v.allowBackorder,
-    imageUrl: v.images[0]?.url ?? null,
+    imageUrl: toImageSrc(v.images[0]?.url),
     widthCm: v.widthCm,
     heightCm: v.heightCm,
     depthCm: v.depthCm,
   }));
 
-  const gallery = product.images.length
-    ? product.images.map((i) => ({ url: i.url, alt: i.alt }))
-    : [];
+  // Only pictures next/image can draw; one saved before addresses were checked
+  // is skipped rather than allowed to break the page.
+  const gallery = product.images.flatMap((i) => {
+    const url = toImageSrc(i.url);
+    return url ? [{ url, alt: i.alt }] : [];
+  });
 
   return (
     <div className={`wrap ${styles.page}`}>
@@ -153,6 +165,12 @@ export default async function ProductPage({ params }: { params: Params }) {
               <dt>Finishes</dt>
               <dd>{product.variants.length} to choose from</dd>
             </div>
+            {product.color && (
+              <div>
+                <dt>Colour</dt>
+                <dd>{product.color}</dd>
+              </div>
+            )}
             {product.brand && (
               <div>
                 <dt>Made by</dt>

@@ -149,6 +149,8 @@ model Product {
   nameAm      String?
   description String?
   materials   String?
+  /// Optional. What colour the piece is, as the shop describes it.
+  color       String?
   careNotes   String?
   categoryId  String
   category    Category      @relation(fields: [categoryId], references: [id])

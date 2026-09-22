@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { isImageSrc } from '@/lib/image-src';
 
 import type { ProductCardData } from '@/components/shop/ProductCard';
 import { Hero } from '@/components/hero/Hero';
@@ -185,7 +186,7 @@ async function BlockBody({ block }: { block: Block }) {
     case 'imageText':
       return (
         <div className={styles.imageText} data-side={p.imageSide}>
-          {p.imageUrl && (
+          {isImageSrc(p.imageUrl) && (
             <div className={styles.imageTextImage}>
               <Image src={p.imageUrl} alt={p.imageAlt || ''} fill sizes="(max-width: 900px) 100vw, 50vw" className={styles.cover} />
             </div>
@@ -207,7 +208,7 @@ async function BlockBody({ block }: { block: Block }) {
         <div className={styles.columns} style={{ '--cols': p.count } as React.CSSProperties}>
           {(p.items ?? []).slice(0, p.count).map((item: any, i: number) => (
             <div key={i} className={styles.column}>
-              {item.imageUrl && (
+              {isImageSrc(item.imageUrl) && (
                 <div className={styles.columnImage}>
                   <Image src={item.imageUrl} alt="" fill sizes="33vw" className={styles.cover} />
                 </div>
@@ -405,7 +406,7 @@ async function BlockBody({ block }: { block: Block }) {
     }
 
     case 'gallery': {
-      const images = (p.images ?? []).filter((i: any) => i.url);
+      const images = (p.images ?? []).filter((i: any) => isImageSrc(i.url));
       if (images.length === 0) return null;
       return (
         <>

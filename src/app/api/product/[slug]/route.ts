@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
+import { toImageSrc } from '@/lib/image-src';
 import { effectivePriceSantim } from '@/lib/money';
 
 export const runtime = 'nodejs';
@@ -73,10 +74,11 @@ export async function GET(_request: Request, ctx: { params: Promise<{ slug: stri
     name: product.name,
     categoryName: product.category.name,
     shortDescription: product.shortDescription || null,
-    images: product.images.map((i) => ({
-      url: i.url,
-      alt: i.alt || `${product.name} by Warka Furniture`,
-    })),
+    // Only addresses next/image can draw; Quick View renders these directly.
+    images: product.images.flatMap((i) => {
+      const url = toImageSrc(i.url);
+      return url ? [{ url, alt: i.alt || `${product.name} by Warka Furniture` }] : [];
+    }),
     variants: product.variants.map((v) => ({
       id: v.id,
       label: v.label,

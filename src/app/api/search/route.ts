@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { db } from '@/lib/db';
+import { toImageSrc } from '@/lib/image-src';
 import { effectivePriceSantim } from '@/lib/money';
 
 export const runtime = 'nodejs';
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
         slug: p.slug,
         name: p.name,
         category: p.category.name,
-        image: p.images[0]?.url ?? null,
+        image: toImageSrc(p.images[0]?.url),
         alt: p.images[0]?.alt ?? p.name,
         fromSantim: prices.length ? Math.min(...prices) : null,
       };

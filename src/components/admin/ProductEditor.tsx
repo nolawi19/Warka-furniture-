@@ -15,6 +15,10 @@ type Variant = {
   salePriceSantim: number | null;
   stock: number;
   trackStock: boolean;
+  widthCm: number | null;
+  depthCm: number | null;
+  heightCm: number | null;
+  weightKg: number | null;
 };
 
 const toBirr = (santim: number | null) => (santim === null ? '' : String(santim / 100));
@@ -27,17 +31,12 @@ export function ProductEditor({
   product: {
     id: string | null;
     name: string;
-    slug: string;
     categoryId: string;
     description: string;
     materials: string;
+    color: string;
     status: string;
     isFeatured: boolean;
-    shortDescription: string;
-    brand: string;
-    tags: string;
-    seoTitle: string;
-    seoDescription: string;
   };
   categories: Category[];
   variants: Variant[];
@@ -63,18 +62,15 @@ export function ProductEditor({
   return (
     <div className={styles.wrap}>
       <form action={save} className={styles.form}>
-        <div className={styles.row}>
-          <label className={styles.field}>
-            <span>Name</span>
-            <input name="name" defaultValue={product.name} required maxLength={120} />
-          </label>
-          <label className={styles.field}>
-            <span>
-              Web address <em>leave blank to build it from the name</em>
-            </span>
-            <input name="slug" defaultValue={product.slug} maxLength={120} placeholder="buttoned-bed" />
-          </label>
-        </div>
+        {/* The web address, brand, summary and search text are no longer asked
+            for. The address is made from the name when the product is created
+            and then kept; the brand is always Warka; the card summary and the
+            search title and description are made from the name and
+            description on every save. */}
+        <label className={styles.field}>
+          <span>Name</span>
+          <input name="name" defaultValue={product.name} required minLength={2} maxLength={120} />
+        </label>
 
         <div className={styles.row}>
           <label className={styles.field}>
@@ -102,58 +98,26 @@ export function ProductEditor({
           <textarea name="description" defaultValue={product.description} rows={4} maxLength={4000} />
         </label>
 
-        <label className={styles.field}>
-          <span>Materials</span>
-          <textarea name="materials" defaultValue={product.materials} rows={2} maxLength={2000} />
-
-        <label className={styles.field}>
-          <span>Short description</span>
-          <input
-            name="shortDescription"
-            defaultValue={product.shortDescription}
-            maxLength={300}
-            placeholder="One line for cards and search results"
-          />
-        </label>
-
         <div className={styles.row}>
           <label className={styles.field}>
-            <span>Brand</span>
-            <input name="brand" defaultValue={product.brand} maxLength={80} placeholder="Warka" />
+            <span>
+              Materials <em>optional</em>
+            </span>
+            <textarea
+              name="materials"
+              defaultValue={product.materials}
+              rows={2}
+              maxLength={2000}
+              placeholder="18 mm white melamine board"
+            />
           </label>
           <label className={styles.field}>
-            <span>Tags</span>
-            <input
-              name="tags"
-              defaultValue={product.tags}
-              maxLength={400}
-              placeholder="bedroom, buttoned, made to measure"
-            />
-            <small>Separated by commas. They are searchable on the shop.</small>
+            <span>
+              Colour <em>optional</em>
+            </span>
+            <input name="color" defaultValue={product.color} maxLength={80} placeholder="Cream" />
           </label>
         </div>
-
-        <div className={styles.row}>
-          <label className={styles.field}>
-            <span>Search title</span>
-            <input
-              name="seoTitle"
-              defaultValue={product.seoTitle}
-              maxLength={160}
-              placeholder="Leave blank to use the product name"
-            />
-          </label>
-          <label className={styles.field}>
-            <span>Search description</span>
-            <input
-              name="seoDescription"
-              defaultValue={product.seoDescription}
-              maxLength={320}
-              placeholder="Leave blank to use the short description"
-            />
-          </label>
-        </div>
-        </label>
 
         <label className={styles.check}>
           <input type="checkbox" name="isFeatured" defaultChecked={product.isFeatured} />
@@ -240,6 +204,25 @@ function VariantRow({ variant }: { variant: Variant }) {
           <label className={styles.smallCheck}>
             <input type="checkbox" name="trackStock" defaultChecked={variant.trackStock} />
             <span>Track</span>
+          </label>
+          {/* Sizes are per variant: a 150 cm and a 180 cm bed are different
+              pieces. All optional — a blank box saves as "not given". A bed's
+              length is its depth, so there is one box for both. */}
+          <label className={styles.small}>
+            <span>Width (cm)</span>
+            <input name="widthCm" defaultValue={variant.widthCm ?? ''} inputMode="numeric" placeholder="—" />
+          </label>
+          <label className={styles.small}>
+            <span>Depth / length (cm)</span>
+            <input name="depthCm" defaultValue={variant.depthCm ?? ''} inputMode="numeric" placeholder="—" />
+          </label>
+          <label className={styles.small}>
+            <span>Height (cm)</span>
+            <input name="heightCm" defaultValue={variant.heightCm ?? ''} inputMode="numeric" placeholder="—" />
+          </label>
+          <label className={styles.small}>
+            <span>Weight (kg)</span>
+            <input name="weightKg" defaultValue={variant.weightKg ?? ''} inputMode="numeric" placeholder="—" />
           </label>
           <button type="submit" className={styles.variantSave} disabled={pending} data-saved={saved}>
             {pending ? '…' : saved === 'ok' ? 'Saved' : 'Save'}

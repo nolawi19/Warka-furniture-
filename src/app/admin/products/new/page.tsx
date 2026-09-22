@@ -28,17 +28,12 @@ export default async function NewProduct() {
         product={{
           id: null,
           name: '',
-          slug: '',
           categoryId: categories[0]?.id ?? '',
           description: '',
           materials: '',
+          color: '',
           status: 'DRAFT',
           isFeatured: false,
-          shortDescription: '',
-          brand: '',
-          tags: '',
-          seoTitle: '',
-          seoDescription: '',
         }}
         categories={categories}
         variants={[]}

@@ -49,17 +49,12 @@ export default async function EditProduct({ params }: { params: Promise<{ id: st
         product={{
           id: product.id,
           name: product.name,
-          slug: product.slug,
           categoryId: product.categoryId,
           description: product.description ?? '',
           materials: product.materials ?? '',
+          color: product.color ?? '',
           status: product.status,
           isFeatured: product.isFeatured,
-          shortDescription: product.shortDescription ?? '',
-          brand: product.brand ?? '',
-          tags: product.tags.join(', '),
-          seoTitle: product.seoTitle ?? '',
-          seoDescription: product.seoDescription ?? '',
         }}
         categories={categories}
         variants={product.variants.map((v) => ({
@@ -70,6 +65,10 @@ export default async function EditProduct({ params }: { params: Promise<{ id: st
           salePriceSantim: v.salePriceSantim,
           stock: v.stock,
           trackStock: v.trackStock,
+          widthCm: v.widthCm,
+          depthCm: v.depthCm,
+          heightCm: v.heightCm,
+          weightKg: v.weightKg,
         }))}
       />
 

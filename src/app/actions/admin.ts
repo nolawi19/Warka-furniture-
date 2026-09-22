@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { assertStaff, audit } from '@/lib/admin-guard';
 import { db } from '@/lib/db';
+import { autoDescription, autoTitle } from '@/lib/seo-auto';
 import { parseBirr } from '@/lib/money';
 import { transitionOrder } from '@/lib/orders';
 import { slugify } from '@/lib/slug';
@@ -144,21 +145,28 @@ export async function updateOrderStatusAction(
 
 // ------------------------------------------------------------------ products
 
+// Every optional field is blank-tolerant: a blank box is "not given", never an
+// error. `.nullish()` because a field the form does not send reads as null
+// from FormData, and `.optional()` alone would refuse that with "Expected
+// string, received null".
+const OptionalText = (max: number) => z.string().trim().max(max).nullish();
+
 const ProductSchema = z.object({
-  name: z.string().trim().min(2).max(120),
-  slug: z.string().trim().max(120).optional().or(z.literal('')),
-  categoryId: z.string().min(1),
-  description: z.string().trim().max(4000).optional().or(z.literal('')),
-  materials: z.string().trim().max(2000).optional().or(z.literal('')),
+  name: z
+    .string({ required_error: 'A product needs a name.' })
+    .trim()
+    .min(2, 'A product needs a name of at least two letters.')
+    .max(120, 'Keep the name under 120 characters.'),
+  categoryId: z.string({ required_error: 'Pick a category.' }).min(1, 'Pick a category.'),
+  description: OptionalText(4000),
+  materials: OptionalText(2000),
+  color: OptionalText(80),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
   isFeatured: z.coerce.boolean(),
-  shortDescription: z.string().trim().max(300).optional().or(z.literal('')),
-  brand: z.string().trim().max(80).optional().or(z.literal('')),
-  // One comma-separated box in the form; an array in the database.
-  tags: z.string().trim().max(400).optional().or(z.literal('')),
-  seoTitle: z.string().trim().max(160).optional().or(z.literal('')),
-  seoDescription: z.string().trim().max(320).optional().or(z.literal('')),
 });
+
+/** Every product is Warka's own. The form no longer asks. */
+const BRAND = 'Warka';
 
 export async function saveProductAction(
   productId: string | null,
@@ -169,17 +177,12 @@ export async function saveProductAction(
 
   const parsed = ProductSchema.safeParse({
     name: formData.get('name'),
-    slug: formData.get('slug'),
     categoryId: formData.get('categoryId'),
     description: formData.get('description'),
     materials: formData.get('materials'),
+    color: formData.get('color'),
     status: formData.get('status'),
     isFeatured: formData.get('isFeatured') === 'on',
-    shortDescription: formData.get('shortDescription'),
-    brand: formData.get('brand'),
-    tags: formData.get('tags'),
-    seoTitle: formData.get('seoTitle'),
-    seoDescription: formData.get('seoDescription'),
   });
 
   if (!parsed.success) {
@@ -187,40 +190,47 @@ export async function saveProductAction(
   }
 
   const input = parsed.data;
-  const slug = slugify(input.slug || input.name);
-  if (!slug) return { ok: false, message: 'That name does not make a usable web address.' };
 
-  const clash = await db.product.findFirst({
-    where: { slug, ...(productId ? { id: { not: productId } } : {}) },
-    select: { id: true },
-  });
-  if (clash) return { ok: false, message: `The address /product/${slug} is already taken.` };
+  // The web address is made from the name once, when the product is created,
+  // and kept after that: the form no longer offers it, and renaming a product
+  // must not break every link and every order page that points at it.
+  let slug: string;
+  let tags: string[] = [];
+  if (productId) {
+    const existing = await db.product.findUnique({
+      where: { id: productId },
+      select: { slug: true, tags: true },
+    });
+    if (!existing) return { ok: false, message: 'No such product.' };
+    slug = existing.slug;
+    // Tags are no longer edited, but the ones already there still help the
+    // shop's search find the piece, so they are kept.
+    tags = existing.tags;
+  } else {
+    const base = slugify(input.name);
+    if (!base) return { ok: false, message: 'That name does not make a usable web address.' };
+    slug = await uniqueProductSlug(base);
+  }
 
-  const tags = (input.tags ?? '')
-    .split(',')
-    .map((t) => t.trim())
-    .filter(Boolean)
-    .slice(0, 20);
+  const description = input.description || null;
+  const materials = input.materials || null;
+  const color = input.color || null;
 
-  // The haystack a shop search hits. Everything a customer might type goes in,
-  // including the tags and the brand.
-  const searchText = [
-    input.name,
-    input.shortDescription ?? '',
-    input.description ?? '',
-    input.materials ?? '',
-    input.brand ?? '',
-    tags.join(' '),
-  ]
+  // The haystack a shop search hits. Everything a customer might type goes in.
+  const searchText = [input.name, description ?? '', materials ?? '', color ?? '', BRAND, tags.join(' ')]
     .join(' ')
     .toLowerCase();
 
+  // Made from what the admin wrote, never typed separately; see seo-auto.ts.
+  const fallback = `${input.name} by Warka Furniture, made to your measurements in Kebena, Addis Ababa.`;
   const extraFields = {
-    shortDescription: input.shortDescription || null,
-    brand: input.brand || null,
+    brand: BRAND,
+    color,
+    // The one-line summary on shop cards, taken from the description.
+    shortDescription: description ? autoDescription(description, input.name, 140) : null,
     tags,
-    seoTitle: input.seoTitle || null,
-    seoDescription: input.seoDescription || null,
+    seoTitle: autoTitle(input.name),
+    seoDescription: autoDescription(description, fallback),
   };
 
   if (productId) {
@@ -233,8 +243,8 @@ export async function saveProductAction(
         name: input.name,
         slug,
         categoryId: input.categoryId,
-        description: input.description || null,
-        materials: input.materials || null,
+        description,
+        materials,
         status: input.status,
         isFeatured: input.isFeatured,
         searchText,
@@ -264,8 +274,8 @@ export async function saveProductAction(
       name: input.name,
       slug,
       categoryId: input.categoryId,
-      description: input.description || null,
-      materials: input.materials || null,
+      description,
+      materials,
       status: input.status,
       isFeatured: input.isFeatured,
       searchText,
@@ -296,6 +306,40 @@ export async function saveProductAction(
   return { ok: true, id: created.id };
 }
 
+/** "buttoned-bed", or "buttoned-bed-2" if that is taken, and so on. */
+async function uniqueProductSlug(base: string): Promise<string> {
+  const taken = new Set(
+    (await db.product.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } })).map(
+      (p) => p.slug,
+    ),
+  );
+  if (!taken.has(base)) return base;
+  for (let n = 2; n < 1000; n++) if (!taken.has(`${base}-${n}`)) return `${base}-${n}`;
+  return `${base}-${Date.now().toString(36)}`;
+}
+
+/**
+ * An optional size in whole centimetres (or kilograms). A blank box is "not
+ * given" and saves as null; only something typed is checked, and then it has
+ * to be a sensible whole number, with a message that says which box is wrong.
+ */
+const Dimension = (label: string, max = 1000) =>
+  z
+    .union([z.string(), z.null()])
+    .transform((v, ctx) => {
+      const t = (v ?? '').trim();
+      if (t === '') return null;
+      const n = Number(t);
+      if (!Number.isInteger(n) || n <= 0 || n > max) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `${label}: enter a whole number between 1 and ${max}, or leave it blank.`,
+        });
+        return z.NEVER;
+      }
+      return n;
+    });
+
 const VariantSchema = z.object({
   label: z.string().trim().min(1).max(120),
   sku: z.string().trim().min(1).max(40),
@@ -304,6 +348,10 @@ const VariantSchema = z.object({
   salePrice: z.string().trim().optional().or(z.literal('')),
   stock: z.coerce.number().int().min(0).max(100000),
   trackStock: z.coerce.boolean(),
+  widthCm: Dimension('Width'),
+  depthCm: Dimension('Depth'),
+  heightCm: Dimension('Height'),
+  weightKg: Dimension('Weight', 2000),
 });
 
 
@@ -322,6 +370,10 @@ export async function saveVariantAction(
     salePrice: formData.get('salePrice'),
     stock: formData.get('stock') ?? 0,
     trackStock: formData.get('trackStock') === 'on',
+    widthCm: formData.get('widthCm'),
+    depthCm: formData.get('depthCm'),
+    heightCm: formData.get('heightCm'),
+    weightKg: formData.get('weightKg'),
   });
 
   if (!parsed.success) {
@@ -368,6 +420,10 @@ export async function saveVariantAction(
       salePriceSantim,
       stock: parsed.data.stock,
       trackStock: parsed.data.trackStock,
+      widthCm: parsed.data.widthCm,
+      depthCm: parsed.data.depthCm,
+      heightCm: parsed.data.heightCm,
+      weightKg: parsed.data.weightKg,
     },
   });
 
