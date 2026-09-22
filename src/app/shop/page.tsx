@@ -7,14 +7,46 @@ import { ShopToolbar } from '@/components/shop/ShopToolbar';
 import { Pagination } from '@/components/shop/Pagination';
 import { Icon } from '@/components/ui/Icon';
 import { getCategories, searchProducts, type ShopQuery, type ShopSort } from '@/lib/catalogue';
+import { db } from '@/lib/db';
+import { autoDescription, autoTitle } from '@/lib/seo-auto';
 import { savedVariantIds } from '@/lib/wishlist';
 import styles from './page.module.css';
 
-export const metadata: Metadata = {
-  title: 'Shop',
-  description:
-    'Shop Warka Furniture — furniture, kitchen furniture, doors and custom woodwork, made to your measurements in Kebena, Addis Ababa.',
-};
+const SHOP_DESCRIPTION =
+  'Shop Warka Furniture — furniture, kitchen furniture, doors and custom woodwork, made to your measurements in Kebena, Addis Ababa.';
+
+/**
+ * A category's own title and description when the shop is filtered to one.
+ * Both are made from the category's name and description when it is saved
+ * (see the category action), so there is nothing here to fall out of date.
+ */
+export async function generateMetadata({ searchParams }: { searchParams: Search }): Promise<Metadata> {
+  const slug = one((await searchParams).category);
+  const category = slug
+    ? await db.category
+        .findFirst({
+          where: { slug, isPublished: true },
+          select: { name: true, slug: true, blurb: true, seoTitle: true, seoDescription: true },
+        })
+        .catch(() => null)
+    : null;
+
+  if (!category) {
+    return { title: 'Shop', description: SHOP_DESCRIPTION, alternates: { canonical: '/shop' } };
+  }
+  return {
+    // A category saved before these were generated has none stored yet; it is
+    // given the same derived values rather than the shop-wide ones.
+    title: category.seoTitle || autoTitle(category.name),
+    description:
+      category.seoDescription ||
+      autoDescription(
+        category.blurb,
+        `${category.name} from Warka Furniture, made to your measurements in Kebena, Addis Ababa.`,
+      ),
+    alternates: { canonical: `/shop?category=${category.slug}` },
+  };
+}
 
 export const revalidate = 120;
 

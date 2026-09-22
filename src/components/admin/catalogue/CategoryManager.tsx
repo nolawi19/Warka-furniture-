@@ -10,6 +10,8 @@ import {
 } from '@/app/actions/admin-categories';
 import { Card } from '@/components/admin/ui/Card';
 import { EmptyState } from '@/components/admin/ui/EmptyState';
+import { ImageUploadField } from '@/components/admin/ui/ImageUploadField';
+import { isImageSrc } from '@/lib/image-src';
 import { DragHandle, SortableList } from '@/components/admin/ui/SortableList';
 import styles from './CategoryManager.module.css';
 import { useServerData } from '@/components/admin/ui/useServerData';
@@ -154,7 +156,6 @@ export function CategoryManager({ categories }: { categories: CategoryRow[] }) {
       {editing && (
         <CategoryDialog
           draft={editing}
-          parents={tops.filter((t) => t.id !== editing.id)}
           busy={pending}
           onCancel={() => setEditing(null)}
           onSave={save}
@@ -182,8 +183,10 @@ function Row({
   return (
     <div className={styles.row}>
       <DragHandle args={args} />
-      {row.imageUrl ? (
-         
+      {/* Checked, not just present: a value saved before addresses were
+          checked, like "beds.jpg", would otherwise be fetched relative to
+          /admin/ and 404. */}
+      {isImageSrc(row.imageUrl) ? (
         <img src={row.imageUrl} alt="" className={styles.thumb} />
       ) : (
         <span className={styles.thumbEmpty} aria-hidden="true" />
@@ -229,13 +232,11 @@ function Row({
 
 function CategoryDialog({
   draft,
-  parents,
   busy,
   onCancel,
   onSave,
 }: {
   draft: Draft;
-  parents: CategoryRow[];
   busy: boolean;
   onCancel: () => void;
   onSave: (d: Draft) => void;
@@ -264,39 +265,6 @@ function CategoryDialog({
               onChange={(e) => setValue((v) => ({ ...v, name: e.target.value }))}
             />
           </label>
-          <label className={styles.dialogField}>
-            <span>Name in Amharic</span>
-            <input
-              className="admin-input"
-              value={value.nameAm ?? ''}
-              onChange={(e) => setValue((v) => ({ ...v, nameAm: e.target.value }))}
-            />
-          </label>
-          <label className={styles.dialogField}>
-            <span>Web address</span>
-            <input
-              className="admin-input"
-              value={value.slug ?? ''}
-              placeholder="made from the name"
-              onChange={(e) => setValue((v) => ({ ...v, slug: e.target.value }))}
-            />
-            <small>Changing this breaks any link already pointing at the old address.</small>
-          </label>
-          <label className={styles.dialogField}>
-            <span>Inside</span>
-            <select
-              className="admin-input"
-              value={value.parentId ?? ''}
-              onChange={(e) => setValue((v) => ({ ...v, parentId: e.target.value || undefined }))}
-            >
-              <option value="">Nothing — top level</option>
-              {parents.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </label>
           <label className={`${styles.dialogField} ${styles.dialogWide}`}>
             <span>Description</span>
             <textarea
@@ -306,32 +274,17 @@ function CategoryDialog({
               onChange={(e) => setValue((v) => ({ ...v, blurb: e.target.value }))}
             />
           </label>
-          <label className={`${styles.dialogField} ${styles.dialogWide}`}>
-            <span>Image</span>
-            <input
-              className="admin-input"
-              value={value.imageUrl ?? ''}
-              placeholder="/uploads/beds.jpg"
-              onChange={(e) => setValue((v) => ({ ...v, imageUrl: e.target.value }))}
+          {/* The web address, the search title and the search description are
+              made from the name and description when the category is saved.
+              An existing category keeps its address, so links do not break. */}
+          <div className={`${styles.dialogField} ${styles.dialogWide}`}>
+            <ImageUploadField
+              label="Picture"
+              value={value.imageUrl}
+              hint="Optional. Without one, the menu uses a photograph from a product in this category."
+              onChange={(url) => setValue((v) => ({ ...v, imageUrl: url }))}
             />
-            <small>Upload one in the Media Library, then paste its address here.</small>
-          </label>
-          <label className={styles.dialogField}>
-            <span>Search title</span>
-            <input
-              className="admin-input"
-              value={value.seoTitle ?? ''}
-              onChange={(e) => setValue((v) => ({ ...v, seoTitle: e.target.value }))}
-            />
-          </label>
-          <label className={styles.dialogField}>
-            <span>Search description</span>
-            <input
-              className="admin-input"
-              value={value.seoDescription ?? ''}
-              onChange={(e) => setValue((v) => ({ ...v, seoDescription: e.target.value }))}
-            />
-          </label>
+          </div>
         </div>
 
         <div className={styles.dialogActions}>
