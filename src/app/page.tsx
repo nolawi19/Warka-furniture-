@@ -1,21 +1,16 @@
 import { Hero } from '@/components/hero/Hero';
 import { BrandStory } from '@/components/sections/BrandStory';
-import { ProductCarousel } from '@/components/sections/ProductCarousel';
 import { FurnitureShowcase } from '@/components/sections/FurnitureShowcase';
 import { Offers } from '@/components/sections/Offers';
 import { Quote } from '@/components/sections/Quote';
 import { Section } from '@/components/sections/Section';
 import { StorePanel } from '@/components/sections/StorePanel';
 import { BlockRenderer } from '@/components/blocks/BlockRenderer';
-import {
-  getNewestProducts,
-} from '@/lib/catalogue';
 import { db } from '@/lib/db';
 import { parseBlocks } from '@/lib/site/blocks';
 import { getOffers, hasOffers } from '@/lib/offers';
 import { getShop } from '@/lib/site/shop';
 import { HOME_QUOTE } from '@/lib/site/home-defaults';
-import { savedVariantIds } from '@/lib/wishlist';
 
 export const revalidate = 300;
 
@@ -36,12 +31,7 @@ export default async function HomePage() {
     if (blocks.length > 0) return <BlockRenderer blocks={blocks} />;
   }
 
-  const [shop, newest, saved, configuredOffers] = await Promise.all([
-    getShop(),
-    getNewestProducts(8),
-    savedVariantIds(),
-    getOffers(4),
-  ]);
+  const [shop, configuredOffers] = await Promise.all([getShop(), getOffers(4)]);
 
   // The homepage does not carry a delivery card. Free-delivery zones are still
   // configured in the admin, still priced at checkout, and the pin still picks
@@ -49,7 +39,9 @@ export default async function HomePage() {
   // offers band is dropped to what is left. When free delivery was the only
   // offer configured, hasOffers below is now false and no band renders at all,
   // which is right: there is nothing else to say.
-  const offers = { ...configuredOffers, freeDelivery: null };
+  // Nor a "reduced" strip: the sale prices still apply in the shop and on
+  // each card, but the homepage makes no weekly promotional claim.
+  const offers = { ...configuredOffers, freeDelivery: null, reduced: null };
 
   return (
     <>
@@ -81,23 +73,6 @@ export default async function HomePage() {
         />
       </Section>
 
-      {newest.length > 0 && (
-        <Section labelledBy="new-heading" flush>
-          <ProductCarousel
-            products={newest}
-            kicker="New arrivals"
-            heading="Something New for Your Space"
-            body="Discover our latest furniture and bring a fresh look to your home."
-            headingId="new-heading"
-            linkLabel="See the catalogue"
-            linkHref="/shop"
-            visibleDesktop={4}
-            visibleMobile={1.35}
-            savedIds={saved}
-          />
-        </Section>
-      )}
-
       {/* Only when the shop has actually configured something. getOffers reads
           sale prices, coupons and delivery zones; it invents nothing, and
           hasOffers is false on a shop that has set none of them — in which
@@ -107,7 +82,7 @@ export default async function HomePage() {
           <h2 id="offers-heading" className="sr-only">
             Current offers
           </h2>
-          <Offers offers={offers} savedIds={saved} />
+          <Offers offers={offers} />
         </Section>
       )}
 
@@ -155,7 +130,7 @@ export default async function HomePage() {
           headingId="visit-heading"
           body="Find the furniture that belongs in your home."
           details={[
-            { label: 'Shop', value: shop.area },
+            { label: 'Shop', value: shop.area, href: shop.mapsUrl || undefined },
             { label: 'More information', value: shop.phone, href: `tel:${shop.phoneHref}` },
             { label: 'Direct orders', value: shop.orderPhone, href: `tel:${shop.orderPhoneHref}` },
             { label: 'Email', value: shop.email, href: `mailto:${shop.email}` },

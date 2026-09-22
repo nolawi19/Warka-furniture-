@@ -102,3 +102,15 @@
 @media (pointer: coarse) {
   .action, .danger, .primary { padding-block: 12px; }
 }
+
+/* The quieter of the two header buttons. */
+.secondary {
+  padding: 7px 12px;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.secondary:hover { border-color: var(--ink-3); }

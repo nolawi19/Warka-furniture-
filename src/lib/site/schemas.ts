@@ -62,7 +62,9 @@ export const StoreSchema = z.object({
   orderPhone: Text(40).default('+251-949-196561'),
   orderPhoneHref: Text(40).default('+251949196561'),
 
-  area: Text(120).default('Kebena, Addis Ababa, Ethiopia'),
+  // The city only. The workshop's exact place is its map pin below, and no
+  // neighbourhood or street has been confirmed for that pin, so none is named.
+  area: Text(120).default('Addis Ababa, Ethiopia'),
   city: Text(80).default('Addis Ababa'),
   country: Text(2).default('ET'),
   // Empty on purpose. Nobody has confirmed opening hours or a delivery promise,
@@ -79,7 +81,7 @@ export const StoreSchema = z.object({
   /**
    * Where the shop is, for the map on the website. 0,0 means "not set", which
    * is why the map block renders nothing rather than the Gulf of Guinea. The
-   * default is the workshop's own pin in Kebena.
+   * default is the workshop's own pin, from its Google Maps listing.
    */
   latitude: z.number().min(-90).max(90).default(8.9643517),
   longitude: z.number().min(-180).max(180).default(38.7326431),
@@ -396,7 +398,7 @@ export const SeoSchema = z.object({
     'Warka Furniture — furniture, kitchens, doors and custom woodwork made in Addis Ababa',
   ),
   defaultDescription: Text(320).default(
-    'Warka Furniture (Warka Wood Works — Industrial) makes furniture, kitchen furniture, doors and custom woodwork to your measurements in Kebena, Addis Ababa, Ethiopia.',
+    'Warka Furniture (Warka Wood Works — Industrial) makes furniture, kitchen furniture, doors and custom woodwork to your measurements in Addis Ababa, Ethiopia.',
   ),
   ogImageUrl: z.string().trim().max(500).default(''),
   /** Blank means the icon in /public, which is what the site shipped with. */
@@ -603,27 +605,30 @@ export function parseSetting<K extends SettingKey>(key: K, raw: unknown): Settin
  * The next time the settings are published, the real values are what get
  * saved, and this has nothing left to do.
  */
-const LEGACY_STORE: Partial<Record<keyof StoreSettings, unknown>> = {
-  email: 'warka@example.com',
-  phone: '+251 00 000 0000',
-  phoneHref: '+251000000000',
-  area: 'Kebena, Addis Ababa',
-  openingHours: 'Tuesday to Saturday, 9 to 6',
-  deliveryNote: 'Delivered anywhere in Addis and set up on arrival.',
+const LEGACY_STORE: Partial<Record<keyof StoreSettings, unknown[]>> = {
+  email: ['warka@example.com'],
+  phone: ['+251 00 000 0000'],
+  phoneHref: ['+251000000000'],
+  // Both Kebena labels the site has shipped with; the map pin is the real place.
+  area: ['Kebena, Addis Ababa', 'Kebena, Addis Ababa, Ethiopia'],
+  openingHours: ['Tuesday to Saturday, 9 to 6'],
+  deliveryNote: ['Delivered anywhere in Addis and set up on arrival.'],
 };
 
 /** The same, for the two search defaults that listed only part of what the shop makes. */
-const LEGACY_SEO: Partial<Record<keyof SeoSettings, string>> = {
-  defaultTitle: 'Warka Furniture — beds, dressing tables and drawers made in Addis Ababa',
-  defaultDescription:
+const LEGACY_SEO: Partial<Record<keyof SeoSettings, string[]>> = {
+  defaultTitle: ['Warka Furniture — beds, dressing tables and drawers made in Addis Ababa'],
+  defaultDescription: [
     'Warka Furniture builds buttoned beds, dressing tables, mirrors, chests of drawers and office pedestals to your measurement in Addis Ababa.',
+    'Warka Furniture (Warka Wood Works — Industrial) makes furniture, kitchen furniture, doors and custom woodwork to your measurements in Kebena, Addis Ababa, Ethiopia.',
+  ],
 };
 
 function upgradeSeo(seo: SeoSettings): SeoSettings {
   const fresh = SeoSchema.parse({});
   const out = { ...seo };
-  for (const [field, legacy] of Object.entries(LEGACY_SEO) as [keyof SeoSettings, string][]) {
-    if (out[field] === legacy) (out as Record<string, unknown>)[field] = fresh[field];
+  for (const [field, legacy] of Object.entries(LEGACY_SEO) as [keyof SeoSettings, string[]][]) {
+    if (legacy.includes(out[field] as string)) (out as Record<string, unknown>)[field] = fresh[field];
   }
   return out;
 }
@@ -631,8 +636,8 @@ function upgradeSeo(seo: SeoSettings): SeoSettings {
 function upgradeStore(store: StoreSettings): StoreSettings {
   const fresh = StoreSchema.parse({});
   const out = { ...store };
-  for (const [field, legacy] of Object.entries(LEGACY_STORE) as [keyof StoreSettings, unknown][]) {
-    if (out[field] === legacy) (out as Record<string, unknown>)[field] = fresh[field];
+  for (const [field, legacy] of Object.entries(LEGACY_STORE) as [keyof StoreSettings, unknown[]][]) {
+    if (legacy.includes(out[field])) (out as Record<string, unknown>)[field] = fresh[field];
   }
   // 0,0 was "not set"; the shop's own pin is now known.
   if (out.latitude === 0 && out.longitude === 0) {

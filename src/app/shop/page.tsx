@@ -13,7 +13,7 @@ import { savedVariantIds } from '@/lib/wishlist';
 import styles from './page.module.css';
 
 const SHOP_DESCRIPTION =
-  'Shop Warka Furniture — furniture, kitchen furniture, doors and custom woodwork, made to your measurements in Kebena, Addis Ababa.';
+  'Shop Warka Furniture — furniture, kitchen furniture, doors and custom woodwork, made to your measurements in Addis Ababa.';
 
 /**
  * A category's own title and description when the shop is filtered to one.
@@ -42,7 +42,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Search 
       category.seoDescription ||
       autoDescription(
         category.blurb,
-        `${category.name} from Warka Furniture, made to your measurements in Kebena, Addis Ababa.`,
+        `${category.name} from Warka Furniture, made to your measurements in Addis Ababa.`,
       ),
     alternates: { canonical: `/shop?category=${category.slug}` },
   };
@@ -115,7 +115,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Search 
           <h1 className={styles.title}>{title}</h1>
           <p className={styles.blurb}>
             {activeCategory?.blurb ??
-              'Bedroom and office furniture, built to your measurement in Kebena. Pick a finish, a size and a board; we build it and bring it.'}
+              'Furniture, kitchen furniture, doors and custom woodwork, made to your measurements in Addis Ababa.'}
           </p>
         </div>
         <p className={styles.count}>

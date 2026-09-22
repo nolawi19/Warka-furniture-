@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     product.seoDescription ||
     autoDescription(
       product.description,
-      `${product.name} by Warka Furniture, made to your measurements in Kebena, Addis Ababa.`,
+      `${product.name} by Warka Furniture, made to your measurements in Addis Ababa.`,
     );
   const ogImage = toImageSrc(product.images[0]?.url);
 
@@ -148,7 +148,7 @@ export default async function ProductPage({ params }: { params: Params }) {
           <div className={styles.prose}>
             {product.description
               ? product.description.split(/\n{2,}/).filter(Boolean).map((para, i) => <p key={i}>{para}</p>)
-              : <p>Built to order in the Kebena workshop.</p>}
+              : <p>Built to order in the Warka workshop in Addis Ababa.</p>}
             {product.materials && <p>{product.materials}</p>}
             {product.careNotes && <p>{product.careNotes}</p>}
           </div>

@@ -222,7 +222,7 @@ export async function saveProductAction(
     .toLowerCase();
 
   // Made from what the admin wrote, never typed separately; see seo-auto.ts.
-  const fallback = `${input.name} by Warka Furniture, made to your measurements in Kebena, Addis Ababa.`;
+  const fallback = `${input.name} by Warka Furniture, made to your measurements in Addis Ababa.`;
   const extraFields = {
     brand: BRAND,
     color,

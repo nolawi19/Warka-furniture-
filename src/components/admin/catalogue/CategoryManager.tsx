@@ -242,6 +242,8 @@ function CategoryDialog({
   onSave: (d: Draft) => void;
 }) {
   const [value, setValue] = useState<Draft>(draft);
+  // Saving mid-upload would store the category without the picture.
+  const [uploading, setUploading] = useState(false);
   const isNew = !value.id;
 
   return (
@@ -283,6 +285,7 @@ function CategoryDialog({
               value={value.imageUrl}
               hint="Optional. Without one, the menu uses a photograph from a product in this category."
               onChange={(url) => setValue((v) => ({ ...v, imageUrl: url }))}
+              onBusyChange={setUploading}
             />
           </div>
         </div>
@@ -294,10 +297,10 @@ function CategoryDialog({
           <button
             type="button"
             className={styles.primary}
-            disabled={busy || !value.name.trim()}
+            disabled={busy || uploading || !value.name.trim()}
             onClick={() => onSave(value)}
           >
-            {busy ? 'Saving…' : isNew ? 'Create' : 'Save'}
+            {busy ? 'Saving…' : uploading ? 'Uploading…' : isNew ? 'Create' : 'Save'}
           </button>
         </div>
       </div>

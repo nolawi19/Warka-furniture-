@@ -19,14 +19,21 @@ export function ImageUploadField({
   value,
   onChange,
   hint,
+  onBusyChange,
 }: {
   label: string;
   value: string | null | undefined;
   onChange: (url: string | null) => void;
   hint?: string;
+  /** Lets the form hold its save button while a picture is still on its way. */
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const input = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusyState] = useState(false);
+  const setBusy = (b: boolean) => {
+    setBusyState(b);
+    onBusyChange?.(b);
+  };
   const [error, setError] = useState<string | null>(null);
 
   // A value saved before addresses were checked is shown as a problem to fix,

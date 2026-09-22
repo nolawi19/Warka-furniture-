@@ -70,7 +70,13 @@ export async function SiteFooter() {
             <address className={styles.address}>
               <span className={styles.addressRow}>
                 <Icon name="pin" size={16} />
-                {SHOP.area}
+                {SHOP.mapsUrl ? (
+                  <a href={SHOP.mapsUrl} target="_blank" rel="noopener noreferrer">
+                    {SHOP.area}
+                  </a>
+                ) : (
+                  SHOP.area
+                )}
               </span>
               {SHOP.phone && (
                 <span className={styles.addressRow}>

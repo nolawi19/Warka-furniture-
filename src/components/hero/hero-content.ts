@@ -39,7 +39,8 @@ export const HERO_DEFAULTS: HeroContent = {
   // not, so there is none here.
   facts: [{ value: 'Made to size', label: 'not a fixed catalogue' }],
   panel: 'plate',
-  plateKicker: 'Est. Kebena, Addis Ababa',
+  // The city only: the Google Maps pin confirms Addis Ababa, not a neighbourhood.
+  plateKicker: 'Est. Addis Ababa',
   wordmarkMain: 'WARKA',
   wordmarkSub: 'Furniture',
   amharic: 'ዋርካ የአንጨት ስራዎች',

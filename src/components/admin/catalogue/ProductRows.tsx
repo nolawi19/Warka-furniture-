@@ -154,6 +154,13 @@ export function ProductRows({ products }: { products: ProductRow[] }) {
               </td>
               <td className={cell.num}>
                 <div className={styles.actions}>
+                  <Link
+                    href={`/admin/products/${p.id}`}
+                    className={styles.action}
+                    aria-label={`Edit ${p.name}`}
+                  >
+                    Edit
+                  </Link>
                   <label className={styles.check} title="Show on the homepage">
                     <input
                       type="checkbox"

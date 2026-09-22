@@ -1,6 +1,6 @@
 # Warka Furniture
 
-A furniture shop in Kebena, Addis Ababa, and the website that sells for it.
+A furniture shop in Addis Ababa, and the website that sells for it.
 
 There are **two things** in this repository, and both work:
 

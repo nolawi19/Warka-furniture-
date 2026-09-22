@@ -8,7 +8,7 @@ import styles from '../prose.module.css';
 export const metadata: Metadata = {
   title: 'Visit Warka Furniture',
   description:
-    'Visit Warka Wood Works — Industrial in Kebena, Addis Ababa to see our furniture, kitchen furniture, doors and custom woodwork, and talk to our team.',
+    'Visit Warka Wood Works — Industrial in Addis Ababa to see our furniture, kitchen furniture, doors and custom woodwork, and talk to our team.',
   alternates: { canonical: '/visit' },
 };
 

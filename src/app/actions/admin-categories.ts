@@ -92,7 +92,7 @@ export async function saveCategoryAction(input: unknown): Promise<CategoryAction
     seoTitle: autoTitle(data.name),
     seoDescription: autoDescription(
       blurb,
-      `${data.name} from Warka Furniture, made to your measurements in Kebena, Addis Ababa.`,
+      `${data.name} from Warka Furniture, made to your measurements in Addis Ababa.`,
     ),
   };
 

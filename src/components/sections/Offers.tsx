@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-import { ProductStrip } from '@/components/sections/ProductStrip';
 import { Icon } from '@/components/ui/Icon';
 import { formatMoney } from '@/lib/money';
 import type { Offers as OffersData } from '@/lib/offers';
@@ -15,8 +14,10 @@ import styles from './Offers.module.css';
  * with no sale prices and no coupons gets no offers band, rather than a
  * cheerful banner about savings that do not exist.
  */
-export function Offers({ offers, savedIds }: { offers: OffersData; savedIds: Set<string> }) {
-  const { reduced, coupon, freeDelivery } = offers;
+export function Offers({ offers }: { offers: OffersData }) {
+  // Reduced pieces are not shown here: the homepage makes no "reduced this
+  // week" claim. Sale prices still show on each product card.
+  const { coupon, freeDelivery } = offers;
 
   return (
     <div className={styles.wrap}>
@@ -99,25 +100,7 @@ export function Offers({ offers, savedIds }: { offers: OffersData; savedIds: Set
         </div>
       )}
 
-      {reduced && (
-        <div className={styles.reduced}>
-          <ProductStrip
-            products={reduced.products}
-            kicker={`Up to ${formatMoney(reduced.bestSavingSantim)} off`}
-            heading={reduced.total === 1 ? 'Reduced this week' : 'Reduced pieces'}
-            headingId="offers-reduced-heading"
-            linkLabel={
-              reduced.total > reduced.products.length
-                ? `All ${reduced.total} reduced`
-                : 'Browse everything'
-            }
-            linkHref={reduced.total > reduced.products.length ? '/shop?onSale=1' : '/shop'}
-            savedIds={savedIds}
-          />
-        </div>
-      )}
-
-      {!reduced && (coupon || freeDelivery) && (
+      {(coupon || freeDelivery) && (
         <p className={styles.footLink}>
           <Link href="/shop">
             Browse the catalogue

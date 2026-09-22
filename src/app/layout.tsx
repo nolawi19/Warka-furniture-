@@ -174,6 +174,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang="en"
+      // The stylesheet sets scroll-behavior: smooth on <html>. Next.js turns it
+      // off during route changes only when this attribute says so; without it
+      // Next 15.5 warns that the automatic workaround is going away.
+      data-scroll-behavior="smooth"
       data-theme={theme.defaultTheme === 'system' ? undefined : theme.defaultTheme}
       className={`${inter.variable} ${playfair.variable} ${ethiopic.variable}`}
       suppressHydrationWarning

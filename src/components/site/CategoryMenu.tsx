@@ -31,10 +31,22 @@ export type MenuCategory = {
  * trigger. Hover is a convenience laid on top, not the mechanism.
  */
 export function CategoryMenu({ categories }: { categories: MenuCategory[] }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpenState] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeTimer = useRef<number | null>(null);
+  // Hovering opens the panel, and the click that usually follows the hover
+  // must not then toggle it shut again. A click on a panel that hover opened
+  // keeps it open; after that, clicks toggle as normal. Both live in refs as
+  // well as state: hover and click can land in the same frame, before React
+  // has rendered the hover, and the click must still see the panel as open.
+  const openRef = useRef(false);
+  const openedByHover = useRef(false);
+  function setOpen(next: boolean) {
+    openRef.current = next;
+    if (!next) openedByHover.current = false;
+    setOpenState(next);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -81,6 +93,7 @@ export function CategoryMenu({ categories }: { categories: MenuCategory[] }) {
       onPointerEnter={(e) => {
         if (e.pointerType === 'mouse') {
           cancelClose();
+          if (!openRef.current) openedByHover.current = true;
           setOpen(true);
         }
       }}
@@ -94,7 +107,14 @@ export function CategoryMenu({ categories }: { categories: MenuCategory[] }) {
         className={styles.trigger}
         aria-expanded={open}
         aria-controls="category-panel"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => {
+          if (openRef.current && openedByHover.current) {
+            openedByHover.current = false;
+            return;
+          }
+          openedByHover.current = false;
+          setOpen(!openRef.current);
+        }}
       >
         Categories
         <Icon name="chevron-down" size={15} className={styles.chevron} />
@@ -107,8 +127,15 @@ export function CategoryMenu({ categories }: { categories: MenuCategory[] }) {
               <li key={c.slug}>
                 <Link href={`/shop?category=${c.slug}`} className={styles.item} onClick={() => setOpen(false)}>
                   <span className={styles.thumb}>
+                    {/* Pictures only while the panel is open. A closed panel is
+                        hidden, so they were never seen — but they still mounted,
+                        and next/image keys its LCP check by the generated URL:
+                        this lazy 88px thumbnail of bed.jpg shared its URL with
+                        the priority card of bed.jpg on the page and overwrote
+                        it, so Next warned that the page's largest image was
+                        missing priority when it was not. */}
                     {isImageSrc(c.imageUrl) ? (
-                      <Image src={c.imageUrl} alt="" fill sizes="88px" className={styles.thumbImg} />
+                      open && <Image src={c.imageUrl} alt="" fill sizes="88px" className={styles.thumbImg} />
                     ) : (
                       <Icon name="grid" size={18} />
                     )}
