@@ -2,7 +2,6 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import reactHooks from 'eslint-plugin-react-hooks';
-import react from 'eslint-plugin-react';
 import next from '@next/eslint-plugin-next';
 
 /**
@@ -48,7 +47,7 @@ export default tseslint.config(
         React: 'readonly', crypto: 'readonly', matchMedia: 'readonly',
       },
     },
-    plugins: { 'react-hooks': reactHooks, react, '@next/next': next },
+    plugins: { 'react-hooks': reactHooks, '@next/next': next },
     rules: {
       ...reactHooks.configs.recommended.rules,
       ...next.configs.recommended.rules,

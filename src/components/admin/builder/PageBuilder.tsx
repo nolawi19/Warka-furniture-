@@ -137,7 +137,7 @@ export function PageBuilder({
     if (!frame) return;
 
     function attach() {
-      let doc: Document | null = null;
+      let doc: Document | null;
       try {
         doc = frame?.contentDocument ?? null;
       } catch {
