@@ -19,8 +19,9 @@ const KIND_LABEL: Record<SearchHit['kind'], string> = {
 export function AdminSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [hits, setHits] = useState<SearchHit[]>([]);
-  const [busy, setBusy] = useState(false);
+  // Results remember the term they answer. "Busy" is then simply "the
+  // results on screen are for a different term than the one typed".
+  const [result, setResult] = useState<{ term: string; hits: SearchHit[] } | null>(null);
   const [cursor, setCursor] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -28,7 +29,7 @@ export function AdminSearch() {
   const close = useCallback(() => {
     setOpen(false);
     setQuery('');
-    setHits([]);
+    setResult(null);
     setCursor(0);
   }, []);
 
@@ -52,35 +53,33 @@ export function AdminSearch() {
   // Debounced, and every in-flight request is abandoned when a newer keystroke
   // arrives — otherwise a slow reply for "be" can land after "bench" and
   // replace the right answers with stale ones.
+  const term = query.trim();
+  const searchable = open && term.length >= 2;
+  const hits = searchable ? (result?.hits ?? []) : [];
+  const busy = searchable && result?.term !== term;
+
   useEffect(() => {
-    if (!open) return;
-    const term = query.trim();
-    if (term.length < 2) {
-      setHits([]);
-      setBusy(false);
-      return;
-    }
+    if (!searchable) return;
     const controller = new AbortController();
-    setBusy(true);
     const timer = window.setTimeout(async () => {
       try {
         const res = await fetch(`/api/admin/search?q=${encodeURIComponent(term)}`, {
           signal: controller.signal,
         });
         const data = (await res.json()) as { hits: SearchHit[] };
-        setHits(data.hits ?? []);
+        setResult({ term, hits: data.hits ?? [] });
         setCursor(0);
       } catch {
-        // Aborted, or the network blinked. Leave the last good result up.
-      } finally {
-        setBusy(false);
+        // A newer keystroke abandoned this one: its own search is on the way.
+        // Otherwise the network blinked: leave the last good result up.
+        if (!controller.signal.aborted) setResult((prev) => ({ term, hits: prev?.hits ?? [] }));
       }
     }, 160);
     return () => {
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [query, open]);
+  }, [term, searchable]);
 
   function go(hit: SearchHit) {
     close();

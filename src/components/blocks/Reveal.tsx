@@ -10,7 +10,8 @@ import styles from './Blocks.module.css';
  * An IntersectionObserver that disconnects the moment it fires, so there is no
  * scroll listener and no animation loop anywhere on the site. A visitor who
  * has asked their device for less movement gets the final state immediately
- * and nothing animates at all.
+ * and nothing animates at all — Blocks.module.css does that for them, before
+ * any script has run.
  */
 export function Reveal({
   name,
@@ -29,11 +30,6 @@ export function Reveal({
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setShown(true);
-      return;
-    }
 
     const observer = new IntersectionObserver(
       (entries) => {

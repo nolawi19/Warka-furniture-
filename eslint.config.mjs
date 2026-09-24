@@ -24,9 +24,7 @@ export default tseslint.config(
       'next-env.d.ts',
       'public/**',
       'index.html',
-      // Not TypeScript sources, so the type-aware parser has no program for
-      // them. The config is checked by running it; the catalogue is data.
-      'eslint.config.mjs',
+      // Data, not code.
       'prisma/_legacy-catalogue.cjs',
     ],
   },
@@ -83,15 +81,12 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
 
-      // Advisory here, not ignored. Every remaining instance is the same
-      // shape: a value that exists only in a browser — localStorage,
-      // matchMedia, an IntersectionObserver result — read on mount and put
-      // into state. It cannot be read while rendering on the server, so the
-      // second render is the unavoidable cost of not guessing, and guessing is
-      // what causes hydration mismatches. Warnings rather than off, so a NEW
-      // one still surfaces instead of being silently allowed.
-      'react-hooks/set-state-in-effect': 'warn',
-      'react-hooks/refs': 'warn',
+      // No exceptions left: browser-only values are read with
+      // useSyncExternalStore, results remember the query they answer, and
+      // state that follows a prop is adjusted while rendering. A new case
+      // fails the lint instead of joining a pile of tolerated warnings.
+      'react-hooks/set-state-in-effect': 'error',
+      'react-hooks/refs': 'error',
     },
   },
 
@@ -100,6 +95,15 @@ export default tseslint.config(
     // nothing knows in advance — which is precisely what next/image requires.
     files: ['src/components/admin/**/*.tsx'],
     rules: { '@next/next/no-img-element': 'off' },
+  },
+
+  {
+    // This file is linted too, without type information (it is not part of
+    // the TypeScript program). It also has to be lintable for `next build` to
+    // find the Next.js plugin: Next asks ESLint which config applies to this
+    // very file, and an ignored file has none.
+    files: ['eslint.config.mjs'],
+    ...tseslint.configs.disableTypeChecked,
   },
 
   {

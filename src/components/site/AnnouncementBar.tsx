@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 
 import type { LiveBanner } from '@/lib/site/banners';
 import styles from './AnnouncementBar.module.css';
@@ -12,26 +12,36 @@ import styles from './AnnouncementBar.module.css';
  * the message brings the bar back for everyone rather than staying hidden for
  * the people who dismissed the previous one.
  */
-export function AnnouncementBar({ banner }: { banner: LiveBanner }) {
-  const [hidden, setHidden] = useState(false);
-  const [ready, setReady] = useState(false);
+// Another tab dismissing the same banner hides it here too.
+function subscribe(onChange: () => void) {
+  window.addEventListener('storage', onChange);
+  return () => window.removeEventListener('storage', onChange);
+}
 
-  useEffect(() => {
-    if (!banner.isDismissible) {
-      setReady(true);
-      return;
-    }
-    try {
-      setHidden(localStorage.getItem(`warka.banner.${banner.id}`) === 'dismissed');
-    } catch {
-      // Private window, blocked storage: show the bar. A missed dismissal is
-      // a smaller problem than a bar that never appears.
-    }
-    setReady(true);
-  }, [banner.id, banner.isDismissible]);
+export function AnnouncementBar({ banner }: { banner: LiveBanner }) {
+  const [dismissedNow, setDismissedNow] = useState(false);
+  // The server cannot see this browser's storage, so it answers "unknown" and
+  // the browser fills in the real answer straight after hydrating — without
+  // the two ever disagreeing about the first render.
+  const stored = useSyncExternalStore(
+    subscribe,
+    () => {
+      if (!banner.isDismissible) return 'shown';
+      try {
+        return localStorage.getItem(`warka.banner.${banner.id}`) === 'dismissed' ? 'dismissed' : 'shown';
+      } catch {
+        // Private window, blocked storage: show the bar. A missed dismissal
+        // is a smaller problem than a bar that never appears.
+        return 'shown';
+      }
+    },
+    () => 'unknown',
+  );
+  const hidden = dismissedNow || stored === 'dismissed';
+  const ready = stored !== 'unknown';
 
   function dismiss() {
-    setHidden(true);
+    setDismissedNow(true);
     try {
       localStorage.setItem(`warka.banner.${banner.id}`, 'dismissed');
     } catch {

@@ -44,8 +44,9 @@ export function LocationPicker({
   const [locating, setLocating] = useState(false);
   const [message, setMessage] = useState('');
   const [query, setQuery] = useState('');
-  const [places, setPlaces] = useState<Place[]>([]);
-  const [searching, setSearching] = useState(false);
+  // Results remember the term they answer, so "searching" is derived: the
+  // places on screen belong to a different term than the one typed.
+  const [result, setResult] = useState<{ term: string; places: Place[] } | null>(null);
   const [searchFailed, setSearchFailed] = useState(false);
 
   useEffect(() => {
@@ -121,34 +122,33 @@ export function LocationPicker({
   // Debounced, and an in-flight search is abandoned when a newer keystroke
   // arrives — otherwise a slow reply for "bo" can land after "bole" and
   // replace the right answers with stale ones.
+  const term = query.trim();
+  const searchable = term.length >= 3;
+  const places = searchable ? (result?.places ?? []) : [];
+  const searching = searchable && result?.term !== term;
+
   useEffect(() => {
-    const term = query.trim();
-    if (term.length < 3) {
-      setPlaces([]);
-      setSearching(false);
-      return;
-    }
+    if (!searchable) return;
     const controller = new AbortController();
-    setSearching(true);
     const timer = window.setTimeout(async () => {
       try {
         const res = await fetch(`/api/geocode?q=${encodeURIComponent(term)}`, {
           signal: controller.signal,
         });
         const data = (await res.json()) as { places?: Place[]; error?: string };
-        setPlaces(data.places ?? []);
+        setResult({ term, places: data.places ?? [] });
         setSearchFailed(Boolean(data.error));
       } catch {
-        // Aborted, or the network blinked. Leave the last good result up.
-      } finally {
-        setSearching(false);
+        // A newer keystroke abandoned this one: its own search is on the way.
+        // Otherwise the network blinked: leave the last good result up.
+        if (!controller.signal.aborted) setResult((prev) => ({ term, places: prev?.places ?? [] }));
       }
     }, 450);
     return () => {
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [query]);
+  }, [term, searchable]);
 
   function useMyLocation() {
     if (!navigator.geolocation) {
@@ -210,7 +210,7 @@ export function LocationPicker({
                   onClick={() => {
                     placePin(place.lat, place.lng);
                     setQuery('');
-                    setPlaces([]);
+                    setResult(null);
                   }}
                 >
                   <span className={styles.resultName}>{place.name}</span>

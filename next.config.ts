@@ -3,6 +3,10 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // `next dev` only. Opening the dev site as http://127.0.0.1:3000 rather
+  // than localhost is a different origin to Next, which warns on every page
+  // (and a future Next will refuse). Production is unaffected.
+  allowedDevOrigins: ['127.0.0.1'],
   images: {
     // Product photography is served from local storage today; a CDN host can be
     // added here without touching any component.

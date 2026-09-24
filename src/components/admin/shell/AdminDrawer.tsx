@@ -16,7 +16,14 @@ export function AdminDrawer() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
 
-  useEffect(() => setOpen(false), [pathname]);
+  // A link inside the drawer navigates; the drawer closes with it. Done while
+  // rendering (React's pattern for state that follows a prop) rather than in
+  // an effect, which would paint the new page under an open drawer first.
+  const [shownFor, setShownFor] = useState(pathname);
+  if (shownFor !== pathname) {
+    setShownFor(pathname);
+    setOpen(false);
+  }
 
   useEffect(() => {
     if (!open) return;

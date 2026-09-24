@@ -46,8 +46,9 @@ export function SettingsEditor<T>({
   const [unpublished, setUnpublished] = useState(hasUnpublishedDraft);
 
   // The first render must not look like an edit, or every page would autosave
-  // itself the moment it opened.
-  const touched = useRef(false);
+  // itself the moment it opened. Counted in state rather than flagged in a
+  // ref, because `set` is handed to the editors while they render.
+  const [edits, setEdits] = useState(0);
   const timer = useRef<number | null>(null);
 
   const persist = useCallback(
@@ -67,7 +68,7 @@ export function SettingsEditor<T>({
   );
 
   const set = useCallback((updater: (prev: T) => T) => {
-    touched.current = true;
+    setEdits((n) => n + 1);
     setValue((prev) => updater(prev));
     setSave('dirty');
   }, []);
@@ -75,13 +76,13 @@ export function SettingsEditor<T>({
   // Autosave, debounced. A colour picker fires on every drag; one write per
   // pause is enough.
   useEffect(() => {
-    if (!touched.current) return;
+    if (edits === 0) return;
     if (timer.current) window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => void persist(value), 900);
     return () => {
       if (timer.current) window.clearTimeout(timer.current);
     };
-  }, [value, persist]);
+  }, [value, edits, persist]);
 
   // The browser's own warning is the only one that can block a close.
   useEffect(() => {
