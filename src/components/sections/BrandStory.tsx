@@ -1,10 +1,9 @@
 import Image from 'next/image';
 
 import { ActionButton } from '@/components/ui/ActionButton';
-import { Icon, type IconName } from '@/components/ui/Icon';
 import styles from './BrandStory.module.css';
 
-export type BrandPoint = { icon: IconName; title: string; body: string };
+export type BrandPoint = { title: string; body: string };
 
 /**
  * What the shop is, said once, on a dark band.
@@ -64,9 +63,6 @@ export function BrandStory({
           <ul className={styles.points}>
             {points.map((p) => (
               <li key={p.title} className={styles.point}>
-                <span className={styles.pointIcon} aria-hidden="true">
-                  <Icon name={p.icon} size={18} />
-                </span>
                 <span>
                   <strong className={styles.pointTitle}>{p.title}</strong>
                   <span className={styles.pointBody}>{p.body}</span>

@@ -1,16 +1,20 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
-import { SectionHead } from './SectionHead';
 import styles from './FurnitureShowcase.module.css';
 
 export type ShowcaseImage = { src: string; alt: string };
 
 /**
- * The shop's own photographs, shown at their own shape.
+ * What the workshop makes, and the shop's own pictures of it.
  *
- * The pictures are square and carry their own type and detail, so they are
- * given a square frame and `object-fit: contain`. Cropping them to a banner
- * would cut the very things they were made to show.
+ * The four things it makes are set as the section's type — a short index in
+ * the display face — rather than as small pills under the pictures: they are
+ * the point of the section, and there are only four.
+ *
+ * The pictures are square and carry their own words and detail, so they keep
+ * their own shape (`object-fit: contain`) and are stepped one under the
+ * other, never overlapping: both carry words to their edges.
  */
 export function FurnitureShowcase({
   kicker,
@@ -33,41 +37,46 @@ export function FurnitureShowcase({
   linkHref?: string;
 }) {
   return (
-    <>
-      <SectionHead
-        kicker={kicker}
-        heading={heading}
-        headingId={headingId}
-        linkLabel={linkLabel}
-        linkHref={linkHref}
-      />
+    <div className={styles.layout} data-images={Math.min(images.length, 2)}>
+      <div className={styles.copy}>
+        {kicker && <p className="kicker">{kicker}</p>}
+        <h2 id={headingId} className={styles.heading}>
+          {heading}
+        </h2>
+        {body && <p className={styles.lede}>{body}</p>}
 
-      {body && <p className={styles.lede}>{body}</p>}
+        {services && services.length > 0 && (
+          <ul className={styles.services}>
+            {services.map((s) => (
+              <li key={s} className={styles.service}>
+                {s}
+              </li>
+            ))}
+          </ul>
+        )}
 
-      <div className={styles.grid}>
-        {images.map((img, i) => (
-          <figure key={img.src} className={styles.frame}>
-            <Image
-              src={img.src}
-              alt={img.alt}
-              fill
-              sizes="(max-width: 760px) 100vw, 46vw"
-              className={styles.image}
-              priority={i === 0}
-            />
-          </figure>
-        ))}
+        {linkLabel && linkHref && (
+          <Link href={linkHref} className={styles.more}>
+            {linkLabel}
+          </Link>
+        )}
       </div>
 
-      {services && services.length > 0 && (
-        <ul className={styles.services}>
-          {services.map((s) => (
-            <li key={s} className={styles.service}>
-              {s}
-            </li>
+      {images.length > 0 && (
+        <div className={styles.prints}>
+          {images.slice(0, 2).map((img, i) => (
+            <figure key={img.src} className={styles.print} data-slot={i}>
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                sizes="(max-width: 900px) 90vw, 36vw"
+                className={styles.image}
+              />
+            </figure>
           ))}
-        </ul>
+        </div>
       )}
-    </>
+    </div>
   );
 }

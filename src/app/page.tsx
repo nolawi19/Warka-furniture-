@@ -127,22 +127,18 @@ export default async function HomePage() {
             body="Create spaces that feel warm, comfortable, elegant, and uniquely yours."
             points={[
               {
-                icon: 'sparkle',
                 title: 'Beautiful Design',
                 body: 'Modern furniture made to stand out.',
               },
               {
-                icon: 'heart',
                 title: 'Comfort You Can Feel',
                 body: 'Designed for relaxing, living, and enjoying your space.',
               },
               {
-                icon: 'ruler',
                 title: 'Quality & Detail',
                 body: 'Thoughtfully crafted with attention to every detail.',
               },
               {
-                icon: 'shield',
                 title: 'Timeless Style',
                 body: 'Furniture made to complement your home for years to come.',
               },
