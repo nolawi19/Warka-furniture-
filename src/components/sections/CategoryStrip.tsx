@@ -111,7 +111,6 @@ export function CategoryStrip({
                 {c.blurb && <span className={styles.categoryBlurb}>{c.blurb}</span>}
                 <span className={styles.categoryGo}>
                   {showCounts ? `${c.pieceCount} ${c.pieceCount === 1 ? 'piece' : 'pieces'}` : 'Browse'}
-                  <Icon name="arrow-right" size={15} />
                 </span>
               </span>
             </Link>

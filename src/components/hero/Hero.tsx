@@ -58,10 +58,7 @@ export function Hero({
     >
       <div className={styles.copy}>
         {c.kicker && (
-          <p className={styles.kicker}>
-            <span className={styles.kickerRule} aria-hidden="true" />
-            {c.kicker}
-          </p>
+          <p className={styles.kicker}>{c.kicker}</p>
         )}
 
         <h1 id={headingId} className={styles.headline}>
@@ -73,7 +70,7 @@ export function Hero({
         {(c.primaryLabel || c.secondaryLabel) && (
           <div className={styles.cta}>
             {c.primaryLabel && (
-              <ActionButton as="link" href={c.primaryHref || '/shop'} variant="primary" size="lg" icon="arrow">
+              <ActionButton as="link" href={c.primaryHref || '/shop'} variant="primary" size="lg">
                 {c.primaryLabel}
               </ActionButton>
             )}

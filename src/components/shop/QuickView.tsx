@@ -308,7 +308,6 @@ export function QuickView({ slug, name }: { slug: string; name: string }) {
 
                     <Link href={`/product/${slug}`} className={styles.secondary}>
                       See the full piece
-                      <Icon name="arrow-right" size={15} />
                     </Link>
                   </div>
 

@@ -111,7 +111,7 @@ export default function CraftPage() {
           </p>
 
           <div className={styles.cta}>
-            <ActionButton as="link" href="/visit" variant="primary" size="lg" icon="arrow">
+            <ActionButton as="link" href="/visit" variant="primary" size="lg">
               Come and See a Piece
             </ActionButton>
             <ActionButton as="link" href="/shop" variant="ghost" size="lg">

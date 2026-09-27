@@ -23,7 +23,6 @@ export function CraftSequence({
   return (
     <div className={styles.wrap}>
       <div className={styles.head}>
-        <p className="kicker">How a piece is made</p>
         <h2 id={headingId} className={styles.heading}>
           {heading}
         </h2>
@@ -71,7 +70,7 @@ export function CraftSequence({
 
       {showLink && (
         <div className={styles.foot}>
-          <ActionButton as="link" href="/craft" variant="ghost" icon="arrow">
+          <ActionButton as="link" href="/craft" variant="ghost">
             How we build
           </ActionButton>
         </div>

@@ -66,8 +66,8 @@ export default async function AccountPage() {
                         day: 'numeric',
                         month: 'short',
                         year: 'numeric',
-                      })}{' '}
-                      · {o._count.items} {o._count.items === 1 ? 'item' : 'items'}
+                      })}
+                      , {o._count.items} {o._count.items === 1 ? 'item' : 'items'}
                     </span>
                     <span className={styles.orderStatus} data-tone={statusTone(o.status)}>
                       {STATUS_LABEL[o.status]}

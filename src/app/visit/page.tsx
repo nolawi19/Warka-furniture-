@@ -96,7 +96,7 @@ export default async function VisitPage() {
           </p>
 
           <div className={styles.cta}>
-            <ActionButton as="link" href="/shop" variant="primary" size="lg" icon="arrow">
+            <ActionButton as="link" href="/shop" variant="primary" size="lg">
               Browse the Catalogue
             </ActionButton>
             <ActionButton as="link" href="/contact" variant="ghost" size="lg">

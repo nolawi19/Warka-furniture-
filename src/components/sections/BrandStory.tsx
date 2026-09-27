@@ -50,7 +50,7 @@ export function BrandStory({
 
         {linkLabel && linkHref && (
           <div className={styles.cta}>
-            <ActionButton as="link" href={linkHref} variant="brass" size="lg" icon="arrow">
+            <ActionButton as="link" href={linkHref} variant="brass" size="lg">
               {linkLabel}
             </ActionButton>
           </div>

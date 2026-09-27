@@ -104,7 +104,6 @@ export function Offers({ offers }: { offers: OffersData }) {
         <p className={styles.footLink}>
           <Link href="/shop">
             Browse the catalogue
-            <Icon name="arrow-right" size={15} />
           </Link>
         </p>
       )}

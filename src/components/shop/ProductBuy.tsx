@@ -209,7 +209,7 @@ export function ProductBuy({
             ? `Only ${current.stock} left in the showroom`
             : current.trackStock
               ? "Ready to take away"
-              : "Made to order · about 2 weeks"
+              : "Made to order, in about two weeks"
           : "Out of stock"}
       </p>
 

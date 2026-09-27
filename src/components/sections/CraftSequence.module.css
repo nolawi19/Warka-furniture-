@@ -8,7 +8,7 @@
 
 .wrap { display: grid; gap: clamp(32px, 4vw, 56px); }
 
-.head { display: grid; gap: var(--space-3); max-width: 24em; }
+.head { display: grid; gap: var(--space-3); }
 
 .heading {
   font-family: var(--font-serif);
@@ -17,6 +17,7 @@
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-display);
   text-wrap: balance;
+  max-width: 20ch;
 }
 
 .steps {

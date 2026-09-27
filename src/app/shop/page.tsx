@@ -163,7 +163,6 @@ export default async function ShopPage({ searchParams }: { searchParams: Search 
                 )}
                 <Link href="/contact" className={styles.emptyLink} data-tone="brass">
                   Ask the workshop
-                  <Icon name="arrow-right" size={15} />
                 </Link>
               </div>
             </div>

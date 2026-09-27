@@ -397,7 +397,7 @@ async function BlockBody({ block }: { block: Block }) {
             <p className={styles.featuredPrice}>
               {prices.length > 0 ? formatMoney(Math.min(...prices)) : 'Priced in the shop'}
             </p>
-            <ActionButton as="link" href={`/product/${product.slug}`} variant="primary" icon="arrow">
+            <ActionButton as="link" href={`/product/${product.slug}`} variant="primary">
               See this piece
             </ActionButton>
           </div>

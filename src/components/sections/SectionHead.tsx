@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-import { Icon } from '@/components/ui/Icon';
 import styles from './Sections.module.css';
 
 /** The heading row every section shares: a label, a title, and a way out. */
@@ -37,7 +36,6 @@ export function SectionHead({
       {linkLabel && linkHref && (
         <Link href={linkHref} className={styles.sectionLink}>
           {linkLabel}
-          <Icon name="arrow-right" size={16} />
         </Link>
       )}
       {note && !linkLabel && <p className={styles.sectionNote}>{note}</p>}

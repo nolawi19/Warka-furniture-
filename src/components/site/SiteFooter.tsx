@@ -107,7 +107,7 @@ export async function SiteFooter() {
             </address>
 
             {SHOP.services.length > 0 && (
-              <p className={styles.services}>{SHOP.services.join(' · ')}</p>
+              <p className={styles.services}>{servicesSentence(SHOP.services)}</p>
             )}
 
             <SocialLinks social={social} />
@@ -164,4 +164,10 @@ export async function SiteFooter() {
       </div>
     </footer>
   );
+}
+
+/** "Furniture, kitchen furniture, doors and custom woodwork." — read as a sentence. */
+function servicesSentence(services: string[]) {
+  const words = services.map((s, i) => (i === 0 ? s : s.charAt(0).toLowerCase() + s.slice(1)));
+  return `${new Intl.ListFormat('en-GB', { type: 'conjunction' }).format(words)}.`;
 }

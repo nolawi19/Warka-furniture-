@@ -355,7 +355,7 @@
   width: 100%;
   /* The shopfront photograph is 432px wide; past that it only gets softer. */
   max-width: 432px;
-  justify-self: end;
+  justify-self: start;
   margin: 0;
   aspect-ratio: 4 / 5;
   overflow: hidden;

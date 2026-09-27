@@ -33,7 +33,7 @@ export function Cta({
       {(primaryLabel || secondaryLabel) && (
         <div className={styles.ctaButtons}>
           {primaryLabel && (
-            <ActionButton as="link" href={primaryHref || '/shop'} variant="primary" size="lg" icon="arrow">
+            <ActionButton as="link" href={primaryHref || '/shop'} variant="primary" size="lg">
               {primaryLabel}
             </ActionButton>
           )}
