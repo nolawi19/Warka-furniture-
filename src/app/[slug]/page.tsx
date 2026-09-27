@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 
 import { BlockRenderer } from '@/components/blocks/BlockRenderer';
 import { db } from '@/lib/db';
@@ -17,12 +18,14 @@ export const revalidate = 300;
  */
 type Params = Promise<{ slug: string }>;
 
-async function findPublished(slug: string) {
+// cache(): the metadata and the page ask for the same page in one request,
+// and the second ask reuses the first answer instead of querying again.
+const findPublished = cache(async (slug: string) => {
   const page = await db.page.findFirst({ where: { slug, status: 'PUBLISHED' } });
   // Prisma's Json filters cannot ask "is not database NULL" cleanly, and a
   // page marked published with nothing published yet is not a page.
   return page?.publishedBlocks ? page : null;
-}
+});
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;

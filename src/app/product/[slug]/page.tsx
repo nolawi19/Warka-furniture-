@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { cache, Suspense } from 'react';
 
 import { ProductBuy } from '@/components/shop/ProductBuy';
 import { ProductGallery } from '@/components/shop/ProductGallery';
@@ -17,9 +18,13 @@ import styles from './page.module.css';
 
 type Params = Promise<{ slug: string }>;
 
+// Once per request: the metadata and the page both need the piece, and cache()
+// makes the second call reuse the first instead of querying again.
+const getProduct = cache(getProductBySlug);
+
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await getProduct(slug);
   if (!product) return { title: 'Not found' };
 
   const prices = product.variants.map(effectivePriceSantim).filter((n): n is number => n !== null);
@@ -50,15 +55,15 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function ProductPage({ params }: { params: Params }) {
-  const SHOP = await getShop();
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
-  if (!product) notFound();
-
-  const [related, saved] = await Promise.all([
-    getRelatedProducts(product.id, product.categoryId, 4),
+  // Everything that does not depend on the piece starts at the same time as
+  // the piece itself; only the related pieces have to wait for it.
+  const [SHOP, product, saved] = await Promise.all([
+    getShop(),
+    getProduct(slug),
     savedVariantIds(),
   ]);
+  if (!product) notFound();
 
   const prices = product.variants.map(effectivePriceSantim).filter((n): n is number => n !== null);
   const from = prices.length ? Math.min(...prices) : null;
@@ -191,14 +196,33 @@ export default async function ProductPage({ params }: { params: Params }) {
         </div>
       </section>
 
-      {related.length > 0 && (
-        <section className={styles.related} aria-labelledby="related-heading">
-          <SectionHead heading="You may also like" headingId="related-heading" linkLabel="All pieces" linkHref="/shop" />
-          <ProductStrip products={related} savedIds={saved} columns={{ mobile: 2, tablet: 3, desktop: 4 }} />
-        </section>
-      )}
+      {/* Streamed: the piece itself is sent without waiting for these, and
+          they arrive a moment later below the fold. */}
+      <Suspense fallback={null}>
+        <RelatedPieces productId={product.id} categoryId={product.categoryId} saved={saved} />
+      </Suspense>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     </div>
+  );
+}
+
+/** "You may also like": its own async component so it can stream in. */
+async function RelatedPieces({
+  productId,
+  categoryId,
+  saved,
+}: {
+  productId: string;
+  categoryId: string;
+  saved: Set<string>;
+}) {
+  const related = await getRelatedProducts(productId, categoryId, 4);
+  if (related.length === 0) return null;
+  return (
+    <section className={styles.related} aria-labelledby="related-heading">
+      <SectionHead heading="You may also like" headingId="related-heading" linkLabel="All pieces" linkHref="/shop" />
+      <ProductStrip products={related} savedIds={saved} columns={{ mobile: 2, tablet: 3, desktop: 4 }} />
+    </section>
   );
 }

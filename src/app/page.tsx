@@ -24,22 +24,34 @@ export default async function HomePage() {
   // Optional by nature: "has someone built a homepage?" If the database
   // cannot answer, that is not a reason to fail here — fall through and let
   // the queries below report the real problem.
-  const built = await db.page
+  //
+  // Both questions go to the database at once rather than one after the
+  // other: the shop has no built homepage today, so waiting for that answer
+  // before asking for everything else cost a full round trip on every visit.
+  // If a built homepage does exist, the second set is simply not used.
+  const builtQuery = db.page
     .findFirst({ where: { slug: 'home', status: 'PUBLISHED' } })
     .catch(() => null);
-
-  if (built?.publishedBlocks) {
-    const blocks = parseBlocks(built.publishedBlocks);
-    if (blocks.length > 0) return <BlockRenderer blocks={blocks} />;
-  }
-
-  const [shop, configuredOffers, photographed] = await Promise.all([
+  const pageData = Promise.all([
     getShop(),
     getOffers(4),
     // Two pieces that have real photographs, for the board beside the plate.
     // Read-only, and optional: if it fails the board shows the plate alone.
     getPhotographedProducts(2).catch(() => []),
   ]);
+
+  const built = await builtQuery;
+  if (built?.publishedBlocks) {
+    const blocks = parseBlocks(built.publishedBlocks);
+    if (blocks.length > 0) {
+      // Not needed on this path; settle it quietly so a failure there is not
+      // reported as an unhandled rejection.
+      pageData.catch(() => {});
+      return <BlockRenderer blocks={blocks} />;
+    }
+  }
+
+  const [shop, configuredOffers, photographed] = await pageData;
   const boardPhotos = photographed
     .filter((p) => p.imageUrl)
     .map((p) => ({

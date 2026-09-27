@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { SessionUser } from '@/lib/auth';
 import type { NavItem } from '@/lib/site/schemas';
 import { Icon } from '@/components/ui/Icon';
 import type { MenuCategory } from './CategoryMenu';
@@ -20,14 +19,16 @@ import styles from './MobileNav.module.css';
  * those is a div that happens to slide.
  */
 export function MobileNav({
-  user,
+  signedIn,
   cartCount,
   savedCount,
   nav,
   categories,
   cartLabel,
 }: {
-  user: SessionUser | null;
+  /** Only whether someone is signed in: the menu needs nothing else about
+      them, and anything passed here is serialised into every page. */
+  signedIn: boolean;
   cartCount: number;
   savedCount: number;
   nav: NavItem[];
@@ -161,7 +162,7 @@ export function MobileNav({
                   </li>
                   <li>
                     <Link
-                      href={user ? '/account/wishlist' : '/login?next=/account/wishlist'}
+                      href={signedIn ? '/account/wishlist' : '/login?next=/account/wishlist'}
                       className={styles.link}
                     >
                       Saved pieces
@@ -169,8 +170,8 @@ export function MobileNav({
                     </Link>
                   </li>
                   <li>
-                    <Link href={user ? '/account' : '/login'} className={styles.link}>
-                      {user ? 'Your account' : 'Sign in'}
+                    <Link href={signedIn ? '/account' : '/login'} className={styles.link}>
+                      {signedIn ? 'Your account' : 'Sign in'}
                       <Icon name="arrow-right" size={17} />
                     </Link>
                   </li>

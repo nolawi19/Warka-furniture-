@@ -55,7 +55,7 @@ export function SiteHeader({
     <HeaderShell sticky={settings?.sticky ?? true}>
       <div className={`wrap ${styles.inner}`}>
         <MobileNav
-          user={user}
+          signedIn={user !== null}
           cartCount={cartCount}
           savedCount={savedCount}
           nav={items}
