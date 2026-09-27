@@ -1,0 +1,78 @@
+/* The Craft Line. A hairline measured out across the top of the window, with
+   a brass marker riding its end and the shop's name beside the marker, the
+   way a length is marked off on a board before it is cut.
+
+   Both parts move with transform only: the line scales from the left, the
+   marker translates along with it on the same curve and duration. */
+
+.line {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--z-craftline);
+  height: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.track {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: linear-gradient(90deg, var(--ember) 0%, var(--ember-text) 100%);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  transform: translateX(0);
+}
+.dot {
+  position: absolute;
+  top: -3px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ember);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ember) 20%, transparent);
+}
+.label {
+  position: absolute;
+  top: 8px;
+  right: 6px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--ember-text);
+  white-space: nowrap;
+}
+
+/* Drawing: out to most of the width, slowing as it goes, so a long wait
+   still looks like progress without ever claiming to be done. */
+.line[data-phase='drawing'] { opacity: 1; }
+.line[data-phase='drawing'] .track {
+  transform: scaleX(0.86);
+  transition: transform 2400ms cubic-bezier(0.1, 0.7, 0.2, 1);
+}
+.line[data-phase='drawing'] .mark {
+  transform: translateX(86vw);
+  transition: transform 2400ms cubic-bezier(0.1, 0.7, 0.2, 1);
+}
+
+/* Finishing: the last stretch quickly, then away. */
+.line[data-phase='finishing'] { opacity: 0; transition: opacity 220ms var(--ease-out) 160ms; }
+.line[data-phase='finishing'] .track { transform: scaleX(1); transition: transform 180ms var(--ease-out); }
+.line[data-phase='finishing'] .mark { transform: translateX(100vw); transition: transform 180ms var(--ease-out); }
+
+@media (prefers-reduced-motion: reduce) {
+  /* No travel: the line is simply there, full width, while the page loads. */
+  .track,
+  .line[data-phase] .track { transform: scaleX(1); transition: none; }
+  .mark { display: none; }
+}

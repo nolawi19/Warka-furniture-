@@ -39,10 +39,11 @@
 .head { display: grid; gap: var(--space-3); }
 
 .category {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
   font-weight: 500;
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ember-text);
 }
 
@@ -76,10 +77,11 @@
 .storyBlock { display: grid; gap: var(--space-4); align-content: start; }
 
 .storyTitle {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
   font-weight: 500;
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink-3);
 }
 
@@ -113,4 +115,9 @@
 }
 @media (max-width: 420px) {
   .specList > div { grid-template-columns: 1fr; gap: 2px; }
+}
+
+/* Breadcrumb links are small words; on a finger each gets a full target. */
+@media (pointer: coarse) {
+  .crumbs a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
 }

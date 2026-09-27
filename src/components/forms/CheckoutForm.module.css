@@ -194,13 +194,14 @@
 .couponRow { display: flex; gap: var(--space-2); }
 
 .couponInput {
+  font-family: var(--font-sans);
   flex: 1;
   max-width: 260px;
   padding: 12px 14px;
   font: inherit;
   font-size: var(--text-body);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink);
   background: var(--bg-2);
   border: 1px solid var(--line);
@@ -231,13 +232,14 @@
 /* The legend above the zone list. The map fills the zone in by itself, so
    this says what the list is for rather than just naming it. */
 .zonesLegend {
+  font-family: var(--font-sans);
   display: grid;
   gap: 3px;
   padding: 0 0 var(--space-3);
   font-size: var(--text-micro);
   font-weight: 500;
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink-3);
 }
 .zonesLegend span {

@@ -80,10 +80,11 @@
 .col { display: grid; gap: var(--space-4); align-content: start; }
 
 .colTitle {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
   font-weight: 500;
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink-3);
 }
 
@@ -126,11 +127,12 @@
    about the height the line-height was already reserving, so the footer looks
    the same and stops being fiddly. Pointer devices are untouched. */
 @media (pointer: coarse) {
-  .colLink { padding-block: 9px; }
-  .addressRow { padding-block: 3px; }
-  .addressRow a { display: inline-block; padding-block: 5px; }
+  /* 44px rows: the target size a thumb needs, not only the WCAG minimum. */
+  .colLink { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; padding-block: 0; }
+  .addressRow { padding-block: 0; }
+  .addressRow a { display: inline-flex; align-items: center; min-height: 44px; padding-block: 0; }
   .legal { gap: var(--space-6); }
-  .legal a { display: inline-block; padding-block: 6px; }
+  .legal a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; padding-block: 0; }
 }
 
 /* The quiet label that says which number is which. */

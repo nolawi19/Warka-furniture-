@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { ProductCard } from '@/components/shop/ProductCard';
+import { AccountNav } from '@/components/site/AccountNav';
 import { Icon } from '@/components/ui/Icon';
 import { currentUser } from '@/lib/auth';
 import { savedPieces } from '@/lib/wishlist';
@@ -50,6 +51,8 @@ export default async function WishlistPage() {
             </p>
           )}
         </header>
+
+        <AccountNav />
 
         {pieces.length === 0 ? (
           <div className={styles.empty}>

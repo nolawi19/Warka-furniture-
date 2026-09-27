@@ -19,3 +19,12 @@
 .primary { background: var(--ember); color: var(--ember-ink); }
 .ghost { border-color: var(--line); }
 .ghost:hover { background: var(--bg-3); }
+.primary { transition: filter var(--dur-fast) var(--ease-out); }
+.primary:hover { filter: brightness(1.08); }
+.ghost { transition: background-color var(--dur-fast) var(--ease-out); }
+.text code {
+  font-size: 0.92em;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-3);
+}

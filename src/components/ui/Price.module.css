@@ -13,9 +13,10 @@
 .price[data-sale='true'] { color: var(--ember-text); }
 
 .from {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink-3);
   font-weight: 500;
 }
@@ -28,10 +29,11 @@
 }
 
 .saving {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
   font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ember-text);
   background: var(--ember-soft);
   border-radius: var(--radius-sm);

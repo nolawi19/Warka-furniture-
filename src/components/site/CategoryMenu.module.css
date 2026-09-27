@@ -77,9 +77,10 @@
 .itemAm { font-size: var(--text-micro); font-weight: 400; color: var(--ink-3); }
 
 .itemCount {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink-3);
 }
 

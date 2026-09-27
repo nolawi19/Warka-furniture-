@@ -29,6 +29,23 @@ body {
   transition: background var(--dur-slow) var(--ease-out), color var(--dur-slow) var(--ease-out);
 }
 
+/* Paper grain over the public site: a fixed layer, painted once, that never
+   moves or intercepts a click. The admin is a tool, and stays flat. */
+body:has(> #main)::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  /* Behind the content, above the wall: the grain sits on the page, never on
+     a photograph or a card, which paint over it. */
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--grain);
+  background-size: 160px 160px;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: multiply;
+}
+:root[data-theme='dark'] body:has(> #main)::before { mix-blend-mode: screen; }
+
 img,
 picture,
 video,
@@ -124,13 +141,29 @@ ul, ol {
 /* The small capitalised line above a heading. Tracking is what makes it read
    as a label rather than as shouting. */
 .micro {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
   font-weight: 500;
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink-2);
 }
 .micro--ember { color: var(--ember-text); }
+
+/* The line that introduces a section. Set in the display face's italic, in
+   brass, in sentence case: it reads as a caption written by the shop rather
+   than as a tracked-out label stamped on every heading. .micro--ember is the
+   same thing under the name the existing markup already uses. */
+.kicker,
+.micro.micro--ember {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--text-lg);
+  letter-spacing: 0;
+  line-height: var(--leading-snug);
+  color: var(--ember-text);
+}
 
 .serif {
   font-family: var(--font-serif);

@@ -48,7 +48,19 @@ export function BrandStory({
         </h2>
         {body && <p className={styles.body}>{body}</p>}
 
-        {points.length > 0 && (
+        {linkLabel && linkHref && (
+          <div className={styles.cta}>
+            <ActionButton as="link" href={linkHref} variant="brass" size="lg" icon="arrow">
+              {linkLabel}
+            </ActionButton>
+          </div>
+        )}
+      </div>
+
+      {/* The points are their own column: beside the heading when there is no
+          picture, under it when there is. Inside the copy column they left the
+          right half of a wide band empty. */}
+      {points.length > 0 && (
           <ul className={styles.points}>
             {points.map((p) => (
               <li key={p.title} className={styles.point}>
@@ -62,16 +74,7 @@ export function BrandStory({
               </li>
             ))}
           </ul>
-        )}
-
-        {linkLabel && linkHref && (
-          <div className={styles.cta}>
-            <ActionButton as="link" href={linkHref} variant="brass" size="lg" icon="arrow">
-              {linkLabel}
-            </ActionButton>
-          </div>
-        )}
-      </div>
+      )}
 
       {imageUrl && (
         <figure className={styles.media} data-shape={mediaShape}>

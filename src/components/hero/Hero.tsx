@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { ActionButton } from '@/components/ui/ActionButton';
 import { Icon } from '@/components/ui/Icon';
@@ -7,6 +8,9 @@ import styles from './Hero.module.css';
 
 export { HERO_DEFAULTS };
 export type { HeroContent, HeroFact } from './hero-content';
+
+/** A real photograph of a real piece, pinned to the board beside the plate. */
+export type BoardPhoto = { src: string; alt: string; name: string; href: string };
 
 /**
  * The hero — one component, used by both the public homepage and the Website
@@ -22,13 +26,22 @@ export type { HeroContent, HeroFact } from './hero-content';
  * taken on the forecourt, and the largest is 432px across. Stretched behind a
  * headline they would be a blur; framed at close to their own size, beside
  * type doing the heavy lifting, they read as photographs of real furniture.
+ *
+ * The plate sits on a board: a panel of oak with a measuring rule along its
+ * top edge, because the one thing this workshop does that a catalogue does
+ * not is measure first. Up to two photographs are pinned to it, each a link to
+ * the piece it shows. The builder passes none and gets the board and plate
+ * alone.
  */
 export function Hero({
   headingId = 'hero-heading',
   wrap = true,
   priority = true,
+  boardPhotos = [],
   ...props
 }: Partial<HeroContent> & {
+  /** Real product photographs for the board. At most two are shown. */
+  boardPhotos?: BoardPhoto[];
   headingId?: string;
   /** False inside the builder's block shell, which supplies the gutter itself. */
   wrap?: boolean;
@@ -86,21 +99,43 @@ export function Hero({
 
       {c.panel === 'plate' && (
         <div className={styles.stageColumn}>
-          <div className={styles.plate}>
-            {c.plateKicker && <p className={styles.plateKicker}>{c.plateKicker}</p>}
+          <div className={styles.board} data-photos={Math.min(boardPhotos.length, 2)}>
+            <span className={styles.rule} aria-hidden="true" />
+            {boardPhotos.slice(0, 2).map((photo, i) => (
+              <figure key={photo.href} className={styles.print} data-slot={i}>
+                <Link href={photo.href} className={styles.printLink}>
+                  <span className={styles.printFrame}>
+                    <Image
+                      src={photo.src}
+                      alt={photo.alt}
+                      fill
+                      sizes="(max-width: 900px) 34vw, 200px"
+                      // Above the fold on a tablet, where the board fills the
+                      // first screen; both are small files.
+                      priority={priority}
+                      className={styles.printImg}
+                    />
+                  </span>
+                  <figcaption className={styles.printCaption}>{photo.name}</figcaption>
+                </Link>
+              </figure>
+            ))}
+            <div className={styles.plate}>
+              {c.plateKicker && <p className={styles.plateKicker}>{c.plateKicker}</p>}
 
-            <p className={styles.wordmark}>
-              <span className={styles.wordmarkMain}>{c.wordmarkMain}</span>
-              {c.wordmarkSub && <span className={styles.wordmarkSub}>{c.wordmarkSub}</span>}
-            </p>
-
-            {c.amharic && (
-              <p className={`am ${styles.amharic}`} lang="am">
-                {c.amharic}
+              <p className={styles.wordmark}>
+                <span className={styles.wordmarkMain}>{c.wordmarkMain}</span>
+                {c.wordmarkSub && <span className={styles.wordmarkSub}>{c.wordmarkSub}</span>}
               </p>
-            )}
 
-            {c.plateNote && <p className={styles.plateNote}>{c.plateNote}</p>}
+              {c.amharic && (
+                <p className={`am ${styles.amharic}`} lang="am">
+                  {c.amharic}
+                </p>
+              )}
+
+              {c.plateNote && <p className={styles.plateNote}>{c.plateNote}</p>}
+            </div>
           </div>
         </div>
       )}

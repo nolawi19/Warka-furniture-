@@ -41,6 +41,8 @@ export function StoreMap({
   // component is one of only two things in the app that touch them.
   const mapRef = useRef<any>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
+  // The map pictures, separately: the pin and the link still work without them.
+  const [tilesFailed, setTilesFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,13 +64,21 @@ export function StoreMap({
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
           attribution: '© OpenStreetMap contributors',
-        }).addTo(map);
+        })
+          .on('tileerror', () => {
+            if (!cancelled) setTilesFailed(true);
+          })
+          .addTo(map);
 
+        // The pin in the site's own brass, read from the theme so a colour
+        // chosen in Admin → Design reaches the map too.
+        const brass =
+          getComputedStyle(document.documentElement).getPropertyValue('--ember').trim() || '#7c4f26';
         const marker = L.circleMarker([lat, lng], {
           radius: 9,
           color: '#ffffff',
           weight: 3,
-          fillColor: '#bc431e',
+          fillColor: brass,
           fillOpacity: 1,
         })
           .addTo(map)
@@ -109,6 +119,19 @@ export function StoreMap({
     <div className={styles.wrap}>
       <div ref={containerRef} className={styles.map} style={{ height }} role="img" aria-label={`A map showing ${label}`} />
       {status === 'loading' && <p className={styles.note}>Loading the map…</p>}
+      {status === 'ready' && tilesFailed && (
+        <p className={styles.note} role="status">
+          The map pictures are not loading on this connection.{' '}
+          <a
+            href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=${zoom}/${lat}/${lng}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open the location in OpenStreetMap
+          </a>
+          .
+        </p>
+      )}
       {status === 'failed' && (
         <p className={styles.note}>
           The map could not load.{' '}

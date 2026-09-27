@@ -1,16 +1,18 @@
 import { Hero } from '@/components/hero/Hero';
 import { BrandStory } from '@/components/sections/BrandStory';
+import { CraftSequence } from '@/components/sections/CraftSequence';
 import { FurnitureShowcase } from '@/components/sections/FurnitureShowcase';
 import { Offers } from '@/components/sections/Offers';
 import { Quote } from '@/components/sections/Quote';
 import { Section } from '@/components/sections/Section';
 import { StorePanel } from '@/components/sections/StorePanel';
 import { BlockRenderer } from '@/components/blocks/BlockRenderer';
+import { getPhotographedProducts } from '@/lib/catalogue';
 import { db } from '@/lib/db';
 import { parseBlocks } from '@/lib/site/blocks';
 import { getOffers, hasOffers } from '@/lib/offers';
 import { getShop } from '@/lib/site/shop';
-import { HOME_QUOTE } from '@/lib/site/home-defaults';
+import { HOME_QUOTE, HOME_VISIT } from '@/lib/site/home-defaults';
 
 export const revalidate = 300;
 
@@ -31,7 +33,21 @@ export default async function HomePage() {
     if (blocks.length > 0) return <BlockRenderer blocks={blocks} />;
   }
 
-  const [shop, configuredOffers] = await Promise.all([getShop(), getOffers(4)]);
+  const [shop, configuredOffers, photographed] = await Promise.all([
+    getShop(),
+    getOffers(4),
+    // Two pieces that have real photographs, for the board beside the plate.
+    // Read-only, and optional: if it fails the board shows the plate alone.
+    getPhotographedProducts(2).catch(() => []),
+  ]);
+  const boardPhotos = photographed
+    .filter((p) => p.imageUrl)
+    .map((p) => ({
+      src: p.imageUrl as string,
+      alt: p.imageAlt || `${p.name}, made by Warka Furniture`,
+      name: p.name,
+      href: `/product/${p.slug}`,
+    }));
 
   // The homepage does not carry a delivery card. Free-delivery zones are still
   // configured in the admin, still priced at checkout, and the pin still picks
@@ -45,11 +61,11 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* The plate, always. The hero used to show whichever product happened to
-          be photographed; it now carries the Warka name, the Amharic and the
-          note about the sycamore fig, which is the shop's own identity rather
-          than a piece of stock. */}
-      <Hero panel="plate" />
+      {/* The plate, always: the Warka name, the Amharic and the note about the
+          sycamore fig. It sits on the oak board with two real pieces pinned
+          beside it, so the first screen says both who the shop is and what it
+          makes. */}
+      <Hero panel="plate" boardPhotos={boardPhotos} />
 
       <Section id="furniture" labelledBy="furniture-heading">
         <FurnitureShowcase
@@ -85,6 +101,10 @@ export default async function HomePage() {
           <Offers offers={offers} />
         </Section>
       )}
+
+      <Section id="how-we-build" labelledBy="craft-heading">
+        <CraftSequence headingId="craft-heading" />
+      </Section>
 
       <div className="band">
         <Section labelledBy="brand-heading">
@@ -129,6 +149,8 @@ export default async function HomePage() {
           heading="Make Your Space Beautiful"
           headingId="visit-heading"
           body="Find the furniture that belongs in your home."
+          imageUrl={HOME_VISIT.imageUrl}
+          imageAlt={HOME_VISIT.imageAlt}
           details={[
             { label: 'Shop', value: shop.area, href: shop.mapsUrl || undefined },
             { label: 'More information', value: shop.phone, href: `tel:${shop.phoneHref}` },

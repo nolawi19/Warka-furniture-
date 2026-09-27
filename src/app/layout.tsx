@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import { headers } from 'next/headers';
 import { Inter, Noto_Sans_Ethiopic, Playfair_Display } from 'next/font/google';
 
@@ -7,6 +8,9 @@ import { AnnouncementBar } from '@/components/site/AnnouncementBar';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { ThemeScript } from '@/components/site/ThemeScript';
+import { CraftLine } from '@/components/site/CraftLine';
+import { Entrance } from '@/components/site/Entrance';
+import { BasketToast } from '@/components/site/BasketToast';
 import { MaintenanceScreen } from '@/components/site/MaintenanceScreen';
 import { currentUser, isStaff } from '@/lib/auth';
 import { getCartSummary } from '@/lib/cart';
@@ -195,6 +199,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {themeCss}
         </style>
         <ThemeScript fallback={theme.defaultTheme} />
+        {/* Drawn only when a navigation is actually slow; see the component.
+            Suspense because it reads the query string, which a statically
+            rendered page does not have until the browser does. */}
+        <Suspense fallback={null}>
+          <CraftLine />
+        </Suspense>
         {inAdmin ? (
           // The admin brings its own shell. Wrapping a tool in the shop's
           // header and footer gives it a second navigation that goes nowhere
@@ -210,6 +220,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           />
         ) : (
           <>
+            {/* The brand entrance: only when the visit starts on the homepage.
+                It decides for itself, before the first paint, whether to play. */}
+            {pathname === '/' && <Entrance />}
             <a className="skip-link" href="#main">
               Skip to the content
             </a>
@@ -225,6 +238,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             />
             <main id="main">{children}</main>
             <SiteFooter />
+            <BasketToast cartLabel={header.cartLabel?.trim() || 'Basket'} />
             <script
               type="application/ld+json"
               dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}

@@ -85,10 +85,9 @@ export function ProductCard({
             // Not a broken image: this piece is real, it simply has not been
             // photographed yet. Saying so is better than a grey box.
             <div className={styles.placeholder}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true">
-                <rect x="3" y="5" width="18" height="14" rx="1.5" />
-                <path d="M3 15.5l4.2-3.6 3.4 2.6 4-3.4L21 15" />
-              </svg>
+              <span className={styles.placeholderMark} aria-hidden="true">
+                WARKA
+              </span>
               <span>Photograph coming</span>
             </div>
           )}

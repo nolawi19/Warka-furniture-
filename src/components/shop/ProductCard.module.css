@@ -52,19 +52,33 @@
 .card:hover .imageHover,
 .card:focus-within .imageHover { opacity: 1; transform: scale(var(--card-image-scale, 1.04)); }
 
+/* A piece that is real but not yet photographed: a panel of the same oak as
+   the homepage board, pale, with the shop's mark on it. It reads as a card
+   waiting for its picture rather than as a broken image. */
 .placeholder {
   position: absolute;
   inset: 0;
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 10px;
-  color: var(--ink-3);
+  gap: 8px;
+  background-color: var(--oak-soft);
+  background-image: var(--wood);
+  background-size: 640px 320px;
+  background-blend-mode: soft-light;
+  color: var(--ink-2);
   font-size: var(--text-micro);
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
 }
-.placeholder svg { width: 36px; height: 36px; }
+.placeholderMark {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  opacity: 0.72;
+}
+.placeholder svg { width: 28px; height: 28px; opacity: 0.6; }
 
 /* ----------------------------------------------------------------- badges */
 
@@ -82,10 +96,11 @@
 
 .badge,
 .badgeSale {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   padding: 5px 10px;
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--bg-2) 92%, transparent);
@@ -153,9 +168,10 @@
 }
 
 .category {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink-3);
 }
 
@@ -206,9 +222,10 @@
 }
 
 .options {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink-3);
 }
 

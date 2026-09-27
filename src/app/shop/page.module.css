@@ -125,3 +125,8 @@
 .emptyLink:hover { border-color: var(--ink-3); }
 .emptyLink[data-tone='brass'] { background: var(--ember); border-color: var(--ember); color: var(--ember-ink); }
 .emptyLink[data-tone='brass']:hover { filter: brightness(1.08); }
+
+/* Breadcrumb links are small words; on a finger each gets a full target. */
+@media (pointer: coarse) {
+  .crumbs a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
+}

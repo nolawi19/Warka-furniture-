@@ -1,0 +1,21 @@
+.diagram {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  margin-inline: auto;
+}
+
+.box { stroke: var(--ink-2); stroke-width: 1.2; stroke-linejoin: round; }
+.faceFront { fill: var(--bg-2); }
+.faceTop { fill: var(--bg-3); }
+.faceSide { fill: color-mix(in srgb, var(--bg-3) 70%, var(--line-strong)); }
+
+.measure path { fill: none; stroke: var(--ember); stroke-width: 1.2; stroke-linecap: round; }
+.measure text {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  fill: var(--ember-text);
+}

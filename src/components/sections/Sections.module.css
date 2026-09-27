@@ -32,10 +32,13 @@
 .sectionHeadText { display: grid; gap: 10px; min-width: 0; }
 
 .sectionKicker {
-  font-size: var(--text-micro);
-  font-weight: 500;
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--ember-text);
 }
 
@@ -50,9 +53,10 @@
 }
 
 .sectionNote {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink-3);
 }
 
@@ -192,14 +196,15 @@
 }
 
 .categoryGo {
+  font-family: var(--font-sans);
   display: inline-flex;
   align-items: center;
   gap: 8px;
   margin-top: 6px;
   font-size: var(--text-micro);
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   opacity: 0.86;
 }
 .categoryGo svg { transition: transform var(--dur-fast) var(--ease-out); }
@@ -321,8 +326,8 @@
   font-family: var(--font-sans);
   font-style: normal;
   font-size: var(--text-micro);
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink-3);
 }
 
@@ -345,20 +350,24 @@
 }
 .visit[data-media='none'] { grid-template-columns: minmax(0, 1fr); }
 
-.visitImage {
+.visitFrame {
+  position: relative;
   width: 100%;
-  height: auto;
+  /* The shopfront photograph is 432px wide; past that it only gets softer. */
+  max-width: 432px;
+  justify-self: end;
+  margin: 0;
   aspect-ratio: 4 / 5;
-  object-fit: cover;
+  overflow: hidden;
   border-radius: var(--radius-lg);
+  background: var(--bg-3);
   box-shadow: var(--shadow-2);
 }
+.visitImage { object-fit: cover; }
 
 /* See BrandStory: a poster is shown whole rather than cropped to 4:5. */
-.visitImage[data-shape='whole'] {
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
-}
+.visitFrame[data-shape='whole'] { aspect-ratio: 1 / 1; }
+.visitFrame[data-shape='whole'] .visitImage { object-fit: contain; }
 
 .visitBody { display: flex; flex-direction: column; gap: var(--space-5); }
 
@@ -371,9 +380,10 @@
 }
 .details > div { display: grid; grid-template-columns: 120px 1fr; gap: var(--space-4); }
 .details dt {
+  font-family: var(--font-sans);
   font-size: var(--text-micro);
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink-3);
   padding-top: 2px;
 }
@@ -385,7 +395,7 @@
 
 @media (max-width: 900px) {
   .visit { grid-template-columns: 1fr; }
-  .visitImage { aspect-ratio: 3 / 2; }
+  .visitFrame { aspect-ratio: 3 / 2; max-width: none; justify-self: stretch; }
 }
 @media (max-width: 420px) {
   .details > div { grid-template-columns: 1fr; gap: 2px; }
@@ -413,4 +423,9 @@
 @media (prefers-reduced-motion: reduce) {
   .categoryImg, .categoryGo svg, .sectionLink svg { transition: none; }
   .category:hover .categoryImg { transform: none; }
+}
+
+/* "Browse everything" and its siblings: a full target on a finger. */
+@media (pointer: coarse) {
+  .sectionLink { min-height: 44px; }
 }

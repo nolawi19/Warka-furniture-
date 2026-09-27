@@ -6,6 +6,7 @@ import {
 } from '@/lib/site/schemas';
 import { getPublishedSettings } from '@/lib/site/settings';
 import { getShop } from '@/lib/site/shop';
+import { getCategories } from '@/lib/catalogue';
 import { Icon } from '@/components/ui/Icon';
 import { NewsletterForm } from './NewsletterForm';
 import { SocialLinks } from './SocialLinks';
@@ -20,7 +21,13 @@ import styles from './SiteFooter.module.css';
  * settings so they are stated in exactly one place across the whole site.
  */
 export async function SiteFooter() {
-  const [SHOP, settings] = await Promise.all([getShop(), getPublishedSettings()]);
+  const [SHOP, settings, categories] = await Promise.all([
+    getShop(),
+    getPublishedSettings(),
+    // The same published categories the header menu shows. Optional: a
+    // footer without a shop column is still a footer.
+    getCategories().catch(() => []),
+  ]);
   const { footer, social } = settings;
   const year = new Date().getFullYear();
 
@@ -107,6 +114,25 @@ export async function SiteFooter() {
           </div>
 
           <div className={styles.cols}>
+            {categories.length > 0 && (
+              <nav className={styles.col} aria-label="Shop">
+                <h2 className={styles.colTitle}>Shop</h2>
+                <ul className={styles.colList}>
+                  {categories.slice(0, 6).map((c) => (
+                    <li key={c.slug}>
+                      <Link href={`/shop?category=${c.slug}`} className={styles.colLink}>
+                        {c.name}
+                      </Link>
+                    </li>
+                  ))}
+                  <li>
+                    <Link href="/shop" className={styles.colLink}>
+                      Everything
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
+            )}
             {columns.map((col) => (
               <nav key={col.id} className={styles.col} aria-label={col.title}>
                 <h2 className={styles.colTitle}>{col.title}</h2>

@@ -125,7 +125,10 @@
 /* The focus ring animates in so keyboard users get the same quality of
    feedback the mouse gets. */
 .btn:focus-visible {
-  outline: none;
+  /* Transparent, not none: Windows high-contrast mode drops box-shadows and
+     paints this outline instead, so the ring never disappears there. */
+  outline: 2px solid transparent;
+  outline-offset: 2px;
   box-shadow:
     0 0 0 2px var(--bg),
     0 0 0 4px var(--ember-text);

@@ -37,10 +37,10 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  font-size: var(--text-micro);
-  font-weight: 500;
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
   color: var(--ember-text);
 }
 .kickerRule {
@@ -54,7 +54,9 @@
 
 .headline {
   font-family: var(--font-serif);
-  font-size: var(--text-display);
+  /* One step under the display token: four lines of 100px type pushed the
+     buttons below the fold on a laptop. */
+  font-size: clamp(40px, 5.4vw, 84px);
   font-weight: 500;
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-display);
@@ -108,22 +110,103 @@
 
 .stageColumn { min-width: 0; }
 
-/* The typographic plate, for a shop with no photograph to lead with. */
+/* The board: a panel of oak with a measuring rule along its top edge. The
+   plate sits in the middle of it; real photographs are pinned at two corners,
+   overlapping the edge the way prints pinned to a workshop wall do. */
+.board {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 6 / 5;
+  padding: clamp(36px, 5vw, 64px) clamp(20px, 3vw, 40px) clamp(28px, 4vw, 48px);
+  border-radius: var(--radius-lg);
+  background-color: var(--oak);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.08)),
+    var(--wood);
+  background-size: 100% 100%, 640px 320px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06), var(--shadow-2);
+}
+
+/* Centimetre ticks, a longer one every five. Drawn with two gradients so the
+   rule is resolution-independent and costs no image. */
+.rule {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 18px;
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+  background:
+    repeating-linear-gradient(90deg, rgba(20, 17, 14, 0.5) 0 1px, transparent 1px 50px) 12px 0 / auto 16px no-repeat,
+    repeating-linear-gradient(90deg, rgba(20, 17, 14, 0.34) 0 1px, transparent 1px 10px) 12px 0 / auto 8px no-repeat,
+    linear-gradient(rgba(250, 249, 247, 0.28), rgba(250, 249, 247, 0.12));
+  border-bottom: 1px solid rgba(20, 17, 14, 0.12);
+}
+
+.print {
+  position: absolute;
+  z-index: 2;
+  width: 32%;
+  margin: 0;
+}
+.print[data-slot='0'] { left: -5%; bottom: 12%; width: 25%; }
+.print[data-slot='1'] { right: -5%; top: 16%; width: 23%; }
+
+.printLink {
+  display: block;
+  padding: 7px 7px 0;
+  background: var(--bg-2);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-2);
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+.printLink:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
+
+.printFrame {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--bg-3);
+}
+.printImg { object-fit: cover; }
+
+.printCaption {
+  padding: 7px 2px 8px;
+  font-size: var(--text-micro);
+  line-height: 1.3;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The nameplate itself. */
 .plate {
+  position: relative;
+  z-index: 1;
   display: grid;
   justify-items: center;
   gap: var(--space-3);
-  padding: clamp(32px, 4.4vw, 64px) clamp(24px, 3vw, 48px);
+  width: min(100%, 54%);
+  min-width: 260px;
+  padding: clamp(28px, 3.6vw, 52px) clamp(20px, 2.4vw, 36px);
   background: var(--bg-2);
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-2);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-3);
   text-align: center;
 }
+.board[data-photos='0'] .plate { width: min(100%, 74%); }
 
 .plateKicker {
   font-size: var(--text-micro);
-  letter-spacing: var(--tracking-micro);
+  /* Tighter than the other spaced capitals, so the full nameplate line
+     stays on one line on the plate's narrowest width. */
+  letter-spacing: 0.1em;
+  white-space: nowrap;
   text-transform: uppercase;
   color: var(--ink-3);
 }
@@ -131,7 +214,7 @@
 .wordmark { display: grid; justify-items: center; gap: 4px; }
 .wordmarkMain {
   font-family: var(--font-serif);
-  font-size: clamp(38px, 5.4vw, 72px);
+  font-size: clamp(38px, 4.2vw, 62px);
   font-weight: 600;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -169,6 +252,7 @@
 .photoImg { object-fit: cover; }
 
 .photoMark {
+  font-family: var(--font-sans);
   position: absolute;
   left: 16px;
   bottom: 16px;
@@ -181,8 +265,8 @@
   backdrop-filter: blur(8px);
   font-size: var(--text-micro);
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ink);
 }
 
@@ -192,6 +276,21 @@
   .hero { grid-template-columns: minmax(0, 1fr); gap: var(--space-7); }
   .stageColumn { order: -1; }
   .photo { aspect-ratio: 3 / 2; }
+  .board { aspect-ratio: auto; min-height: 340px; padding-top: 44px; }
+  .print[data-slot='0'] { left: 3%; top: 11%; width: 27%; }
+  .print[data-slot='1'] { right: 3%; bottom: 5%; width: 25%; }
+}
+
+@media (max-width: 560px) {
+  /* On a phone the prints move out of the plate's way, below it, as a pair. */
+  .board { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-4); min-height: 0; }
+  .plate { width: 100%; min-width: 0; order: -1; }
+  .board[data-photos='0'] .plate { width: 100%; }
+  .print { position: relative; inset: auto; width: auto; }
+  .print[data-slot='0'], .print[data-slot='1'] { inset: auto; width: auto; }
+  .board[data-photos='2'] { display: grid; grid-template-columns: 1fr 1fr; place-items: stretch; }
+  .board[data-photos='2'] .plate { grid-column: 1 / -1; }
+  .printFrame { aspect-ratio: 4 / 3; }
 }
 
 @media (max-width: 480px) {

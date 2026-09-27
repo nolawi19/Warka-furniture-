@@ -7,6 +7,7 @@ import { useState, useTransition } from 'react';
 import { addToCartAction } from '@/app/actions/cart';
 import { Icon } from '@/components/ui/Icon';
 import styles from './QuickAdd.module.css';
+import { announceBasketAdd } from '@/lib/ui/basket-events';
 
 /**
  * The bar that rises off the bottom of a product card on hover.
@@ -56,6 +57,7 @@ export function QuickAdd({
       const result = await addToCartAction(variantId!, 1);
       if (result.ok) {
         setAdded(true);
+        announceBasketAdd({ name, quantity: 1 });
         // The basket count lives in the header, which is a server component.
         router.refresh();
         window.setTimeout(() => setAdded(false), 2000);

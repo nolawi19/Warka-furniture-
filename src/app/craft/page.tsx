@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { CraftSequence } from '@/components/sections/CraftSequence';
 import { ActionButton } from '@/components/ui/ActionButton';
 import styles from '../prose.module.css';
 
@@ -20,6 +21,15 @@ export default function CraftPage() {
           At Warka Furniture, we believe great furniture should fit your home — not the other way
           around.
         </p>
+      </div>
+
+      {/* The same three steps as the homepage, full width, before the long
+          version below. */}
+      <div className={styles.sequence}>
+        <CraftSequence headingId="steps-heading" heading="Every piece, in three steps" showLink={false} />
+      </div>
+
+      <div className={styles.page}>
 
         <div className={styles.body}>
           <p>

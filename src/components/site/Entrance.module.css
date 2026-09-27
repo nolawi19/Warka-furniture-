@@ -1,0 +1,127 @@
+/* =========================================================================
+   The entrance
+   =========================================================================
+   About two seconds, in four beats, all transform / opacity / clip-path:
+
+     0.00  a clean wall                 (the page's own background)
+     0.05  oak comes up through it      material, 450ms
+     0.30  WARKA is drawn in            clip from the left, 500ms
+     0.65  the rule is measured out     scaleX, 600ms
+     0.80  Measure · Build · Finish     one after another, 130ms apart
+     1.20  the full name and the Amharic
+     1.55  the board lifts away         clip upward, 450ms, revealing the
+                                        homepage, whose hero is on the same oak
+   ========================================================================= */
+
+.entrance { display: none; }
+
+:root[data-entrance] .entrance {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-intro);
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  overflow: hidden;
+  clip-path: inset(0 0 0 0);
+  animation: entrance-lift 450ms var(--ease-in-out) 1550ms forwards;
+}
+
+/* The oak itself. */
+.material {
+  position: absolute;
+  inset: 0;
+  background-color: var(--oak);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.1)),
+    var(--wood);
+  background-size: 100% 100%, 640px 320px;
+  opacity: 0;
+  animation: entrance-fade 450ms var(--ease-out) 50ms forwards;
+}
+
+.inner {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: clamp(18px, 3vh, 28px);
+  padding-inline: var(--gutter);
+  color: #14110e; /* ink on oak in both themes: the oak does not flip */
+}
+
+.mark {
+  font-family: var(--font-serif);
+  font-size: clamp(56px, 11vw, 140px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  clip-path: inset(0 100% 0 0);
+  animation: entrance-draw 500ms var(--ease-out) 300ms forwards;
+}
+
+.rule {
+  display: grid;
+  gap: 12px;
+  width: min(520px, 80vw);
+}
+
+/* A rule with centimetre ticks, measured out from the left. */
+.ruleLine {
+  display: block;
+  height: 12px;
+  border-top: 2px solid #14110e;
+  background: repeating-linear-gradient(90deg, rgba(20, 17, 14, 0.55) 0 1px, transparent 1px 13px);
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: entrance-measure 600ms var(--ease-out) 650ms forwards;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  font-family: var(--font-sans);
+  font-size: clamp(11px, 1.4vw, 13px);
+  font-weight: 600;
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+}
+.steps li {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: entrance-rise 320ms var(--ease-out) forwards;
+}
+.steps li:nth-child(1) { animation-delay: 800ms; }
+.steps li:nth-child(2) { animation-delay: 930ms; text-align: center; }
+.steps li:nth-child(3) { animation-delay: 1060ms; text-align: right; }
+
+.name {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  font-family: var(--font-serif);
+  font-size: clamp(18px, 2.4vw, 24px);
+  font-style: italic;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: entrance-rise 360ms var(--ease-out) 1200ms forwards;
+}
+.name .am { font-style: normal; font-size: 0.8em; opacity: 0.8; }
+
+/* Any interaction: everything goes at once, quickly. */
+:root[data-entrance='skip'] .entrance {
+  animation: entrance-fade-out 240ms var(--ease-out) forwards;
+}
+
+@keyframes entrance-fade { to { opacity: 1; } }
+@keyframes entrance-fade-out { to { opacity: 0; visibility: hidden; } }
+@keyframes entrance-draw { to { clip-path: inset(0 0 0 0); } }
+@keyframes entrance-measure { to { transform: scaleX(1); } }
+@keyframes entrance-rise { to { opacity: 1; transform: none; } }
+@keyframes entrance-lift {
+  to { clip-path: inset(0 0 100% 0); visibility: hidden; }
+}
+
+/* Belt and braces: the pre-paint script already skips it for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-entrance] .entrance { display: none; }
+}

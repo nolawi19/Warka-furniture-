@@ -87,7 +87,7 @@
 }
 .esc:hover { background: var(--bg-3); color: var(--ink); }
 
-.body { max-height: min(60vh, 520px); overflow-y: auto; }
+.body { max-height: min(60vh, 520px); overflow-y: auto; overscroll-behavior: contain; }
 
 .suggest { padding: var(--space-4); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--space-3); }
@@ -111,7 +111,42 @@
   border-radius: var(--radius);
   transition: background var(--dur-fast) var(--ease-out);
 }
-.hit:hover, .hitCat:hover { background: var(--bg-3); }
+.hit:hover, .hitCat:hover, .hitAll:hover,
+.hit[data-active], .hitCat[data-active], .hitAll[data-active] { background: var(--bg-3); }
+
+/* The last row: the full search, in the shop, with its filters. */
+.hitAll {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  padding: 11px 12px;
+  border-top: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ember-text);
+}
+
+.clear {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  color: var(--ink-3);
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.clear:hover { background: var(--bg-3); color: var(--ink); }
+.clear svg { width: 16px; height: 16px; }
+
+.emptyTitle { font-family: var(--font-serif); font-size: var(--text-h4); color: var(--ink); }
+.retry {
+  color: var(--ember-text);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
 .thumb {
   width: 56px;

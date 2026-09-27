@@ -44,3 +44,11 @@
   margin-top: var(--space-4);
 }
 .updated { font-size: var(--text-xs); color: var(--ink-3); margin-top: var(--space-6); }
+
+/* The craft page's three steps: wider than the prose column, so the rule
+   has room to run. */
+.sequence {
+  padding-block: clamp(28px, 4vw, 56px);
+  margin-bottom: clamp(8px, 2vw, 24px);
+  border-block: 1px solid var(--line-2);
+}

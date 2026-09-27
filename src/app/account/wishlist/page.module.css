@@ -75,3 +75,8 @@
   transition: background var(--dur-fast) var(--ease-out);
 }
 .cta:hover { background: var(--ember); }
+
+/* Breadcrumb links are small words; on a finger each gets a full target. */
+@media (pointer: coarse) {
+  .crumbs a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
+}

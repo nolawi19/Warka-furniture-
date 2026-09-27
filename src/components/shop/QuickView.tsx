@@ -10,6 +10,7 @@ import { addToCartAction } from '@/app/actions/cart';
 import { Icon } from '@/components/ui/Icon';
 import { formatMoney } from '@/lib/money';
 import styles from './QuickView.module.css';
+import { announceBasketAdd } from '@/lib/ui/basket-events';
 
 /**
  * A look at a piece without leaving the grid.
@@ -93,6 +94,7 @@ export function QuickView({ slug, name }: { slug: string; name: string }) {
       const result = await addToCartAction(variant.id, qty);
       if (result.ok) {
         setAdded(true);
+        announceBasketAdd({ name: `${name}, ${variant.label}`, quantity: qty });
         // The basket count is rendered on the server, in the header.
         router.refresh();
       } else {

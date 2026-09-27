@@ -1,18 +1,46 @@
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.88fr);
-  gap: clamp(32px, 5vw, 88px);
+  grid-template-areas: 'copy media' 'points media';
+  column-gap: clamp(32px, 5vw, 88px);
+  row-gap: var(--space-7);
+  align-items: start;
+}
+.copy { grid-area: copy; }
+.points { grid-area: points; }
+.media { grid-area: media; align-self: center; }
+
+/* No picture: the statement on the left, the four points as a two-by-two on
+   the right, so the band is full rather than half empty. */
+.grid[data-media='none'] {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-areas: 'copy points';
   align-items: center;
 }
-.grid[data-media='none'] { grid-template-columns: minmax(0, 1fr); max-width: 72ch; }
+.grid[data-media='none'] .points {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-6);
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+.grid[data-media='none'] .point {
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-5);
+  border-top: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+}
 
 .copy { display: grid; gap: var(--space-5); align-content: start; }
 
 .kicker {
-  font-size: var(--text-micro);
-  font-weight: 500;
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--ember-text);
 }
 
@@ -81,6 +109,13 @@
 .media[data-shape='whole'] .image { object-fit: contain; }
 
 @media (max-width: 900px) {
-  .grid { grid-template-columns: minmax(0, 1fr); }
-  .media { aspect-ratio: 3 / 2; order: -1; }
+  .grid,
+  .grid[data-media='none'] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'media' 'copy' 'points';
+  }
+  .media { aspect-ratio: 3 / 2; }
+}
+@media (max-width: 520px) {
+  .grid[data-media='none'] .points { grid-template-columns: minmax(0, 1fr); gap: var(--space-5); }
 }

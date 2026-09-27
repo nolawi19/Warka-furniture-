@@ -39,8 +39,10 @@ export const HERO_DEFAULTS: HeroContent = {
   // not, so there is none here.
   facts: [{ value: 'Made to size', label: 'not a fixed catalogue' }],
   panel: 'plate',
-  // The city only: the Google Maps pin confirms Addis Ababa, not a neighbourhood.
-  plateKicker: 'Est. Addis Ababa',
+  // The brand's own nameplate, kept word for word as the shop asked. It says
+  // where the business was established; the current address shown elsewhere
+  // on the site comes from the map pin in Store Settings.
+  plateKicker: 'Est. Kebena, Addis Ababa',
   wordmarkMain: 'WARKA',
   wordmarkSub: 'Furniture',
   amharic: 'ዋርካ የአንጨት ስራዎች',

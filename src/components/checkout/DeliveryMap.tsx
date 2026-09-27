@@ -75,7 +75,7 @@ export function DeliveryMap({
     onChangeRef.current = onChange;
   });
 
-  const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
+  const [status, setStatus] = useState<'loading' | 'ready' | 'failed' | 'no-tiles'>('loading');
   const [query, setQuery] = useState('');
   const [places, setPlaces] = useState<Place[]>([]);
   const [searching, setSearching] = useState(false);
@@ -171,6 +171,15 @@ export function DeliveryMap({
 
         mapRef.current = map;
         markerRef.current = marker;
+
+        // A listener here also stops MapLibre printing every failed tile to
+        // the console. The pictures are what fails on a poor connection; the
+        // pin, the place search and "use my location" all still work, so say
+        // that rather than leave "Loading the map…" up for good.
+        map.on('error', () => {
+          if (cancelled) return;
+          setStatus((s) => (s === 'loading' ? 'no-tiles' : s));
+        });
 
         map.on('load', () => {
           if (!cancelled) setStatus('ready');
@@ -468,6 +477,14 @@ export function DeliveryMap({
             <p className={styles.overlayHint}>
               You can still order — write where it should go in the notes and we will call to
               arrange it.
+            </p>
+          </div>
+        )}
+        {status === 'no-tiles' && (
+          <div className={styles.overlay} role="status">
+            <p>The map pictures are not loading.</p>
+            <p className={styles.overlayHint}>
+              You can still search for a place above or use your location, and the pin will be set.
             </p>
           </div>
         )}

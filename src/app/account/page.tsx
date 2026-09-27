@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { logoutAction } from '@/app/actions/auth';
+import { AccountNav } from '@/components/site/AccountNav';
 import { currentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { formatMoney } from '@/lib/money';
@@ -41,6 +41,8 @@ export default async function AccountPage() {
           <h1 className={`dsp ${styles.title}`}>{user.name}</h1>
         </header>
 
+        <AccountNav />
+
         <section aria-labelledby="orders-heading" className={styles.section}>
           <h2 id="orders-heading" className={styles.sectionTitle}>
             Your orders
@@ -67,7 +69,9 @@ export default async function AccountPage() {
                       })}{' '}
                       · {o._count.items} {o._count.items === 1 ? 'item' : 'items'}
                     </span>
-                    <span className={styles.orderStatus}>{STATUS_LABEL[o.status]}</span>
+                    <span className={styles.orderStatus} data-tone={statusTone(o.status)}>
+                      {STATUS_LABEL[o.status]}
+                    </span>
                     <span className={styles.orderTotal}>{formatMoney(o.totalSantim)}</span>
                   </Link>
                 </li>
@@ -96,12 +100,16 @@ export default async function AccountPage() {
           </dl>
         </section>
 
-        <form action={logoutAction}>
-          <button type="submit" className={styles.signOut}>
-            Sign out
-          </button>
-        </form>
       </div>
     </div>
   );
+}
+
+/** A colour for each stage, so the list can be read at a glance. */
+function statusTone(status: string) {
+  if (status === 'DELIVERED') return 'ok';
+  if (status === 'PAYMENT_FAILED') return 'error';
+  if (status === 'CANCELLED' || status === 'REFUNDED') return 'muted';
+  if (status === 'PENDING_PAYMENT') return 'waiting';
+  return 'progress';
 }

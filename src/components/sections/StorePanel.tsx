@@ -46,15 +46,18 @@ export function StorePanel({
 
       <div className={styles.visit} data-media={imageUrl ? 'image' : 'none'}>
         {imageUrl && (
-          <Image
-            src={imageUrl}
-            alt={imageAlt ?? ''}
-            width={432}
-            height={511}
-            sizes="(max-width: 900px) 100vw, 50vw"
-            className={styles.visitImage}
-            data-shape={mediaShape}
-          />
+          // A frame with its own shape and the picture filling it, so the
+          // frame decides the proportions and next/image is never asked to
+          // draw at a size its width and height attributes disagree with.
+          <figure className={styles.visitFrame} data-shape={mediaShape}>
+            <Image
+              src={imageUrl}
+              alt={imageAlt ?? ''}
+              fill
+              sizes="(max-width: 900px) 100vw, 432px"
+              className={styles.visitImage}
+            />
+          </figure>
         )}
 
         <div className={styles.visitBody}>

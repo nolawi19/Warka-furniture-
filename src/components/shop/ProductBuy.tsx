@@ -10,6 +10,8 @@ import { BuyBar } from "./BuyBar";
 import { SaveButton } from "./SaveButton";
 import { formatMoney } from "@/lib/money";
 import styles from "./ProductBuy.module.css";
+import { announceBasketAdd } from "@/lib/ui/basket-events";
+import { DimensionDiagram } from "./DimensionDiagram";
 
 export type BuyVariant = {
   id: string;
@@ -147,6 +149,7 @@ export function ProductBuy({
       if (result.ok) {
         setFeedback({ tone: "ok", text: "Added to your basket." });
         setAdded(true);
+        announceBasketAdd({ name: `${productName}, ${current.label}`, quantity: qty });
         window.setTimeout(() => setAdded(false), 1400);
         router.refresh();
       } else {
@@ -321,6 +324,11 @@ export function ProductBuy({
             <Icon name="ruler" size={15} />
             Will it fit
           </h3>
+          <DimensionDiagram
+            widthCm={current.widthCm}
+            depthCm={current.depthCm}
+            heightCm={current.heightCm}
+          />
           <dl className={styles.fitGrid}>
             {current.widthCm && (
               <div>

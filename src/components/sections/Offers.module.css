@@ -18,12 +18,13 @@
 .card[data-tone='quiet'] { background: var(--bg-2); border-color: var(--line-2); }
 
 .cardKicker {
+  font-family: var(--font-sans);
   display: flex;
   align-items: center;
   gap: 7px;
   font-size: var(--text-micro);
-  letter-spacing: var(--tracking-micro);
-  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  text-transform: none;
   color: var(--ember-text);
 }
 .card[data-tone='quiet'] .cardKicker { color: var(--ink-2); }

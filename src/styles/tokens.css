@@ -74,6 +74,20 @@
   --ember-soft: rgba(124, 79, 38, 0.08);
   --ember-line: rgba(124, 79, 38, 0.28);
 
+  /* -- material ------------------------------------------------------- */
+  /* Oak. Only for the material itself: the entrance, the board behind the
+     hero plate, the craft line. Never a section background, so the site does
+     not turn brown. */
+  --oak: #b98b5e;
+  --oak-deep: #8a6038;
+  --oak-soft: #e9dccb;
+  /* Paper grain, as an SVG noise tile. 3% ink, so it reads as a surface
+     under the fingertips rather than as a pattern. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.08 0 0 0 0 0.07 0 0 0 0 0.05 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  --grain-opacity: 0.05;
+  /* Oak grain: long, stretched noise, for the material surfaces. */
+  --wood: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='320'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0035 .11' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.23 0 0 0 0 0.12 1.6 0 0 0 -.62'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)'/%3E%3C/svg%3E");
+
   /* -- status --------------------------------------------------------- */
   --ok: #2f6b41;
   --ok-soft: rgba(47, 107, 65, 0.1);
@@ -136,7 +150,9 @@
   --text-body: 16px;
   --text-sm: 14px;
   --text-xs: 12.5px;
-  --text-micro: 11px;
+  /* The smallest text on the site, labels included. Labels are set in
+     sentence case now, and sentence case at 11px is hard to read. */
+  --text-micro: 12px;
 
   --leading-tight: 1.04;
   --leading-snug: 1.28;
@@ -145,7 +161,8 @@
   --tracking-display: -0.025em;
   --tracking-tight: -0.014em;
   --tracking-wide: 0.02em;
-  --tracking-micro: 0.16em;
+  --tracking-micro: 0.16em;   /* spaced capitals: the nameplate lockups only */
+  --tracking-label: 0.01em;   /* every other small label, in sentence case */
 
   --weight-heading: 500;
   --weight-body: 400;
@@ -171,6 +188,14 @@
   --card-aspect: 4 / 5;
   --card-hover-lift: -4px;
   --card-image-scale: 1.04;
+
+  /* -- layers --------------------------------------------------------- */
+  --z-header: 50;
+  --z-menu: 60;
+  --z-dialog: 200;
+  --z-toast: 300;
+  --z-craftline: 400;
+  --z-intro: 500;
 }
 
 /* Dark is opt-in; light is the default the shop asked for. The dark palette
@@ -211,6 +236,11 @@
   --ember-ink: #1b1614;
   --ember-soft: rgba(217, 164, 65, 0.12);
   --ember-line: rgba(217, 164, 65, 0.3);
+
+  --oak: #a57c52;
+  --oak-deep: #6f4c2c;
+  --oak-soft: #2a241e;
+  --grain-opacity: 0.07;
 
   --ok: #6fbf8a;
   --ok-soft: rgba(111, 191, 138, 0.12);
