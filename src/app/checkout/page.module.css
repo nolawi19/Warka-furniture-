@@ -72,7 +72,7 @@
 .notReadyCta {
   display: inline-flex;
   align-items: center;
-  padding: 13px 22px;
+  padding: 12px 24px;
   background: var(--ember);
   color: var(--ember-ink);
   border-radius: var(--radius);

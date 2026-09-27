@@ -50,7 +50,7 @@
 .btn[data-size='sm'] { font-size: var(--text-micro); padding: 9px 16px; min-height: 38px; }
 .btn[data-size='md'] {
   font-size: var(--text-xs);
-  padding: var(--btn-primary-pad-y, 13px) var(--btn-primary-pad-x, 24px);
+  padding: var(--btn-primary-pad-y, 12px) var(--btn-primary-pad-x, 24px);
   min-height: 46px;
 }
 .btn[data-size='lg'] { font-size: var(--text-sm); padding: 17px 34px; min-height: 56px; }
@@ -154,7 +154,7 @@
   animation: ripple 400ms var(--ease-out) forwards;
 }
 .btn[data-variant='primary'] .ripple {
-  background: color-mix(in srgb, #fff 34%, transparent);
+  background: color-mix(in srgb, var(--on-photo) 34%, transparent);
 }
 @keyframes ripple {
   to { transform: scale(1); opacity: 0; }

@@ -25,7 +25,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(24px, 3.4vw, 56px);
-  padding-top: 22px;
+  padding-top: 24px;
 }
 
 /* The rule: centimetre ticks along a hairline. */
@@ -59,7 +59,7 @@
 .stepName {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 12px;
   font-family: var(--font-serif);
   font-size: var(--text-h3);
   font-weight: 500;
@@ -115,7 +115,7 @@
   .steps {
     grid-template-columns: minmax(0, 1fr);
     padding-top: 0;
-    padding-left: 26px;
+    padding-left: 28px;
     gap: var(--space-7);
   }
   .steps::before {

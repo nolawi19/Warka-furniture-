@@ -45,7 +45,7 @@
   color: var(--ember-text);
   background: var(--ember-soft);
   border-radius: var(--radius-sm);
-  padding: 4px 9px;
+  padding: 4px 8px;
 }
 
 /* ---------------------------------------------------------- availability */
@@ -53,7 +53,7 @@
 .availability {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   font-size: var(--text-sm);
   color: var(--ink-2);
 }
@@ -92,7 +92,7 @@
 
 .option {
   min-height: 44px;
-  padding: 11px 18px;
+  padding: 12px 20px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--bg-2);
@@ -177,7 +177,7 @@
 
 .assurances {
   display: grid;
-  gap: 11px;
+  gap: 12px;
   padding: var(--space-5);
   border: 1px solid var(--line-2);
   border-radius: var(--radius);
@@ -186,7 +186,7 @@
 .assurances li {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   font-size: var(--text-sm);
   color: var(--ink-2);
 }
@@ -235,7 +235,7 @@
   font-family: var(--font-sans);
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-size: var(--text-micro);
   font-weight: 500;
   letter-spacing: var(--tracking-label);

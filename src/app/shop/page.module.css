@@ -3,7 +3,7 @@
 .crumbs {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-size: var(--text-xs);
   color: var(--ink-3);
   margin-bottom: var(--space-5);
@@ -115,7 +115,7 @@
   align-items: center;
   gap: 8px;
   min-height: 44px;
-  padding: 11px 20px;
+  padding: 12px 20px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   font-size: var(--text-sm);
@@ -130,3 +130,5 @@
 @media (pointer: coarse) {
   .crumbs a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
 }
+
+.crumbs a { transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), text-decoration-color var(--dur-fast) var(--ease-out); }

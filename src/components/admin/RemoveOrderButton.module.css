@@ -77,7 +77,7 @@
 }
 .cancel:hover { background: var(--admin-sunken, rgba(0, 0, 0, 0.04)); }
 
-.confirm { border: none; background: var(--danger, #a32d20); color: #fff; font-weight: 500; }
+.confirm { border: none; background: var(--danger, #a32d20); color: var(--on-danger); font-weight: 500; }
 .confirm:hover:not(:disabled) { background: color-mix(in srgb, var(--danger, #a32d20) 86%, #000); }
 .cancel:disabled, .confirm:disabled { opacity: 0.55; cursor: not-allowed; }
 

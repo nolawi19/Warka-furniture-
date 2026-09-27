@@ -17,7 +17,7 @@
   align-items: center;
   gap: var(--space-3);
   min-height: 38px;
-  padding-block: 7px;
+  padding-block: 8px;
 }
 
 .text {

@@ -46,7 +46,7 @@
   justify-items: center;
   gap: clamp(18px, 3vh, 28px);
   padding-inline: var(--gutter);
-  color: #14110e; /* ink on oak in both themes: the oak does not flip */
+  color: var(--ink-on-oak);
 }
 
 .mark {
@@ -69,7 +69,7 @@
 .ruleLine {
   display: block;
   height: 12px;
-  border-top: 2px solid #14110e;
+  border-top: 2px solid var(--ink-on-oak);
   background: repeating-linear-gradient(90deg, rgba(20, 17, 14, 0.55) 0 1px, transparent 1px 13px);
   transform: scaleX(0);
   transform-origin: left center;

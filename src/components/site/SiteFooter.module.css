@@ -60,7 +60,7 @@
 
 .address {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   font-style: normal;
   margin-top: var(--space-1);
 }
@@ -92,7 +92,7 @@
 
 .colLink {
   display: inline-block;
-  padding-block: 5px;
+  padding-block: 4px;
   transition: color var(--dur-fast) var(--ease-out);
 }
 .colLink:hover { color: var(--ember-text); }
@@ -152,3 +152,8 @@
   font-size: var(--text-sm);
   color: var(--ink-2);
 }
+
+/* Every footer link eases its colour rather than snapping. */
+.addressRow a, .legal a, .colLink { transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), text-decoration-color var(--dur-fast) var(--ease-out); }
+.brandLink { transition: opacity var(--dur-fast) var(--ease-out); }
+.brandLink:hover { opacity: 0.72; }

@@ -4,7 +4,7 @@
   justify-content: space-between;
   gap: var(--space-3);
   flex-wrap: wrap;
-  padding: 9px var(--gutter);
+  padding: 8px var(--gutter);
   font-size: var(--text-sm);
   background: var(--warn-soft);
   color: var(--warn);

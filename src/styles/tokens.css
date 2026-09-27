@@ -39,6 +39,10 @@
   --ink-3: #706962;
   --ink-inverse: #faf9f7;
 
+  /* Ink on the oak material. The oak does not flip with the theme, so
+     neither does the ink written on it. */
+  --ink-on-oak: #14110e;
+
   /* Text that sits on a photograph, under a dark scrim. It does NOT flip with
      the theme, because the scrim does not either — a gradient down to
      rgba(12,10,8,.82) is dark in both. --ink-inverse looks right for this and
@@ -95,6 +99,7 @@
   --warn-soft: rgba(138, 90, 20, 0.12);
   --danger: #a32d20;
   --danger-soft: rgba(163, 45, 32, 0.1);
+  --on-danger: #ffffff;   /* text on a filled danger button: 6.4:1 */
   --info: #2b5878;
   --info-soft: rgba(43, 88, 120, 0.1);
 
@@ -102,12 +107,12 @@
 
   /* -- elevation ------------------------------------------------------ */
   /* Long and soft, never one hard drop. Weight is implied by how far the
-     shadow travels, not by how dark it is. */
+     shadow travels, not by how dark it is. Three levels and no more:
+     1 at rest, 2 hovered or popped over, 3 for dialogs and drawers. */
   --shadow-rgb: 20, 17, 14;
   --shadow-1: 0 1px 2px rgba(20, 17, 14, 0.04);
   --shadow-2: 0 2px 4px rgba(20, 17, 14, 0.04), 0 12px 32px -14px rgba(20, 17, 14, 0.14);
   --shadow-3: 0 4px 8px rgba(20, 17, 14, 0.05), 0 28px 64px -24px rgba(20, 17, 14, 0.22);
-  --shadow-4: 0 8px 16px rgba(20, 17, 14, 0.06), 0 48px 96px -32px rgba(20, 17, 14, 0.3);
 
   /* -- radii ---------------------------------------------------------- */
   /* Softer than joinery, harder than software. Enough to read as considered,
@@ -190,12 +195,16 @@
   --card-image-scale: 1.04;
 
   /* -- layers --------------------------------------------------------- */
+  /* Every stacking decision on the site uses one of these, so nothing is
+     ever settled by who picked the bigger number. */
+  --z-sticky: 40;
   --z-header: 50;
   --z-menu: 60;
   --z-dialog: 200;
   --z-toast: 300;
   --z-craftline: 400;
   --z-intro: 500;
+  --z-skip: 600;
 }
 
 /* Dark is opt-in; light is the default the shop asked for. The dark palette
@@ -248,6 +257,7 @@
   --warn-soft: rgba(217, 164, 65, 0.13);
   --danger: #e8796b;
   --danger-soft: rgba(232, 121, 107, 0.12);
+  --on-danger: #1b1614;   /* the dark theme's danger is light, so its text is dark */
   --info: #7db4dc;
   --info-soft: rgba(125, 180, 220, 0.12);
 
@@ -257,5 +267,4 @@
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.4), 0 12px 32px -14px rgba(0, 0, 0, 0.66);
   --shadow-3: 0 4px 8px rgba(0, 0, 0, 0.45), 0 28px 64px -24px rgba(0, 0, 0, 0.75);
-  --shadow-4: 0 8px 16px rgba(0, 0, 0, 0.5), 0 48px 96px -32px rgba(0, 0, 0, 0.82);
 }

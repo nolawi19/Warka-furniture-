@@ -26,6 +26,9 @@ one metal (brass), real photographs framed close to their own size.
 | `--ember` / `--ember-text` | `#7c4f26` / `#6e4520` | brass: accent fill / accent words |
 | `--ok` `--warn` `--danger` `--info` | | status, each with a `-soft` tint |
 | `--oak`, `--oak-soft` | `#b98b5e` | **material only** — entrance, hero board, craft line |
+| `--ink-on-oak` | `#14110e` | text on the oak; does **not** flip with the theme |
+| `--on-danger` | `#fff` / dark `#1b1614` | text on a filled danger button |
+| `--on-photo` | `#faf9f7` | text or highlights over photographs; does not flip |
 
 Dark theme redefines every token under `:root[data-theme='dark']`.
 Never write a raw hex in a component.
@@ -41,24 +44,40 @@ Never write a raw hex in a component.
 
 ## Space
 
-4px grid only: `--space-1` (4) … `--space-10` (128). Sections use `.section`
-(56–120px). Siblings are spaced with `gap`, not per-child margins.
+4px grid only: `--space-1` (4) … `--space-10` (128). Every padding, margin
+and gap in the stylesheets is a multiple of 4px (1–2px hairline nudges and
+fluid `clamp()` values excepted). Sections use `.section` (56–120px).
+Siblings are spaced with `gap`, not per-child margins.
 
 ## Depth (three levels)
 
-`--shadow-1` rest · `--shadow-2` hover / popover · `--shadow-3` dialog.
-Hover steps up exactly one level. Dark theme uses the darker shadow set.
+Exactly three levels, no fourth:
+
+| Level | Token | Use |
+|---|---|---|
+| 0 flat | `1px solid var(--line)` | default containers |
+| 1 | `--shadow-1` | at rest |
+| 2 | `--shadow-2` | hovered, dropdowns, popovers, pinned prints |
+| 3 | `--shadow-3` | dialogs, drawers, the toast, the hero plate |
+
+Hover steps up exactly one level. Small inline things (badges, chips) get
+no shadow. Dark theme uses the darker shadow set.
 
 ## Layers (z-index)
 
-| Layer | Value |
-|---|---|
-| sticky header | 50 |
-| dropdowns / menus | 60 |
-| drawers, dialogs, search | 200 |
-| toast | 300 |
-| craft line (navigation) | 400 |
-| entrance | 500 |
+Always `var(--z-…)`; raw numbers only for ordering inside one component
+(1, 2, 3, −1).
+
+| Layer | Token | Value |
+|---|---|---|
+| sticky bars (admin settings bar) | `--z-sticky` | 40 |
+| sticky header, mobile buy bar | `--z-header` | 50 |
+| dropdowns / menus | `--z-menu` | 60 |
+| drawers, dialogs, search (panel = +1 over its scrim) | `--z-dialog` | 200 |
+| toast | `--z-toast` | 300 |
+| craft line (navigation) | `--z-craftline` | 400 |
+| entrance | `--z-intro` | 500 |
+| skip link | `--z-skip` | 600 |
 
 ## Motion
 
@@ -80,6 +99,10 @@ Buttons `ActionButton` (primary / ghost / sizes), inputs (`Fields`,
 
 ## Interactive states
 
-Every control: hover, `:focus-visible` ring (2px brass, never removed),
-active, disabled (`opacity .5`, not hidden). Touch targets ≥ 44px on coarse
-pointers.
+Every control: hover, `:focus-visible` ring (2px brass, never removed —
+a box-shadow ring keeps a transparent outline so Windows high-contrast still
+draws it; an input that drops its outline shows focus on its row with
+`:focus-within`), active, disabled (`opacity .5`, not hidden). Colour changes
+ease over `--dur-fast`; nothing snaps. An option that is already selected
+does not need a hover change. Touch targets ≥ 44px on coarse pointers.
+Text inputs use `:focus`; everything else `:focus-visible`.

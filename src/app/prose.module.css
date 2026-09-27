@@ -22,7 +22,8 @@
   height: 1.5px;
   background: var(--ink-3);
 }
-.body a { color: var(--ember-text); text-decoration: underline; }
+.body a { color: var(--ember-text); text-decoration: underline; text-underline-offset: 3px; transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), text-decoration-color var(--dur-fast) var(--ease-out); }
+.body a:hover { color: var(--ink); }
 
 /* The two buttons some prose pages end on. Its own row so the flex column's
    gap still spaces it like a paragraph, and it wraps rather than overflowing

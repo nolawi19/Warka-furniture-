@@ -3,8 +3,8 @@
 .trigger {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding-block: 10px;
+  gap: 4px;
+  padding-block: 12px;
   font-size: var(--text-sm);
   color: var(--ink-2);
   transition: color var(--dur-fast) var(--ease-out);
@@ -18,7 +18,7 @@
   position: absolute;
   top: calc(100% + 10px);
   left: -20px;
-  z-index: 70;
+  z-index: var(--z-menu);
   width: min(660px, calc(100vw - 2 * var(--gutter)));
   background: var(--bg-2);
   border: 1px solid var(--line-2);
@@ -43,7 +43,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 10px;
+  padding: 12px;
   border-radius: var(--radius);
   transition: background var(--dur-fast) var(--ease-out);
 }
@@ -68,7 +68,7 @@
 .itemName {
   display: flex;
   align-items: baseline;
-  gap: 7px;
+  gap: 8px;
   flex-wrap: wrap;
   font-size: var(--text-sm);
   font-weight: 500;

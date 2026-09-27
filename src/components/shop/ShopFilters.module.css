@@ -35,7 +35,7 @@
 .search {
   width: 100%;
   min-height: 44px;
-  padding: 11px 12px 11px 38px;
+  padding: 12px 12px 12px 40px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--bg-2);
@@ -57,7 +57,7 @@
   gap: var(--space-3);
   width: 100%;
   min-height: 40px;
-  padding: 9px 12px;
+  padding: 8px 12px;
   margin-inline: -12px;
   width: calc(100% + 24px);
   border-radius: var(--radius);
@@ -96,7 +96,7 @@
 .check {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   min-height: 40px;
   font-size: var(--text-sm);
   color: var(--ink-2);
@@ -121,9 +121,9 @@
 .mobileTrigger {
   display: none;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   min-height: 46px;
-  padding: 12px 18px;
+  padding: 12px 20px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--bg-2);
@@ -147,7 +147,7 @@
 .scrim {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: var(--z-dialog);
   background: color-mix(in srgb, var(--ink) 42%, transparent);
   animation: fade var(--dur-base) var(--ease-out);
 }
@@ -157,14 +157,14 @@
   position: fixed;
   inset-inline: 0;
   bottom: 0;
-  z-index: 91;
+  z-index: calc(var(--z-dialog) + 1);
   max-height: 86vh;
   display: flex;
   flex-direction: column;
   background: var(--bg);
   border-top-left-radius: var(--radius-xl);
   border-top-right-radius: var(--radius-xl);
-  box-shadow: var(--shadow-4);
+  box-shadow: var(--shadow-3);
   animation: rise var(--dur-base) var(--ease-out);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -189,7 +189,7 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  margin-right: -10px;
+  margin-right: -12px;
   border-radius: var(--radius);
   color: var(--ink-2);
 }

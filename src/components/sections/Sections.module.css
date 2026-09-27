@@ -78,7 +78,7 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   padding-bottom: 4px;
   font-size: var(--text-sm);
   font-weight: 500;
@@ -173,7 +173,7 @@
 .categoryName {
   display: flex;
   align-items: baseline;
-  gap: 9px;
+  gap: 8px;
   flex-wrap: wrap;
   font-family: var(--font-serif);
   font-size: var(--text-h4);
@@ -200,7 +200,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 8px;
   font-size: var(--text-micro);
   font-weight: 500;
   letter-spacing: var(--tracking-label);
@@ -388,7 +388,7 @@
   padding-top: 2px;
 }
 .details dd { color: var(--ink); }
-.details dd a { border-bottom: 1px solid var(--line); }
+.details dd a { border-bottom: 1px solid var(--line); transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
 .details dd a:hover { color: var(--ember-text); border-color: currentColor; }
 
 .visitCta { display: flex; gap: var(--space-3); flex-wrap: wrap; }

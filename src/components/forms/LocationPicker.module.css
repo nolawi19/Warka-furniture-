@@ -3,7 +3,7 @@
 .controls { display: flex; gap: var(--space-2); flex-wrap: wrap; }
 
 .locate {
-  padding: 11px 16px;
+  padding: 12px 16px;
   font-size: var(--text-sm);
   font-weight: 500;
   color: var(--ember-ink);
@@ -15,7 +15,7 @@
 .locate:disabled { opacity: 0.6; cursor: progress; }
 
 .clear {
-  padding: 11px 14px;
+  padding: 12px 16px;
   font-size: var(--text-sm);
   color: var(--ink-2);
   border: 1px solid var(--line);
@@ -59,7 +59,7 @@
   color: var(--ink-2);
 }
 .coord input {
-  padding: 10px 12px;
+  padding: 12px 12px;
   font: inherit;
   font-size: var(--text-sm);
   color: var(--ink);
@@ -93,7 +93,7 @@
 .searchRow {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 0 12px;
   background: var(--bg-2);
   border: 1px solid var(--line);
@@ -138,7 +138,7 @@
   display: grid;
   gap: 1px;
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 12px;
   text-align: left;
   border-bottom: 1px solid var(--line-2);
 }

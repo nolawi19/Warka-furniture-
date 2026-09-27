@@ -37,7 +37,7 @@
   color: var(--ember-text);
   background: var(--ember-soft);
   border-radius: var(--radius-sm);
-  padding: 3px 7px;
+  padding: 4px 8px;
 }
 
 .quote {

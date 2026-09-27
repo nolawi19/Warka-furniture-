@@ -4,7 +4,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 8px;
   /* 44px: the smallest target a thumb reliably hits. */
   min-width: 44px;
   min-height: 44px;
@@ -51,7 +51,7 @@
   background: var(--bg);
   color: var(--ink);
   overflow: hidden;
-  box-shadow: var(--shadow-4);
+  box-shadow: var(--shadow-3);
 }
 .dialog::backdrop {
   background: rgb(0 0 0 / 54%);
@@ -211,7 +211,7 @@
   flex-direction: column;
   justify-content: center;
   min-height: 44px;
-  padding: 6px 14px;
+  padding: 8px 16px;
   border: 1px solid var(--line-2);
   border-radius: var(--radius);
   font-size: var(--text-sm);
@@ -242,7 +242,7 @@
 .stock {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-size: var(--text-xs);
   color: var(--ink-2);
 }
@@ -311,7 +311,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 8px;
   min-height: 44px;
   font-size: var(--text-sm);
   color: var(--ink-2);

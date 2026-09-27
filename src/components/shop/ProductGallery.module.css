@@ -30,8 +30,8 @@
   bottom: 14px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 13px;
+  gap: 8px;
+  padding: 8px 12px;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--bg-2) 90%, transparent);
   font-size: var(--text-micro);
@@ -52,7 +52,7 @@
   place-items: center;
   width: 44px;
   height: 44px;
-  margin-top: -22px;
+  margin-top: -24px;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--bg-2) 92%, transparent);
   color: var(--ink);
@@ -67,7 +67,7 @@
   position: absolute;
   right: 14px;
   bottom: 14px;
-  padding: 5px 10px;
+  padding: 4px 12px;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--bg-2) 90%, transparent);
   font-size: var(--text-micro);
@@ -101,7 +101,7 @@
 .viewerClose {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   height: 44px;
   padding-inline: var(--space-4);
   border: 1px solid var(--line);
@@ -148,7 +148,7 @@
 
 .thumbs {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   overflow-x: auto;
   padding-bottom: 4px;
   scrollbar-width: thin;

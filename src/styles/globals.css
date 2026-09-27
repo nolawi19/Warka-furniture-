@@ -247,7 +247,7 @@ ul, ol {
   position: absolute;
   left: -9999px;
   top: 0;
-  z-index: 500;
+  z-index: var(--z-skip);
   background: var(--ink);
   color: var(--bg);
   padding: var(--space-3) var(--space-4);
@@ -295,7 +295,7 @@ ul, ol {
 .admin-input {
   width: 100%;
   min-width: 0;
-  padding: 8px 10px;
+  padding: 8px 12px;
   font: inherit;
   font-size: var(--text-sm);
   color: var(--ink);
@@ -344,7 +344,7 @@ ul, ol {
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 3px 8px;
+  padding: 4px 8px;
   border-radius: var(--radius-pill);
   background: var(--bg-3);
   color: var(--ink-3);

@@ -9,7 +9,7 @@
 .input {
   flex: 1 1 180px;
   min-width: 0;
-  padding: 10px 12px;
+  padding: 12px 12px;
   font-size: var(--text-sm);
   color: var(--ink);
   background: var(--bg-2);
@@ -23,7 +23,7 @@
 
 .button {
   flex: none;
-  padding: 10px 16px;
+  padding: 12px 16px;
   font-size: var(--text-sm);
   font-weight: 500;
   color: var(--ember-ink);

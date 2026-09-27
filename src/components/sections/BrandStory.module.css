@@ -88,7 +88,7 @@
   font-size: var(--text-h4);
   font-weight: 500;
   letter-spacing: var(--tracking-tight);
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 .pointBody { display: block; font-size: var(--text-sm); opacity: 0.72; line-height: var(--leading-body); }
 

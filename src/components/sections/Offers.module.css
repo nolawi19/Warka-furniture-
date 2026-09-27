@@ -21,7 +21,7 @@
   font-family: var(--font-sans);
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-size: var(--text-micro);
   letter-spacing: var(--tracking-label);
   text-transform: none;
@@ -51,7 +51,7 @@
 .code { font-size: var(--text-sm); color: var(--ink-2); }
 .code strong {
   display: inline-block;
-  padding: 3px 9px;
+  padding: 4px 8px;
   margin-inline: 2px;
   border-radius: var(--radius-sm);
   background: var(--bg);
@@ -76,7 +76,7 @@
 .footLink a {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   min-height: 44px;
   color: var(--ember-text);
   transition: gap var(--dur-fast) var(--ease-out);

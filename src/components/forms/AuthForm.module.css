@@ -20,7 +20,7 @@
   background: var(--bg-2);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 12px 14px;
+  padding: 12px 16px;
   font-size: var(--text-body);
   transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
 }
@@ -36,4 +36,5 @@
 
 
 .alt { font-size: var(--text-sm); color: var(--ink-2); text-align: center; }
-.alt a { color: var(--ember-text); text-decoration: underline; }
+.alt a { color: var(--ember-text); text-decoration: underline; text-underline-offset: 3px; transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), text-decoration-color var(--dur-fast) var(--ease-out); }
+.alt a:hover { color: var(--ink); }

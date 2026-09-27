@@ -19,7 +19,7 @@
 .button:hover:not(:disabled) { border-color: var(--ink-3); background: var(--bg-3); }
 .button:disabled { opacity: 0.5; cursor: progress; }
 .button[data-destructive='true'] { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
-.button[data-confirming='true'] { background: var(--danger); color: #fff; border-color: var(--danger); }
+.button[data-confirming='true'] { background: var(--danger); color: var(--on-danger); border-color: var(--danger); }
 
 .cancel {
   align-self: flex-start;
@@ -37,6 +37,6 @@
 /* The armed state of a destructive action: filled, so it is unmistakable. */
 .confirming {
   background: var(--danger) !important;
-  color: #fff !important;
+  color: var(--on-danger) !important;
   border-color: var(--danger) !important;
 }

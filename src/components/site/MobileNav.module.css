@@ -19,7 +19,7 @@
 .scrim {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: var(--z-dialog);
   background: color-mix(in srgb, var(--ink) 42%, transparent);
   backdrop-filter: blur(2px);
   animation: fade var(--dur-base) var(--ease-out);
@@ -30,13 +30,13 @@
   position: fixed;
   inset-block: 0;
   left: 0;
-  z-index: 91;
+  z-index: calc(var(--z-dialog) + 1);
   width: min(400px, 88vw);
   display: flex;
   flex-direction: column;
   background: var(--bg);
   border-right: 1px solid var(--line-2);
-  box-shadow: var(--shadow-4);
+  box-shadow: var(--shadow-3);
   animation: slide var(--dur-base) var(--ease-out);
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -89,7 +89,7 @@
   justify-content: space-between;
   gap: var(--space-3);
   min-height: 48px;
-  padding: 10px 12px;
+  padding: 12px 12px;
   margin-inline: -12px;
   border-radius: var(--radius);
   font-family: var(--font-serif);
@@ -117,7 +117,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
   font-size: var(--text-sm);
@@ -129,7 +129,7 @@
 .badge {
   min-width: 24px;
   height: 24px;
-  padding-inline: 7px;
+  padding-inline: 8px;
   display: grid;
   place-items: center;
   border-radius: var(--radius-pill);
